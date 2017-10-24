@@ -1,0 +1,7 @@
+Copiar en la siguiente ruta:
+
+\gulp-fixes\babel\index.js en:
+\node_modules\babel-plugin-undeclared-variables-check\lib\
+
+\gulp-fixes\gulp-content-filter\index.js en:
+\node_modules\gulp-content-filter\

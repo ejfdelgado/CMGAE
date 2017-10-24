@@ -28,7 +28,7 @@ La configuración de listas es algo como:
 function configurarListasEditor(vie, configuracionListas) {
     vie.use(new vie.RdfaService());
     
-    for (tipoNombre in configuracionListas) {
+    for (let tipoNombre in configuracionListas) {
     	let tipoNombreRel = tipoNombre+'Rel';
     	let unTipo = configuracionListas[tipoNombre];
     	let confCampos = [];
@@ -155,7 +155,7 @@ function mostrarMensaje(papa, msg, clase) {
 
 //valida un elemento input que responda a val(), prefiere placeholder y después name
 function escorrecto(elemento) {
-	validacion = elemento.attr('validacion');
+	var validacion = elemento.attr('validacion');
 	var nombre = elemento.attr('placeholder');
 	if (nombre === undefined) {nombre = elemento.attr('name');}
 	if (validacion !== undefined) {
@@ -241,7 +241,7 @@ function capturarFormulario(item, data) {
 }
 
 (function($) {
-	
+	var memoriaGlobal = {};
 	/**
 	 * Sirve para enviar mensajes:
 	 * 
@@ -423,11 +423,11 @@ function capturarFormulario(item, data) {
 	}
 	
 	function darMemoriaProds() {
-		memoriatxt = localStorage[LLAVE_PRODS_CARR];
+		var memoriatxt = localStorage[LLAVE_PRODS_CARR];
 		if (memoriatxt === undefined) {
 			memoriatxt = '{}';
 		}
-		memoria = JSON.parse(memoriatxt);
+		var memoria = JSON.parse(memoriatxt);
 		return memoria;
 	}
 	
@@ -449,7 +449,7 @@ function capturarFormulario(item, data) {
 		if (listaBusq.length == 0) {
 			//Si la lista de productos nuevos que no están en local storage es vacia:
 			if (lista !== undefined) {
-				llenarDatosProds(lista, memoria);
+				llenarDatosProds(lista, memoriaGlobal);
 			}
 			callback();
 		} else {
@@ -462,20 +462,20 @@ function capturarFormulario(item, data) {
 			.done(function( msg ) {
 				if (msg.error == 0) {
 					var data = msg.data;
-					for (llave in data) {
-						memoria[llave] = data[llave];
+					for (let llave in data) {
+						memoriaGlobal[llave] = data[llave];
 					}
-					escrMemoriaProds(memoria);
+					escrMemoriaProds(memoriaGlobal);
 					if (lista !== undefined) {
-						llenarDatosProds(lista, memoria);
+						llenarDatosProds(lista, memoriaGlobal);
 					}
 					callback();
 				} else {
 					errorcall();
 				}
 			})
-			.fail(function( jqXHR, textStatus ) {
-				errorcall(e);
+			.fail(function(jqXHR, textStatus ) {
+				errorcall();
 			});
 		}
 	}
@@ -486,7 +486,7 @@ function capturarFormulario(item, data) {
 	function completarInfoProductos(lista, callback, errorcall) {
 		try {
 			var listaBusq = [];
-			memoria = darMemoriaProds();
+			var memoria = darMemoriaProds();
 			lista.find('[about][typeof]').each(function(i, elem) {
 				var self = $(elem);
 				var llave = self.attr('typeof')+'/'+self.attr('about');
@@ -497,7 +497,7 @@ function capturarFormulario(item, data) {
 			
 			completarInfoProductosBase(lista, listaBusq, callback, errorcall);
 		} catch (e) {
-			console.log('Error: '+str(e))
+			console.log(e)
 		}
 	}
 	
@@ -509,7 +509,7 @@ function capturarFormulario(item, data) {
 			try {
 				lista.empty();
 				leerCarritoLocal(function(data) {
-					for (llave in data) {
+					for (let llave in data) {
 						//Se recorre cada producto
 						var tokens = llave.split(/\/(.+)?/);
 						var tipo = tokens[0];

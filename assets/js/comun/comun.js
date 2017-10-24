@@ -8,7 +8,7 @@ var pila = [];
 			  try {
 				  var temp = model.toJSON()
 				  
-				  viejo = temp['@subject'];
+				  var viejo = temp['@subject'];
 				  if (model.isNew()) {
 					  if (viejo in mapaIds ) {
 						  temp['@subject'] = mapaIds[viejo];
@@ -18,10 +18,11 @@ var pila = [];
 					  }
 				  }
 				  
-				  ident = temp['@subject'];
-				  tipo = temp['@type'];
+				  var ident = temp['@subject'];
+				  var tipo = temp['@type'];
 				  
 				  var matchCampo = /(viejs\.org\/ns\/)(.*)(>)/g.exec(tipo);
+				  var tipoNombre = null;
 				  if (matchCampo) {
 					  tipoNombre = matchCampo[2];
 				  }
@@ -34,7 +35,7 @@ var pila = [];
 					  return;
 				  }
 				  
-				  matchIdentFinal = matchIdent[2];
+				  var matchIdentFinal = matchIdent[2];
 				  
 				  var contenido = {};
 				  
@@ -120,9 +121,9 @@ var pila = [];
 								'</div>'));
 					  panelEliminar = self.find('.btnEliminar');
 					  
-					  botonEliminar = panelEliminar.find('.btnEliminar2');
-					  botonCancelar = panelEliminar.find('.btnEliminar4');
-					  botonAceptar = panelEliminar.find('.btnEliminar5');
+					  let botonEliminar = panelEliminar.find('.btnEliminar2');
+					  let botonCancelar = panelEliminar.find('.btnEliminar4');
+					  let botonAceptar = panelEliminar.find('.btnEliminar5');
 					  
 					  botonEliminar.click(function() {
 						  var self = $(this);
@@ -171,7 +172,7 @@ var pila = [];
 		  if (pila[pila.length-1] === "menu") {pila.pop();}
 	  };
 	  
-      abrirToolBar = function() {
+      var abrirToolBar = function() {
 	  if ($('body').data('Midgard-midgardToolbar').options.display === 'full') {
 		  $('body').data('Midgard-midgardToolbar').__proto__.hide();
 		  $('body').data('Midgard-midgardToolbar').options.display = 'minimized';
@@ -268,8 +269,8 @@ var pila = [];
 							contentType: "application/json; charset=utf-8",
 						})
 						.done(function( msg ) {
-							datos = msg['datos'];
-							sigui = msg['next'];
+							var datos = msg['datos'];
+							var sigui = msg['next'];
 							destino.empty();
 							for (var i=0; i<datos.length; i++) {
 								var dato = datos[i];

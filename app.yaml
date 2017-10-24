@@ -5,6 +5,14 @@ api_version: 1
 
 threadsafe: false
 
+skip_files:
+- ^(.*/)?#.*#$
+- ^(.*/)?.*~$
+- ^(.*/)?.*\.py[co]$
+- ^(.*/)?.*/RCS/.*$
+- ^(.*/)?\..*$
+- node_modules/.*$
+
 handlers:
 - url: /favicon.ico
   static_files: assets/img/favicon.ico
