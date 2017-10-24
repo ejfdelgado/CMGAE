@@ -1,0 +1,117 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		{% with nodo=path|add:'/pagina' tipo='Documento' %}
+		<title>{% buscar leng dicci tipo nodo 'title' 'Nucleus' %}</title>
+		<meta property="og:title" content="{% buscar leng dicci tipo nodo 'title' 'Titulo' %}" />
+		<meta name="twitter:title" content="{% buscar leng dicci tipo nodo 'title' 'Titulo' %}" />
+		<meta property="og:description" content="{% buscar leng dicci tipo nodo 'description' 'Descripcion' %}" />
+		<meta name="keywords" content="{% buscar leng dicci tipo nodo 'palabrasclave' '' %}">
+		<meta name="twitter:description" content="{% buscar leng dicci tipo nodo 'description' 'Descripcion' %}" />
+		<!-- meta name="google-site-verification" content="v-q_pV-B3zUITjVMreiaBWnwSF9qY975Me_ZrcNpktc" /-->
+		{% endwith %}
+		{% with nodo='/general' tipo="Configuracion" %}
+		<meta property="og:image" content="{% buscar leng dicci tipo nodo 'imagen' '/images/pic04.jpg' %}" />
+		<meta name="twitter:image" content="{% buscar leng dicci tipo nodo 'imagen' '/images/pic04.jpg' %}" />
+		<meta property="og:site_name" content="{% buscar leng dicci tipo nodo 'site_name' 'Nombre del Sitio' %}" />
+		<meta property="og:url" content="{% buscar leng dicci tipo nodo 'url' 'http://www.dominio.com' %}" />
+		<meta property="og:type" content="{% buscar leng dicci tipo nodo 'type' 'website' %}" />
+		{% endwith %}
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		
+		{% if admin %}
+	    <link rel="stylesheet" href="/assets/css/create/create-ui.css" />
+	    <link rel="stylesheet" href="/assets/css/create/midgardnotif.css" />
+	    {% endif %}
+	    
+		<!-- CSS's comunes -->
+		<link rel="stylesheet" href="/assets/css/create-basic.css" />
+		<link rel="stylesheet" href="/assets/css/font-awesome.min.css" />
+		<link rel="stylesheet" href="/assets/css/font-awesome.css" />
+		
+		<!-- CSS's del template -->
+		<link rel="stylesheet" href="/assets/templates/photon/css/main.css" />
+		
+		<link rel="stylesheet" href="/miestilo.css" />
+		<link rel="stylesheet" href="/assets/css/rrssb.css" />
+		
+		<style>
+		body {
+			font-family: 'CicleFina';
+		}
+		</style>
+		
+		<script type="text/html" id="TestimonioEjemplo">
+			         <li about="" typeof="Testimonio">
+			            <span class="image"><img property="imagen" src="/images/fotoPerfil.jpg" alt="" data-carpeta="/perfiles"></span>
+			            <h3 property="titulo">Jane Doe</h3>
+			            <p property="contenido">Sed magna etiam</p>
+			         </li>
+		</script>
+		
+		<script type="text/html" id="CaracteristicaEjemplo">
+			<div class="4u 12u$(medium)" about="" typeof="Caracteristica">
+				<span class="image fit"><img property="imagen" src="/images/pic02.jpg" alt="" data-carpeta="/caracteristica-mini"/></span>
+				<h3 property="titulo"></h3>
+				<div property="contenido"></div>
+				<ul class="actions">
+					<li><a href="#" class="button">M&aacute;s</a></li>
+				</ul>
+			</div>
+		</script>
+		
+		__USER__
+		
+		{% block encabezado %}{% endblock %}
+		
+	</head>
+	<body class="landing">
+		{% csrf_token %}
+		{% with nodo=path|add:'/pagina' tipo='Documento' %}
+		<div class="menu_pagina invisible" about="{{ nodo }}" typeof="{{ tipo }}">
+			<ul>
+				<li><span>T&iacute;tulo:</span><div textplain="true" property="title">{% buscar leng dicci tipo nodo 'title' 'Nucleus' %}</div></li>
+				<li><span>Descripci&oacute;n:</span><div textplain="true" property="description">{% buscar leng dicci tipo nodo 'description' 'Descripcion' %}</div></li>
+				<li><span>Palabras clave:</span><div textplain="true" property="palabrasclave">{% buscar leng dicci tipo nodo 'palabrasclave' '' %}</div></li>
+				<li><span>Im&aacute;gen:</span><div textplain="true" property="imagen">{% buscar leng dicci tipo nodo 'imagen' '/images/pic04.jpg' %}</div></li>
+			</ul>
+		</div>
+		{% endwith %}
+
+		{% block content %}{% endblock %}
+
+		<!-- Footer -->
+		{% with nodo='/social' tipo='Documento' %}
+		<section id="footer" about="{{ nodo }}" typeof="{{ tipo }}" styleProperty="fondo" style="{% buscar leng dicci tipo nodo 'fondo' 'background-image: url(\'/images/overlay1.png\') !important;' %}">
+			<ul class="icons editable" property="redes">
+				{% buscar leng dicci tipo nodo 'redes' '<li><a target="_blank" href="#" class="icon alt fa-twitter"><span class="label">Twitter</span></a></li><li><a target="_blank" href="#" class="icon alt fa-facebook"><span class="label">Facebook</span></a></li><li><a href="#" target="_blank" class="icon alt fa-instagram"><span class="label">Instagram</span></a></li><li><a target="_blank" href="#" class="icon alt fa-github"><span class="label">GitHub</span></a></li><li><a target="_blank" href="#" class="icon alt fa-envelope"><span class="label">Email</span></a></li>' %}
+			</ul>
+			<ul class="copyright editable" property="pie">
+				{% buscar leng dicci tipo nodo 'pie' '<li>&copy; Untitled</li><li>Developed by: <a target="_blank" href="http://www.proyeccioncolombia.com">Proyecci&oacute;n Colombia</a></li><li>Design: <a target="_blank" href="http://html5up.net">HTML5 UP</a></li>' %}
+			</ul>
+			<ul class="copyright">
+				<li><a data-lenguaje="{{ leng_pred }}">Español</a></li><li><a data-lenguaje="eng">English</a></li>
+			</ul>
+		</section>
+		{% endwith %}
+
+		{% autoescape off %}
+		{{ JS_COMUNES3 }}
+		
+		<script src="/assets/templates/photon/js/main.js"></script>
+		<script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+		
+		{{ JS_COMUNES0 }}
+		{% if admin %}
+		{{ JS_COMUNES1 }}
+		{% endif %}
+		{{ JS_COMUNES2 }}
+		{{ ANALYTICS }}
+		{% endautoescape %}
+		
+		<script src="/assets/js/comun/rrssb.min.js"></script>
+		
+		{% block scripts %}{% endblock %}
+	</body>
+</html>

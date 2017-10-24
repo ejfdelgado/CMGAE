@@ -1,0 +1,241 @@
+
+.model3d {
+	position: relative;
+	width: 100%;
+	height: 400px;
+	z-index: 9999; 
+}
+
+.model3dfull {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.divplayer {
+	position: absolute;
+	height: 100%;
+	border: 0;
+	padding: 0;
+	margin: 0;
+	z-index: 10001;
+}
+
+.diveditor {
+	position: absolute;
+	height: 100%;
+	border: 0;
+	padding: 0;
+	margin: 0;
+	background-color: white;
+	z-index: 10000;
+	width: 50%;
+	left: 0;
+	right: 50%;
+}
+
+.canvasedit {
+	display: table;
+    margin: 0 auto;
+}
+
+.canvaseditw {
+	width: 100%;
+}
+
+.canvasedith {
+	height: 100%;
+}
+
+.editorfondo {
+	background-image: url("/assets/img/tilable2.jpg");
+	background-repeat: repeat;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	padding: 20px 20px 50px 20px;
+}
+
+.editorfondo canvas {
+	cursor: crosshair;
+}
+
+.editorcontrol3d {
+	position: absolute;
+	display: table;
+	bottom: 0;
+	left: 0px;
+	right: 0px;
+	height: 30px;
+	width: 100%;
+}
+
+.divplayerall {
+	width: 100%;
+}
+
+.divplayerhalf {
+	width: 50%;
+	right: 0;
+	left: 50%;
+}
+
+.control3d {
+	position: absolute;
+	display: table;
+	bottom: 0;
+	left: 0px;
+	right: 0px;
+	height: 30px;
+	width: 100%;
+}
+
+.control3drow {
+	display: table-row;
+	width: 100%;
+}
+
+.uncontrol {
+	display: table-cell;
+	height: 30px;
+	cursor: pointer;
+	width: 60px;
+	background-size: 100% 100%;
+}
+
+.sample3d {
+	border-radius: 10px;
+	background-color: white;
+}
+
+.controlesp {
+	display: table-cell;
+	width: 4px;
+	height: 30px;
+}
+
+.tiempo3d {
+	position: relative;
+	height: 30px;
+	display: table-cell;
+	cursor: pointer;
+}
+
+.tiempo3dAction {
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	top: 0;
+	left: 2px;
+}
+
+.color3dAction {
+	border-radius: 10px;
+	position: absolute;
+	height: 29px;
+	width: 100%;
+	top: 0;
+	left: 2px;
+}
+
+.tiempo3dout {
+	width: 100%;
+	height: 20px;
+	margin-top: 3px;
+}
+
+.tiempo3doutborder {
+	border: 2px solid;
+	border-color: #2e8bff;
+	border-radius: 10px;
+}
+
+.fondoColor {
+	background-image: url("/assets/img/color-picker.png");
+	background-size: 100% 100%;
+}
+
+.tiempo3dbar {
+	background: #2e8bff;
+	border-radius: 5px;
+	width: 0%;
+	height: 100%;
+}
+
+.reload3d_on {
+	background-image: url("/assets/img/rel.png");
+}
+
+.reload3d_on:hover {
+	background-image: url("/assets/img/rel_.png");
+}
+
+.play3d_on {
+	background-image: url("/assets/img/play.png");
+}
+
+.play3d_on:hover {
+	background-image: url("/assets/img/play_.png");
+}
+
+.play3d_off {
+	background-image: url("/assets/img/pause.png");
+}
+
+.play3d_off:hover {
+	background-image: url("/assets/img/pause_.png");
+}
+
+.full3d_on {
+	background-image: url("/assets/img/full.png");
+}
+
+.full3d_on:hover {
+	background-image: url("/assets/img/full_.png");
+}
+
+.full3d_off {
+	background-image: url("/assets/img/min.png");
+}
+
+.full3d_off:hover {
+	background-image: url("/assets/img/min_.png");
+}
+
+.noselect {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.mitexto {
+	color: black;
+	/*text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;*/
+	text-align: justify;
+	top: 0px;
+	left: 0px;
+	position: absolute;
+	font-size: 100%;
+	margin: 0;
+	cursor: move;
+	font-size: 15px !important;
+}
+
+.mitexto p {
+	margin: 10px;
+	font-size: 15px !important;
+}
+
+.mitexto h2 {
+	margin: 10px;
+	font-size: 15px !important;
+}

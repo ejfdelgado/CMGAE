@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+
+{% block encabezado %}
+<script type="text/html" id="CarritoCaracteristica">
+	<form class="4u 12u$(medium)" about="" typeof="Caracteristica">
+		<span class="image fit"><img property="imagen" src="/images/pic02.jpg" alt="" /></span>
+		<h3 property="titulo">Titulo</h3>
+		<div property="contenido">Descripci&oacute;n...</div>
+		<input name="cant" type="text" value="1"/>
+<select name="tipo">
+  <option value="0">Volvo</option>
+  <option value="1">Saab</option>
+  <option value="2">Mercedes</option>
+  <option value="3">Audi</option>
+</select>
+<input type="checkbox" name="fuerte" checked>Es fuerte?<br>
+
+  <input type="radio" name="color" value="azul"> Azul<br>
+  <input type="radio" name="color" value="rojo"> Rojo<br>
+  <input type="radio" name="color" value="verde"> Verde
+<a class="carrito_borrar button">Eliminar</a>
+	</form>
+</script>
+
+<style>
+#listaCarrito {
+	margin: 150px 0 10px 0;
+    width: 100%;
+    text-align: center;
+}
+
+#listaCarrito form {
+	margin: 10px;
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+<div id="listaCarrito">
+	
+</div>
+<ul>
+<li><a class="carrito_guardar_remoto button">Guardar</a></li>
+<li><a class="carrito_pagar button">Pagar</a></li>
+</ul>
+{% endblock %}

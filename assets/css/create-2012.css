@@ -1,0 +1,140 @@
+body {
+  background-color: #eeeeec;
+  padding-top: 1em;
+}
+
+.logo {
+  display: block;
+  position: relative;
+  background-color: transparent;
+  height: 220px;
+  margin-bottom: 2em;
+}
+
+.logo h1 {
+  background-image: url('/img/create.png');
+  background-repeat: no-repeat;
+  width: 524px;
+  height: 209px;
+}
+
+.logo h1 span {
+  display: none;
+}
+
+.logo .shortdesc {
+  font-size: 20pt;
+  position: absolute;
+  top: 188px;
+  left: 170px;
+  font-family: Cantarell, Verdana, sans-serif;
+  font-size: 24px;
+  line-height: 24px;
+  width: 400px;
+  text-align: center;
+}
+
+.slogan p {
+  font-size: 14pt;
+  line-height: 18pt;
+  text-align: justify;
+}
+
+.slogan .download {
+  text-align: center;
+}
+
+.slogan .download .btn {
+  margin: 1em;
+}
+
+.features {
+  margin-top: 2em;
+}
+
+.features .span3 {
+  min-height: 14em;
+}
+
+.features p {
+  font-size: 11pt;
+  text-align: justify;
+}
+
+footer {
+  margin-top: 2em;
+  display: block;
+}
+
+footer p {
+  font-size: 12pt;
+}
+
+a {
+  color: #000000;
+  font-weight: bold;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+h1, h2, h3, p, li {
+  font-family: Cantarell, Verdana, sans-serif;
+}
+
+pre code {
+  color: #000000;
+  border: none;
+}
+
+.guide a code {
+  color: #000000;
+  background-color: transparent;
+  padding: none;
+  border: none;
+}
+
+.guide section img {
+  background-color: #ffffff;
+  margin: 1em;
+  border-radius: 6px;
+}
+
+.guide h1 {
+  margin-bottom: 1em;
+}
+
+.guide p,
+.guide li {
+  font-size: 14pt;
+  line-height: 18pt;
+}
+
+.guide code {
+  font-size: 12pt;
+}
+
+.guide .slogan,
+.guide section {
+  margin-bottom: 2em;
+}
+
+.guide .nav li {
+  margin-bottom: 1em;
+}
+
+.guide .nav li:last-child {
+  margin-bottom: 0px;
+}
+
+hr {
+  height: 32px;
+  background-image: url('/img/favicon.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  margin: 0px;
+  margin-bottom: 2em;
+  border-top: none;
+  border-bottom: none;
+}

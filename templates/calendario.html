@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8' />
+<link href='/assets/templates/calendar/css/fullcalendar.css' rel='stylesheet' />
+<link href='/assets/templates/calendar/css/fullcalendar.print.css' rel='stylesheet' media='print' />
+<link href="/assets/css/jquery-ui.min.css" rel="stylesheet">
+
+<link href="/assets/css/date/default.css" rel="stylesheet">
+<link href="/assets/css/date/default.date.css" rel="stylesheet">
+<link href="/assets/css/bootstrap.min.css" rel="stylesheet">
+
+<link href="/assets/css/datebootstrap/bootstrap-datepicker.min.css" rel="stylesheet">
+<link href="/assets/css/datebootstrap/bootstrap-datepicker3.min.css" rel="stylesheet">
+
+<script src='/assets/js/comun/moment.min.js'></script>
+<script src='/assets/js/comun/jquery-2.1.1.min.js'></script>
+<script src="/assets/js/comun/jquery-ui.min.js"></script>
+<script src="/assets/js/comun/notify.min.js"></script>
+<script src='/assets/templates/calendar/js/fullcalendar.min.js'></script>
+<script src='/assets/templates/calendar/js/fullcalendar-cstm.js'></script>
+<script src="/assets/js/comun/bootstrap.min.js"></script>
+<script src="/assets/js/comun/datebootstrap/bootstrap-datepicker.min.js"></script>
+<script src="/assets/js/comun/datebootstrap/bootstrap-datepicker.es.min.js"></script>
+
+<script id="tpl-detalle" type="text/plain">
+<div class="panel panel-default un-detalle">
+	<div class="row">
+		<div class="col-md-1">
+			<div class="_dia row"></div>
+			<div class="_mes row"></div>
+			<div class="_anio row"></div>
+		</div>
+		<div class="col-md-1 srvName"></div>
+		<div class="col-md-4">
+			<div class="_srvpagado row"></div>
+			<div class="_sesionesmes row"></div>
+			<div class="_srvmeses row"></div>
+		</div>
+		<div class="col-md-6 text-justify obs"></div>
+	</div>
+</div>
+</script>
+
+<style>
+
+body {
+	margin:20px !important;
+}
+
+.transparent_black {
+	background: black;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+	filter: alpha(opacity = 50);
+	-moz-opacity: 0.5;
+	-khtml-opacity: 0.5;
+	opacity: 0.5;
+}
+
+.div_espera {
+	position: fixed;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	z-index: 999999;
+	text-align: center;
+    color: white;
+    padding-top: 10%;
+    font-weight: bold;
+}
+
+.div_espera li {
+	list-style: none;
+}
+
+.invisible {
+	display: none;
+}
+
+.sintexto {
+	height: 18px;
+}
+
+.fastedit {
+	cursor: pointer;
+	height: 18px;
+}
+
+.doble-col {
+	width: 50%;
+	float: left;
+}
+
+.fastlabel {
+	width: 100%;
+}
+
+.una-fila {
+	width: 100%;
+	display: block;
+}
+
+.una-fila.fina {
+	line-height: 0.1 !important;
+	display: inline-block;
+}
+
+.una-fila.espago {
+	text-align: right;
+}
+
+.una-fila.espago label {
+	display: inline-block;
+}
+
+</style>
+</head>
+<body>
+<div id="id_div_espera" class="div_espera transparent_black">Procesando...</div>
+
+<div id="dialog-form-confirm" class="formulario-editable" title="Confirmación">
+	<form class="fast_form">
+		<div>¿Está seguro de realizar esta operación?</div>
+	</form>
+</div>
+
+<div id="dialog-form" class="formulario-editable" title="Editar datos cliente">
+		<form class="fast_form">
+			<div class="fastlabel">Nombres:</div>
+			<div class="fastedit" data-name="title"></div>
+
+			<div class="una-fila">
+				<div class="doble-col">
+					<div class="fastlabel">Paquete:</div>
+					<div class="fastedit" data-name="srv" data-options></div>
+				</div>
+				<div class="doble-col">
+					<div class="fastlabel">Max. Personas:</div>
+					<div class="fastedit" data-name="maxper" data-options></div>
+				</div>
+			</div>
+
+			<div class="una-fila">&nbsp;</div>
+
+			<div class="una-fila">
+				<div class="doble-col">
+					<div class="fastlabel">EPS/Medicina prepagada:</div>
+					<div class="fastedit" data-name="eps"></div>
+				</div>
+				<div class="doble-col">
+					<div class="fastlabel">Cumpleaños:</div>
+					<div class="fastedit" data-name="cumple" fecha></div>
+				</div>
+			</div>
+			<div class="una-fila">&nbsp;</div>
+
+			<div class="una-fila">
+				<div class="doble-col">
+					<div class="fastlabel">Celular:</div>
+					<div class="fastedit" data-name="cel"></div>
+				</div>
+				<div class="doble-col">
+					<div class="fastlabel">Teléfono:</div>
+					<div class="fastedit" data-name="tel"></div>
+				</div>
+			</div>
+			<div class="una-fila">&nbsp;</div>
+			<div class="fastlabel">Diagnostico/Condición especial/Observación:</div>
+			<div class="fastedit" data-name="obs" data-longtext></div>
+		</form>
+		<div class="una-fila">&nbsp;</div>
+		
+		<div class="panel panel-default todo-detalle">
+		  <div class="panel-heading">Detalle</div>
+		  <div class="panel-body"></div>
+		</div>
+</div>
+	<div id="dialog-form-event" class="formulario-editable"
+		title="Editar datos sesión">
+		<form class="fast_form">
+			<div class="fastlabel srv-x srv-1 srv-2 srv-3 srv-4 srv-5 srv-6 srv-7">Nombres:</div>
+			<div class="fastedit srv-x srv-1 srv-2 srv-3 srv-4 srv-5 srv-6 srv-7" data-name="title"></div>
+			
+			<div class="una-fila">
+				<div class="doble-col srv-x srv-1 srv-2 srv-3 srv-4 srv-5 srv-6 srv-7">
+					<div class="fastlabel">Paquete:</div>
+					<div class="fastedit" data-name="srv" data-options></div>
+				</div>
+				<div class="doble-col srv-x srv-1 srv-2 srv-3 srv-4 srv-5 srv-6">
+					<div class="fastlabel">Max. Personas:</div>
+					<div class="fastedit" data-name="maxper" data-options></div>
+				</div>
+				<div class="doble-col srv-x srv-7">
+					<div class="fastlabel">Paquete Pagado:</div>
+					<div class="fastedit" data-name="srvpagado" data-options></div>
+				</div>
+			</div>
+			<div class="una-fila fina srv-x srv-1 srv-2 srv-3 srv-4 srv-5 srv-6 srv-7">&nbsp;</div>
+			
+			<div class="una-fila srv-x srv-7">
+				<div class="fastlabel">Monto Pagado:</div>
+				<div class="fastedit" data-name="pagado"></div>
+			</div>
+			
+			<div class="una-fila srv-x srv-7">
+				<div class="doble-col">
+					<div class="fastlabel">Tipo:</div>
+					<div class="fastedit" data-name="srvmeses" data-options></div>
+				</div>
+				<div class="doble-col">
+					<div class="fastlabel">Intensidad:</div>
+					<div class="fastedit" data-name="sesionesmes" data-options></div>
+				</div>
+			</div>
+			
+			<div class="fastlabel srv-x srv-1 srv-2 srv-3 srv-4 srv-5 srv-6">Fisioterapeuta:</div>
+			<div class="fastedit srv-x srv-1 srv-2 srv-3 srv-4 srv-5 srv-6" data-name="resourceId" data-options></div>
+
+			<div class="fastlabel srv-x srv-1 srv-2 srv-3 srv-4 srv-5 srv-6">Novedad:</div>
+			<div class="fastedit srv-x srv-1 srv-2 srv-3 srv-4 srv-5 srv-6" data-name="obs" data-longtext></div>
+		</form>
+	</div>
+	<div id='wrap'>
+		<div id='external-events'>
+			<h4>Clientes</h4>
+			<input id="cliente-add" type="button" value="Agregar cliente">
+			<div class="clientes-ctrl">
+				<input id="buscadorq" type="text"></input><input id="cliente-clean" type="button" value="X"></input>
+			</div>
+			<div id='clientes-container'>
+			</div>
+			<ul id="leyenda-srv">
+			</ul>
+		</div>
+		<div id='calendar'></div>
+		<div style='clear:both'></div>
+	</div>
+</body>
+</html>

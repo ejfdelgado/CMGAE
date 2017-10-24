@@ -1,0 +1,130 @@
+
+/* edelgado */
+
+body {
+	margin: 0;
+}
+
+.enlace1 {
+	color: white;
+    text-decoration: underline;
+    margin: 5px;
+}
+
+header {
+	float: left;
+	height: 100px;
+	width: 100%;
+	background: gray;
+}
+
+nav {
+	float: left;
+	background-color: gray;
+	margin: 0;
+	overflow: hidden;
+	width: 100%;
+}
+
+nav ul {
+	margin: 0 5px 0 5px;
+	padding: 0;
+}
+
+nav ul li {
+	/* This allow us to arrange list items in a row, without using float */
+	display: inline-block;
+	list-style-type: none;
+	margin-top: 5px;
+}
+
+/* Create a style for the first level items */
+nav>ul>li>a {
+	cursor: pointer;
+	color: black;
+	background-color: #9E9E9E;
+	display: block;
+	line-height: 2em;
+	padding: 0.5em 0.5em;
+	text-decoration: none;
+	border-radius: 10px 10px 0px 0px
+}
+
+nav>ul>li>a:hover {
+	color: white;
+	background-color: #1F1F1F;
+}
+
+.invisible {
+	display: none;
+}
+
+.panelConfig {
+	float: left;
+	width: 100%;
+	margin-top: 10px;
+}
+
+.left {
+	float: left;
+	width: 180px;
+}
+
+.left1 {
+	background-color: #9E9E9E;
+	border-radius: 5px;
+	margin: 10px;
+}
+
+.left2 {
+	padding: 10px;
+}
+
+.right {
+	width: 100%;
+}
+
+.right1 {
+	margin: 10px;
+	margin-left: 170px;
+}
+
+.right1b {
+	margin: 10px;
+}
+
+.right2 {
+	width: 100%;
+	margin: 5px;
+}
+
+.all3 {
+	background-color: #9E9E9E;
+	border-radius: 5px;
+	padding: 15px 5px 5px 5px;
+	display: block;
+}
+
+.all3 p {
+    margin: 0;
+}
+
+.all3 h1 {
+	position: absolute;
+	margin-top: -25px;
+	height: 20px;
+	line-height: 20px;
+	font-size: 10px;
+	border: 1px solid #9E9E9E;
+}
+
+.all3 h1 span {
+	background-color: white;
+	color: black;
+	padding: 2px;
+	border-radius: 6px;
+}
+
+#general img {
+	width: 100%;
+}

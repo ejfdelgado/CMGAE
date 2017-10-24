@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="TestStorage">
+<input type="text" name="url" value="/storage/list"/>
+<textarea name="postValue">{"nombre":"hechoaquimismo.appspot.com", "csrfmiddlewaretoken":"{{ csrf_token }}"}</textarea>
+<a class="TestPost">POST</a>
+<p class="TestRespuesta"></p>
+<textarea name="code" rows="10">
+	$('.TestStorage .TestPost').unbind('click').bind('click', function() {
+		var url = $('.TestStorage input[name=url]').val();
+		var contenido = $('.TestStorage textarea[name=postValue]').val();
+		  $.ajax({
+			  type: "PUT",
+			  url: url,
+			  data: contenido,
+			  contentType: "application/json; charset=utf-8",
+			})
+			.done(function( msg ) {
+				var temp = $('<div/>').text(JSON.stringify(msg)).html();
+				$('.TestStorage .TestRespuesta').html(temp );
+			})
+			.fail(function( jqXHR, textStatus ) {
+				$('.TestStorage .TestRespuesta').html("Error");
+			});
+	});
+
+</textarea>
+<a class="TestCode">Actualizar</a>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+(function($) {
+	
+	$('.TestStorage .TestCode').bind('click', function() {
+		var codigo = $('.TestStorage textarea[name=code]').val();
+		eval(codigo);
+	});
+})(jQuery);
+</script>
+
+{% endblock %}
