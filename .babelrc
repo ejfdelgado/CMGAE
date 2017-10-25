@@ -9,6 +9,13 @@
 		"waitOff",
 		"TRADUCTOR",
 		"llenarTemplate",
+		"getVieHere",
+		"pila",
+		"formatearFecha",
+		"toDate",
+		"configureEditorsHere",
+		"_",
+		
 		"HAS_USER",
 		"LENGUAJE",
 		"LENGUAJE_PRED",

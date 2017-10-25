@@ -18,4 +18,11 @@ gulp.task('default', function() {
     .pipe(babel())
     .pipe(uglify())
     .pipe(gulp.dest('assets/dist/comun'));
+  
+  gulp.src([
+    './assets/js/create2/createmain.js',
+  ]).pipe(concat('createmain.js'))
+    .pipe(babel())
+    .pipe(uglify())
+    .pipe(gulp.dest('assets/dist/admin'));
 });

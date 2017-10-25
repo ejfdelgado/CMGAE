@@ -234,7 +234,7 @@ var actividad = (function() {
 		
 		var temp = $('<input type="file" class="invisible" accept="image/*">');
 		  temp.on("change", function (e) {
-		        file = e.target.files[0];
+		        var file = e.target.files[0];
 		        
 		        if (file.size > maximoTamanio) {
 		        	alert('Archivo muy grande! debe ser menor a '+(maximoTamanio/(1024))+'KB');
@@ -338,7 +338,7 @@ var actividad = (function() {
 			objeto.find('[textplain="true"]').each(function (index, element) {
 				var actual = $(element);
 				if(actual.attr("act_tpl") !== "ok") {
-					actual.on('change keyup paste', function() {
+					actual.on('blur', function() {
 						actual.html(actual.text());
 					});
 					actual.attr("act_tpl", "ok");
@@ -463,7 +463,7 @@ var actividad = (function() {
 	  
 	  $('.formhtml .guardar').click(function() {
 		  try {
-			  formulario = $('.formhtml');
+			  var formulario = $('.formhtml');
 			  var nomNodo = formulario.attr('nodo2');
 			  var nomProp = formulario.attr('property2');
 			  var sufijo = formulario.attr('sufijo');
@@ -511,11 +511,11 @@ var actividad = (function() {
 	  
 	  $('textarea[property]').on('change keyup paste', function () {
 		  self = $(this);
-		  propiedad = self.attr('property');
-		  padre = self.closest('[about]');
+		  var propiedad = self.attr('property');
+		  var padre = self.closest('[about]');
 		  if (padre) {
-			  ident = padre.attr('about');
-			  valor = self.val();
+			  let ident = padre.attr('about');
+			  let valor = self.val();
 			  
 			  var dato = {};
 	      	  dato[propiedad] = valor;

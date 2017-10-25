@@ -58,7 +58,7 @@ JS_COMUNES1 = '<script src="/assets/js/create2/ui/core.min.js"></script>'\
             '<script src="/assets/js/comun/date/legacy.js"></script>'\
             '<script src="/assets/js/create2/create-min.js"></script>'\
             '<script src="/assets/js/create2/filereader.js"></script>'\
-            '<script src="/assets/js/create2/createmain.js"></script>'
+            '<script src="/assets/dist/admin/createmain.js"></script>'
 JS_COMUNES2 = '<script src="/assets/dist/comun/comun.js"></script>'\
             '<script src="/mijavascript.js"></script>'
 
