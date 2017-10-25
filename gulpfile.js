@@ -7,21 +7,21 @@ var gulp = require('gulp')
 gulp.task('default', function() {
   gulp.src([
     './assets/js/comun/comun0.js',
-  ]).pipe(concat('comun0.js'))
+  ]).pipe(concat('comun0.min.js'))
     .pipe(babel())
     .pipe(uglify())
     .pipe(gulp.dest('assets/dist/comun'));
   
   gulp.src([
     './assets/js/comun/comun.js',
-  ]).pipe(concat('comun.js'))
+  ]).pipe(concat('comun.min.js'))
     .pipe(babel())
     .pipe(uglify())
     .pipe(gulp.dest('assets/dist/comun'));
   
   gulp.src([
     './assets/js/create2/createmain.js',
-  ]).pipe(concat('createmain.js'))
+  ]).pipe(concat('createmain.min.js'))
     .pipe(babel())
     .pipe(uglify())
     .pipe(gulp.dest('assets/dist/admin'));

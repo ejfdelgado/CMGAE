@@ -21,6 +21,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		
 		{% if admin %}
+		<link rel="stylesheet" href="/assets/css/adminBasico.css" />
 	    <link rel="stylesheet" href="/assets/css/create/create-ui.css" />
 	    <link rel="stylesheet" href="/assets/css/create/midgardnotif.css" />
 	    {% endif %}
@@ -74,7 +75,9 @@
 				<li><span>T&iacute;tulo:</span><div textplain="true" property="title">{% buscar leng dicci tipo nodo 'title' 'Nucleus' %}</div></li>
 				<li><span>Descripci&oacute;n:</span><div textplain="true" property="description">{% buscar leng dicci tipo nodo 'description' 'Descripcion' %}</div></li>
 				<li><span>Palabras clave:</span><div textplain="true" property="palabrasclave">{% buscar leng dicci tipo nodo 'palabrasclave' '' %}</div></li>
-				<li><span>Im&aacute;gen:</span><div textplain="true" property="imagen">{% buscar leng dicci tipo nodo 'imagen' '/images/pic04.jpg' %}</div></li>
+				<li class="imagen_pagina">
+					<img class="imagen_pagina_real" property="imagen" data-max="500" src="{% buscar leng dicci tipo nodo 'imagen' '/images/pic04.jpg' %}" alt="{% buscar leng dicci tipo nodo 'imagen_alt' '' %}" data-carpeta="/caracteristica-mini"/>
+				</li>
 			</ul>
 		</div>
 		{% endwith %}

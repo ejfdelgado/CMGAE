@@ -196,7 +196,7 @@ var pila = [];
 					texto += '<li><a class="menuEliminar manito" onclick="$(\'.menu_core\').toggleClass(\'invisible\');">Borrar</a></li>';
 					texto += '<li><a class="clearmemcache manito" onclick="$(\'.menu_core\').toggleClass(\'invisible\');">Borrar memoria</a></li>';
 					texto += '<li><a class="create-ui-toggle2 manito" onclick="$(\'.menu_core\').toggleClass(\'invisible\');">Editar</a></li>';
-					texto += '<li><a class="manito" onclick="pila.push(\'menu_pagina\'); $(\'.menu_core\').toggleClass(\'invisible\'); $(\'.menu_pagina\').toggleClass(\'invisible\');">Propiedades de p&aacute;gina</a></li>';
+					texto += '<li><a class="manito" onclick="manejoPopUps.mostrarMenuPagina()">Propiedades de p&aacute;gina</a></li>';
 				}
 				texto += '<li><a href="'+logouturl+'">Salir</a></li>';
 			} else {

@@ -1,4 +1,5 @@
 
+//TODO homologar con waitOn y waitOff
 var actividad = (function() {
 	var pendientes = 0;
 	var actividadOn = function() {
@@ -20,6 +21,19 @@ var actividad = (function() {
 		on: actividadOn,
 		off: actividadOff,
 	}
+})();
+
+var manejoPopUps = (function() {
+	var mostrarMenuPagina = function() {
+		pila.push('menu_pagina');
+		$('.menu_core').toggleClass('invisible');
+		$('.menu_pagina').toggleClass('invisible');
+		window.scrollTo(0,0);
+	};
+	
+	return {
+		'mostrarMenuPagina': mostrarMenuPagina,
+	};
 })();
 
 (function($) {

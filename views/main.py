@@ -36,7 +36,7 @@ JS_COMUNES3 = '<script src="/assets/js/comun/jquery-2.1.1.min.js"></script>'\
             '<script src="/assets/js/comun/util.js"></script>'\
             '<!--[if lte IE 8]><script src="/assets/js/ie/respond.min.js"></script><![endif]-->'
 
-JS_COMUNES0 = '<script src="/assets/dist/comun/comun0.js"></script>'\
+JS_COMUNES0 = '<script src="/assets/dist/comun/comun0.min.js"></script>'\
             '<script>if (!HAS_USER) {borrarLocalStorage();}</script>'
 #Este se inserta solo para administradores!
 JS_COMUNES1 = '<script src="/assets/js/create2/ui/core.min.js"></script>'\
@@ -58,8 +58,8 @@ JS_COMUNES1 = '<script src="/assets/js/create2/ui/core.min.js"></script>'\
             '<script src="/assets/js/comun/date/legacy.js"></script>'\
             '<script src="/assets/js/create2/create-min.js"></script>'\
             '<script src="/assets/js/create2/filereader.js"></script>'\
-            '<script src="/assets/dist/admin/createmain.js"></script>'
-JS_COMUNES2 = '<script src="/assets/dist/comun/comun.js"></script>'\
+            '<script src="/assets/dist/admin/createmain.min.js"></script>'
+JS_COMUNES2 = '<script src="/assets/dist/comun/comun.min.js"></script>'\
             '<script src="/mijavascript.js"></script>'
 
 ANALYTICS = '<script>'\
