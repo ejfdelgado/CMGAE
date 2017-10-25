@@ -31,8 +31,19 @@ var manejoPopUps = (function() {
 		window.scrollTo(0,0);
 	};
 	
+	var mostrarFormularioEdicion = function(nodo, atributo, valor, sufijo) {
+		console.log('mostrarFormularioEdicion', nodo, atributo, valor)
+		$(".formhtml").attr('nodo2', nodo);
+		$(".formhtml").attr('property2', atributo);
+		$(".formhtml").attr('sufijo', sufijo);
+		$('.formhtml textarea').val(valor);
+		$('.formhtml').removeClass('invisible');
+		pila.push("formhtml");
+	};
+	
 	return {
 		'mostrarMenuPagina': mostrarMenuPagina,
+		'mostrarFormularioEdicion': mostrarFormularioEdicion,
 	};
 })();
 
@@ -46,36 +57,13 @@ var manejoPopUps = (function() {
 	
 	  var funcionAsignarPropiedadDeNodo = function(vie, nomNodo, nomProp, nuevo, sufijo) {
 		  var sql = "[about='"+nomNodo+"'] [property='"+nomProp+"']";
-		  var sql2 = "[about='"+nomNodo+"'] [styleProperty='"+nomProp+"']";
+		  var sql2 = "[about='"+nomNodo+"'] [styleProperty='"+nomProp+"'],[about='"+nomNodo+"'][styleProperty='"+nomProp+"']";
 		  
 		  if (!hayValor(sufijo)) {
 			  sufijo = '';
 		  }
 		  
-		  var objeto = $(sql);
-		  var objeto2 = $(sql2);
-		  
-		  if (objeto.length > 0) {
-			  var nombreTag = objeto.prop("tagName");
-			  
-			  if (nombreTag == 'IMG') {
-				  if (sufijo == '_alt') {
-					  objeto.attr( "alt", nuevo );
-				  } else {
-					  objeto.attr( "src", nuevo );
-				  }
-			  } else {
-				  if (nombreTag == 'TEXTAREA') {
-					  if (objeto2.length > 0) {
-						  nuevo = nuevo.replace(/"/g, '&quot;');
-					  }
-					  objeto.text(nuevo);
-					  objeto.change();
-				  } else {
-					  objeto.html(nuevo);
-				  }
-			  }
-			  
+		  var notificarCambio = function() {
 			  var dato = {};
 	      	  dato[nomProp+sufijo] = nuevo;
 			  var modelo = vie.entities.get(nomNodo);
@@ -87,6 +75,25 @@ var manejoPopUps = (function() {
 				  cambiados.push(modelo);
 			  }
 			  $('#midgardcreate-save').button({disabled: false});
+		  };
+		  
+		  var objeto = $(sql);
+		  var objeto2 = $(sql2);
+		  if (objeto.length > 0) {
+			  var nombreTag = objeto.prop("tagName");
+			  if (nombreTag == 'IMG') {
+				  if (sufijo == '_alt') {
+					  objeto.attr( "alt", nuevo );
+				  } else {
+					  objeto.attr( "src", nuevo );
+				  }
+			  }
+			  notificarCambio();
+		  } else if (objeto2.length > 0) {
+			  nuevo = nuevo.replace(/"/g, '&quot;');
+			  objeto2.attr('style', nuevo);
+			  notificarCambio();
+			  //objeto.html(nuevo);//TODO esto dónde va??
 		  }
 	  };
 	
@@ -115,20 +122,12 @@ var manejoPopUps = (function() {
 					padre = self.closest('[about]');
 				}
 				if (padre === undefined) { return; }
-				var nuevo = $('<textarea style="display: none;" property="'+propiedad+'" class="editable"></textarea>');
-				nuevo.text(self.attr('style'));
-				padre.append(nuevo);
-				
-				nuevo.change(function() {
-					var texto = nuevo.val();
-					texto = texto.replace(/"/g, '&quot;');
-					self.attr('style', texto);
-				});
 
 				self.on("click", function(e) {
 					if (e.shiftKey) {
 						//Se permite editar el estilo
-						nuevo.click();
+						let valorAnterior = self.attr('style');
+						manejoPopUps.mostrarFormularioEdicion(padre.attr('about'), propiedad, valorAnterior);
 					} else if (e.ctrlKey) {
 						//Se permtie diréctamente actualizar el fondo
 						abrirFileChooser(self, propiedad);
@@ -167,16 +166,12 @@ var manejoPopUps = (function() {
 		respuesta.ok = true;
 		return respuesta;
 	};
+	
 	var abrirAltEditor = function(self) {
 		if (self.prop("tagName") !== 'IMG') {return;}
 		var attrs = comunEdicionImagenes(self);
 		if (attrs.ok == false) {return;}
-		$(".formhtml").attr('nodo2', attrs.ident);
-		$(".formhtml").attr('property2', attrs.propiedad);
-		$(".formhtml").attr('sufijo', '_alt');
-		$('.formhtml textarea').val(self.attr('alt'));
-		$('.formhtml').removeClass('invisible');
-		pila.push("formhtml");
+		manejoPopUps.mostrarFormularioEdicion(attrs.ident, attrs.propiedad, self.attr('alt'), '_alt');
 	}
 	//Todas las imágenes podrán cambiar con click
 	var abrirFileChooser = function(self, propEstilo) {
@@ -326,11 +321,7 @@ var manejoPopUps = (function() {
 						var padre = actual.closest('[about]');
 						if (padre) {
 							if ($('#midgardcreate-save').css('display') === 'none') {return;}
-							$(".formhtml").attr('nodo2', padre.attr('about'));
-							$(".formhtml").attr('property2', actual.attr('property'));
-							$('.formhtml textarea').val(actual.html());
-							$('.formhtml').removeClass('invisible');
-							pila.push("formhtml");
+							manejoPopUps.mostrarFormularioEdicion(padre.attr('about'), actual.attr('property'), actual.html());
 						}
 					});
 					actual.attr("act_edt", "ok");
