@@ -1,0 +1,9 @@
+.imagen_pagina {
+	text-align: center;
+	list-style-type: none;
+}
+
+.imagen_pagina .imagen_pagina_real {
+	margin-top: 10px;
+	width: 50%;
+}
