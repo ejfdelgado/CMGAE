@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8" />
 		{% with nodo=path|add:'/pagina' tipo='Documento' %}
-		<title>{% buscar leng dicci tipo nodo 'title' 'Nucleus' %}</title>
+		<title>{% buscar leng dicci tipo nodo 'title' 'Página' %}</title>
 		<meta property="og:title" content="{% buscar leng dicci tipo nodo 'title' 'Titulo' %}" />
 		<meta name="twitter:title" content="{% buscar leng dicci tipo nodo 'title' 'Titulo' %}" />
 		<meta property="og:description" content="{% buscar leng dicci tipo nodo 'description' 'Descripcion' %}" />
@@ -83,21 +83,8 @@
 		{% endwith %}
 
 		{% block content %}{% endblock %}
-
-		<!-- Footer -->
-		{% with nodo='/social' tipo='Documento' %}
-		<section id="footer" about="{{ nodo }}" typeof="{{ tipo }}" styleProperty="fondo" style="{% buscar leng dicci tipo nodo 'fondo' 'background-image: url(\'/images/overlay1.png\') !important;' %}">
-			<ul class="icons editable" property="redes">
-				{% buscar leng dicci tipo nodo 'redes' '<li><a target="_blank" href="#" class="icon alt fa-twitter"><span class="label">Twitter</span></a></li><li><a target="_blank" href="#" class="icon alt fa-facebook"><span class="label">Facebook</span></a></li><li><a href="#" target="_blank" class="icon alt fa-instagram"><span class="label">Instagram</span></a></li><li><a target="_blank" href="#" class="icon alt fa-github"><span class="label">GitHub</span></a></li><li><a target="_blank" href="#" class="icon alt fa-envelope"><span class="label">Email</span></a></li>' %}
-			</ul>
-			<ul class="copyright editable" property="pie">
-				{% buscar leng dicci tipo nodo 'pie' '<li>&copy; Untitled</li><li>Developed by: <a target="_blank" href="http://www.proyeccioncolombia.com">Proyecci&oacute;n Colombia</a></li><li>Design: <a target="_blank" href="http://html5up.net">HTML5 UP</a></li>' %}
-			</ul>
-			<ul class="copyright">
-				<li><a data-lenguaje="{{ leng_pred }}">Español</a></li><li><a data-lenguaje="eng">English</a></li>
-			</ul>
-		</section>
-		{% endwith %}
+		
+		{% block pie %}{% endblock %}
 
 		{% autoescape off %}
 		{{ JS_COMUNES3 }}

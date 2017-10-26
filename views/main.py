@@ -26,7 +26,7 @@ from settings import TEMPLATE_DIRS, ROOT_PATH, LENGUAJE_PRED
 
 CORREO_ENVIOS = 'edgar.jose.fernando.delgado@gmail.com'
 
-COMMON_TEMPLATES = {'configurar.html':{'admin':True}, 'calendario.html':{'admin':False}}
+COMMON_TEMPLATES = {'configurar.html':{'admin':True}, 'calendario.html':{'admin':False}, 'archivos.html':{'admin':True}}
 
 JS_COMUNES3 = '<script src="/assets/js/comun/jquery-2.1.1.min.js"></script>'\
             '<script src="/assets/js/comun/skel.min.js"></script>'\
