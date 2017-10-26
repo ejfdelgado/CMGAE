@@ -1,20 +1,35 @@
   $(function () {
-    // 6 create an instance when the DOM is ready
-	//Leer https://www.jstree.com/plugins/
-	// html demo
-	$('#html').jstree();
-
-	// inline data demo
-	$('#data').jstree({
+	  
+    $('#paginaCompleta').enhsplitter({minSize: 60, vertical: false, position: 60});
+    $('#totalArchivos').enhsplitter({minSize: 60, position: 350});
+    
+	//Leer https://ace.c9.io/build/kitchen-sink.html
+    
+    var editor = ace.edit("pluginEditor");
+    editor.setTheme("ace/theme/monokai");
+    //editor.getSession().setMode("ace/mode/javascript");
+	editor.getSession().setMode("ace/mode/html");
+    
+	$('#contenedorArchivos').jstree({
 		'core' : {
 			'data' : [
-				{ "text" : "Root node", "children" : [
+				{ "text" : "Raíz", "children" : [
 						{ "text" : "Child node 1" },
 						{ "text" : "Child node 2" }
 				]}
 			]
 		}
 	});
+	  
+    // 6 create an instance when the DOM is ready
+	//Leer https://www.jstree.com/plugins/
+	// html demo
+	  
+	  /*
+	$('#html').jstree();
+
+	// inline data demo
+
 
 	// data format demo
 	$('#frmt').jstree({
@@ -96,11 +111,9 @@
 			}
 		});
 	
-	//Leer https://ace.c9.io/build/kitchen-sink.html
-    var editor = ace.edit("editor");
-    editor.setTheme("ace/theme/monokai");
-    //editor.getSession().setMode("ace/mode/javascript");
-	editor.getSession().setMode("ace/mode/html");
+
+	*/
+	
 	
 	/*
 	$('#jstree_demo').jstree({

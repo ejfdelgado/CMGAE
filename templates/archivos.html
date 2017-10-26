@@ -1,56 +1,52 @@
 {% extends "base.html" %}
 
 {% block encabezado %}
-  <link rel="stylesheet" href="/assets/js/jstree/themes/default/style.min.css" />
-<style type="text/css" media="screen">
-    #editor {
-        position: fixed;
-        top: 60px;
-        bottom: 0;
-        right: 0;
-        left: 300px;
-        z-index: 99999;
-    }
-</style>
+	<link rel="stylesheet" href="/assets/js/jstree/themes/default/style.min.css" />
+    <link rel="stylesheet" href="/assets/css/enhsplitter/jquery.enhsplitter.css" />
+	<style type="text/css" media="screen">
+	    #editor {
+	        position: fixed;
+	        top: 60px;
+	        bottom: 0;
+	        right: 0;
+	        left: 300px;
+	        z-index: 99999;
+	    }
+	    
+	    #paginaCompleta {
+	    	position: fixed;
+	    	top: 0;
+	    	bottom: 0;
+	    	left: 0;
+	    	right: 0;
+	    }
+	    
+	    #pluginEditor {
+	    	width: 100%;
+	    	height: 100%;
+	    }
+	    
+	    #contenedorArchivos {
+	    	overflow-x: scroll;
+	    	overflow-y: scroll;
+	    	width: 100%;
+	    	height: 100%;
+	    }
+    </style>
 {% endblock %}
 
 {% block content %}
-  <!-- 3 setup a container element -->
-  <div id="jstree_demo">
-  </div>
- 
-	<h1>HTML demo</h1>
-	<div id="html" class="demo">
-		<ul>
-			<li data-jstree='{ "opened" : true }'>Root node
-				<ul>
-					<li data-jstree='{ "selected" : true }'>Child node 1</li>
-					<li>Child node 2</li>
-				</ul>
-			</li>
-		</ul>
-	</div>
-
-	<h1>Inline data demo</h1>
-	<div id="data" class="demo"></div>
-
-	<h1>Data format demo</h1>
-	<div id="frmt" class="demo"></div>
-
-	<h1>AJAX demo</h1>
-	<div id="ajax" class="demo"></div>
-
-	<h1>Lazy loading demo</h1>
-	<div id="lazy" class="demo"></div>
-
-	<h1>Callback function data demo</h1>
-	<div id="clbk" class="demo"></div>
-
-	<h1>Interaction and events demo</h1>
-	<button id="evts_button">select node with id 1</button> <em>either click the button or a node in the tree</em>
-	<div id="evts" class="demo"></div>
-	
-	<div id="editor"></div>
+<div id="paginaCompleta">
+	<div id="estadoPagina"></div>
+    <div id="totalArchivos">
+        <div id="buscadorArchivos">
+            <div id="contenedorArchivos"></div>
+        </div>
+        <div id="editorTexto">
+            <div id="pluginEditor"></div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -59,5 +55,6 @@
   <!-- 5 include the minified jstree source -->
   <script src="/assets/js/jstree/jstree.min.js"></script>
   <script src="/assets/js/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+  <script src="/assets/js/enhsplitter/jquery.enhsplitter.js"></script>
   <script src="/assets/cmgae/editor.js"></script>
 {% endblock %}
