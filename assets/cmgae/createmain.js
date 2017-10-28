@@ -256,7 +256,6 @@ var manejoPopUps = (function() {
 		        
 		        var form = new FormData();
 		        form.append('file-0', file);
-		        
 		        form.append('folder', dataFolder);
 		        
 		        var nombreAnterior = darIdAnterior();

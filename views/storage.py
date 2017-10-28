@@ -90,8 +90,9 @@ def delete_files(response, filename):
         response.write(simplejson.dumps({'error':1}))
 
 def read_file(filename):
-    metadata = gcs.stat(filename)
-    with gcs.open(filename) as cloudstorage_file:
+    completo = darRaizStorage()+filename
+    metadata = gcs.stat(completo)
+    with gcs.open(completo) as cloudstorage_file:
         temp = cloudstorage_file.read()
         response = HttpResponse(temp, content_type=metadata.content_type)
         return response
@@ -158,12 +159,16 @@ def StorageHandler(request, ident):
             uploaded_file_type = archivo.content_type
             nombreAnterior = request.POST.get('name', None)
             carpeta = request.POST.get('folder', '')
-            if (not nombreAnterior is None):
-                try:
-                    gcs.delete(nombreAnterior)
-                except:
-                    pass
-            nombre = darRaizStorage()+carpeta+'/'+generarUID()+'-'+uploaded_file_filename
+            auto = request.POST.get('auto', 'true')
+            if (auto == 'true'):
+                if (not nombreAnterior is None):
+                    try:
+                        gcs.delete(nombreAnterior)
+                    except:
+                        pass
+                nombre = darRaizStorage()+carpeta+'/'+generarUID()+'-'+uploaded_file_filename
+            else:
+                nombre = darRaizStorage()+nombreAnterior
             write_retry_params = gcs.RetryParams(backoff_factor=1.1)
             gcs_file = gcs.open(nombre,
                               'w',

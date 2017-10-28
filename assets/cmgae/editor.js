@@ -1,14 +1,19 @@
   $(function () {
 	
+	var destruirEditor = function() {
+		$('editorTexto').empty();
+		var nuevo = $('<div/>', { id: 'pluginEditor'});
+		$('editorTexto').append(nuevo);
+	};
+	  
 	var activarEditor = function(nombre, contenido) {
 		var mapaTipos = [
 		    {'patron': /.*\.js/ig, 'editor': 'ace/mode/javascript'},
 		    {'patron': /.*\.html/ig, 'editor': 'ace/mode/html'},
 		];
-		$('editorTexto').empty();
-		var nuevo = $('<div/>', { id: 'pluginEditor'});
-		$('editorTexto').append(nuevo);
+		destruirEditor();
 	    var editor = ace.edit("pluginEditor");
+	    editor.setValue(contenido);
 	    editor.setTheme("ace/theme/monokai");
 	    for (let i=0; i<mapaTipos.length; i++) {
 	    	let unTipo = mapaTipos[i];
@@ -16,28 +21,67 @@
 	    		editor.getSession().setMode(unTipo.editor);
 	    	}
 	    }
-		
+	};
+	
+	var guardarArchivo = function(id) {
+		var editor = ace.edit("pluginEditor");
+		var blobAttrs = { type: "text/plain"};
+		var file = new File([editor.getValue()], id, blobAttrs);
+		var form = new FormData();
+        form.append('file-0', file);
+        form.append('auto', 'false');
+        form.append('name', id);
+        $.ajax({
+            url: '/storage/',
+            type: 'POST',
+            data: form,
+            headers:{
+            	'X-CSRFToken':$('[name="csrfmiddlewaretoken"]').val()
+            },
+            cache: false,
+            contentType: false,
+            processData: false,
+        }).done(function(data) {
+        	if (data.error != 0) {
+        		alert('Error subiendo el archivo');
+        	} else {
+        		console.log('ok');
+        	}
+        }).fail(function() {
+        	alert('Error subiendo el archivo');
+        }).always(function() {
+        	
+        });
+	}
+	
+	var cargarArchivo = function(id, callback) {
+        $.ajax({
+            url: '/storage/read?name='+encodeURIComponent(id),
+            type: 'GET',
+            cache: false,
+            contentType: false,
+            processData: false,
+        }).done(function(data) {
+        	callback(data);
+        }).fail(function() {
+        	alert('Error leyendo contenido');
+        }).always(function() {
+        	
+        });
 	};
 	  
     $('#paginaCompleta').enhsplitter({minSize: 60, vertical: false, position: 60});
     $('#totalArchivos').enhsplitter({minSize: 60, position: 350});
     
 	//Leer https://ace.c9.io/build/kitchen-sink.html
-    /*
-	$('#contenedorArchivos').jstree({
-		'core' : {
-			'data' : [
-				{ "text" : "Raíz", "children" : [
-						{ "text" : "Child node 1" },
-						{ "text" : "Child node 2" }
-				]}
-			]
+    //Leer https://www.jstree.com/plugins/
+    $('#contenedorArchivos').on("changed.jstree", function (e, data) {
+		if(data.selected.length) {
+			var ref = data.instance.get_node(data.selected[0]);
 		}
-	});*/
-	
+	});
 	$('#contenedorArchivos').jstree({
 		  "core" : {
-		    "animation" : 0,
 		    "check_callback" : true,
 		    "themes" : { "stripes" : true },
 	        'data': {
@@ -57,122 +101,85 @@
 		      "valid_children" : ["root"]
 		    },
 		    "root" : {
-		      "icon" : "/static/3.3.4/assets/images/tree_icon.png",
+		      //"icon" : "/static/3.3.4/assets/images/tree_icon.png",
 		      "valid_children" : ["default"]
 		    },
 		    "default" : {
 		      "valid_children" : ["default","file"]
 		    },
 		    "file" : {
-		      "icon" : "glyphicon glyphicon-file",
+		      "icon" : "/assets/js/jstree/themes/default/file.png",
 		      "valid_children" : []
 		    }
 		  },
+		  'contextmenu': {
+		        'items': function($node) {
+		            return {
+		                'Abrir': {
+		                    "separator_before": false,
+		                    "separator_after": false,
+		                    "label": "Abrir",
+		                    "action": function(data) {
+		                    	destruirEditor();
+		                    	var inst = $.jstree.reference(data.reference);
+		                    	var ref = inst.get_node(data.reference);
+		                    	cargarArchivo(ref.id, function(contenido) {
+		                    		activarEditor(ref.text, contenido);
+		                    	});
+		                    }
+		                },
+		                'Guardar': {
+		                    "separator_before": false,
+		                    "separator_after": false,
+		                    "label": "Guardar",
+		                    "action": function(data) {
+		                    	var inst = $.jstree.reference(data.reference);
+		                    	var ref = inst.get_node(data.reference);
+		                    	guardarArchivo(ref.id);
+		                    }
+		                },
+		                'Create': {
+		                    "separator_before": false,
+		                    "separator_after": false,
+		                    "label": "Crear",
+		                    "action": function(data) {
+		                    	/*
+	                            var inst = $.jstree.reference(data.reference),
+                                obj = inst.get_node(data.reference);
+		                        inst.create_node(obj, {}, "last", function (new_node) {
+		                            new_node.data = {file: true};
+		                            setTimeout(function () { inst.edit(new_node); },0);
+		                        });
+		                        */
+		                    }
+		                },
+
+		                'Rename': {
+		                    "separator_before": false,
+		                    "separator_after": false,
+		                    "label": "Renombrar",
+		                    "action": function(obj) {
+		                    	var inst = $.jstree.reference(obj.reference);
+		                    	inst.edit($node);
+		                    }
+
+		                },
+		                "Remove": {
+		                    "separator_before": false,
+		                    "separator_after": false,
+		                    "label": "Borrar",
+		                    "action": function(obj) {
+		                    	console.log('borrar');
+		                    	var inst = $.jstree.reference(obj.reference);
+		                    	inst.delete_node($node);
+		                    }
+		                }
+		            };
+		        }
+		    },
 		  "plugins" : [
 		    "contextmenu", "dnd", "search","json_data",
 		    "state", "types", "wholerow"
 		  ]
 		});
-	
-	activarEditor('archivo.js', 'Mi contenido');
-	  
-    // 6 create an instance when the DOM is ready
-	//Leer https://www.jstree.com/plugins/
-	// html demo
-	  
-	  /*
-	$('#html').jstree();
-
-	// inline data demo
-
-
-	// data format demo
-	$('#frmt').jstree({
-		'core' : {
-			'data' : [
-				{
-					"text" : "Root node",
-					"state" : { "opened" : true },
-					"children" : [
-						{
-							"text" : "Child node 1",
-							"state" : { "selected" : true },
-							"icon" : "jstree-file"
-						},
-						{ "text" : "Child node 2", "state" : { "disabled" : true } }
-					]
-				}
-			]
-		}
-	});
-
-	// ajax demo
-	$('#ajax').jstree({
-		'core' : {
-			'data' : {
-				"url" : "/assets/cmgae/datos/root.json",
-				"dataType" : "json" // needed only if you do not supply JSON headers
-			}
-		}
-	});
-
-	// data from callback
-	$('#clbk').jstree({
-		'core' : {
-			'data' : function (node, cb) {
-				if(node.id === "#") {
-					cb([{"text" : "Root", "id" : "1", "children" : true}]);
-				}
-				else {
-					cb(["Child"]);
-				}
-			}
-		}
-	});
-
-	// interaction and events
-	$('#evts_button').on("click", function () {
-		var instance = $('#evts').jstree(true);
-		instance.deselect_all();
-		instance.select_node('1');
-	});
-	$('#evts')
-		.on("changed.jstree", function (e, data) {
-			if(data.selected.length) {
-				alert('The selected node is: ' + data.instance.get_node(data.selected[0]).text);
-			}
-		})
-		.jstree({
-			'core' : {
-				'multiple' : false,
-				'data' : [
-					{ "text" : "Root node", "children" : [
-							{ "text" : "Child node 1", "id" : 1 },
-							{ "text" : "Child node 2" }
-					]}
-				]
-			}
-		});
-	
-
-	*/
-	
-	
-	/*
-
-*/
-	
-	/*
-    $('#jstree').jstree();
-    // 7 bind to events triggered on the tree
-    $('#jstree').on("changed.jstree", function (e, data) {
-      console.log(data.selected);
-    });
-    // 8 interact with the tree - either way is OK
-    $('button').on('click', function () {
-      $('#jstree').jstree(true).select_node('child_node_1');
-      $('#jstree').jstree('select_node', 'child_node_1');
-      $.jstree.reference('#jstree').select_node('child_node_1');
-    });
-	*/
   });

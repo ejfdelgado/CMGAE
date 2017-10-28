@@ -1,9 +1,0 @@
-[
-	{
-		"id":1,"text":"Base","children":
-		[
-			{"id":2,"text":"Primero","children":true},
-			{"id":3,"text":"Segundo"}
-		]
-	}
-]
