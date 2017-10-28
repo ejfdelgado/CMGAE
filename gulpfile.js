@@ -25,4 +25,11 @@ gulp.task('default', function() {
     .pipe(babel())
     .pipe(uglify())
     .pipe(gulp.dest('assets/dist/admin'));
+  
+  gulp.src([
+    './assets/cmgae/editor.js',
+  ]).pipe(concat('editor.min.js'))
+    .pipe(babel())
+    .pipe(uglify())
+    .pipe(gulp.dest('assets/dist/admin'));
 });

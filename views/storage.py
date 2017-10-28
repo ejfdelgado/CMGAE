@@ -2,7 +2,7 @@
 from __future__ import with_statement
 
 import sys, traceback
-
+import re
 import logging
 import os
 import uuid
@@ -38,25 +38,47 @@ def create_file(response, filename):
     gcs_file.write('abcde\n')
     gcs_file.write('f'*1024*4 + '\n')
     gcs_file.close()
+
+def darRaizStorage():
+    res = '/'+get_application_id()+'.appspot.com'
+    #res = '/'+app_identity.get_default_gcs_bucket_name()
+    logging.info(res)
+    return res
+
+def transformarRegistroDeArchivo(registro, raiz):
+    res = {}
+    if (raiz is None):
+        raiz = darRaizStorage()
+    res['filename'] = registro.filename[len(raiz):]
     
-def list_bucket(bucket):
-    """Create several files and paginate through them.
-    Production apps should set page_size to a practical value.
-    Args:
-      bucket: bucket.
-    """
+    if (registro.is_dir):
+        res['esDir'] = True
+    else:
+        res['esDir'] = False
+        res['tamanio'] = registro.st_size
+        res['mime'] = registro.content_type
+        res['metadata'] = registro.metadata
+        res['fecha'] = registro.st_ctime
+    return res
+ 
+def list_bucket(ruta, tamanio, ultimo):
+    raiz = darRaizStorage()
+    rutaCompleta = raiz + ruta
     ans = []
-    page_size = 1
-    stats = gcs.listbucket(bucket + '/', max_keys=page_size)
+    if (tamanio is None):
+        tamanio = 10
+    else:
+        tamanio = int(tamanio)
+    stats = gcs.listbucket(rutaCompleta, max_keys=tamanio, delimiter="/", marker=ultimo)
     while True:
         count = 0
         for stat in stats:
             count += 1
-            ans.append(repr(stat))
+            ans.append(transformarRegistroDeArchivo(stat, raiz))
         
-        if count != page_size or count == 0:
+        if count != tamanio or count == 0:
             break
-        stats = gcs.listbucket(bucket + '/', max_keys=page_size,
+        stats = gcs.listbucket(rutaCompleta, max_keys=tamanio,
                                marker=stat.filename)
     return ans;
 
@@ -77,13 +99,48 @@ def read_file(filename):
 def generarUID():
     return str(uuid.uuid4())
 
+def darNombreNodo(ruta):
+    nombreNodo = 'Base'
+    encontrado = re.search('/([^/]+?)/?$', ruta)
+    if (not (encontrado is None)):
+        nombreNodo = encontrado.group(1)
+    return nombreNodo
+
+def nodosJsTree(lista):
+    nueva = []
+    for nodo in lista:
+        nuevo = {
+                 'id':nodo['filename'],
+                 'text':darNombreNodo(nodo['filename']),
+                 'children':nodo['esDir'],
+                 'type':'folder' if nodo['esDir'] else 'file'
+                 }
+        nueva.append(nuevo)
+    return nueva
+
 def StorageHandler(request, ident):
     if not ident == 'read':
         response = HttpResponse("", content_type='application/json')
     try:
         if request.method == 'GET':
-            if (ident == 'list'):
-                ans = list_bucket('/'+get_application_id()+'.appspot.com') 
+            if (ident == 'jstreelist'):
+                ruta = request.GET.get('id', '/')
+                if (ruta == '#'):
+                    ans = list_bucket('', 100, None)
+                else:
+                    ans = list_bucket(ruta, 100, None)
+                nombreNodo = darNombreNodo(ruta)
+                nodo = [
+                        {'text': nombreNodo, 'id': ruta, 'children': nodosJsTree(ans)}
+                        ]
+                if (len(ans) > 0):
+                    nodo[0]['type'] = 'folder'
+                response.write(simplejson.dumps(nodo))
+            elif (ident == 'list'):
+                ruta = request.GET.get('ruta', '/')
+                ultimo = request.GET.get('ultimo', None)
+                tamanio = request.GET.get('tamanio', None)
+                ans = list_bucket(ruta, tamanio, ultimo)
                 response.write(simplejson.dumps({'error':0, 'all_objects': ans}))
             elif (ident == 'basic'):
                 general(response)
@@ -106,7 +163,7 @@ def StorageHandler(request, ident):
                     gcs.delete(nombreAnterior)
                 except:
                     pass
-            nombre = '/'+app_identity.get_default_gcs_bucket_name()+carpeta+'/'+generarUID()+'-'+uploaded_file_filename
+            nombre = darRaizStorage()+carpeta+'/'+generarUID()+'-'+uploaded_file_filename
             write_retry_params = gcs.RetryParams(backoff_factor=1.1)
             gcs_file = gcs.open(nombre,
                               'w',
