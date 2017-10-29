@@ -107,7 +107,7 @@ def darNombreNodo(ruta):
         nombreNodo = encontrado.group(1)
     return nombreNodo
 
-def nodosJsTree(lista):
+def nodosJsTree(lista, excepto=None):
     nueva = []
     for nodo in lista:
         nuevo = {
@@ -116,7 +116,12 @@ def nodosJsTree(lista):
                  'children':nodo['esDir'],
                  'type':'folder' if nodo['esDir'] else 'file'
                  }
-        nueva.append(nuevo)
+        if (excepto is None):
+            nueva.append(nuevo)
+        else:
+            if (not nuevo['id'] == excepto):
+                nueva.append(nuevo)
+            
     return nueva
 
 def StorageHandler(request, ident):
@@ -128,15 +133,18 @@ def StorageHandler(request, ident):
                 ruta = request.GET.get('id', '/')
                 if (ruta == '#'):
                     ans = list_bucket('', 100, None)
+                    nombreNodo = darNombreNodo(ruta)
+                    nodo = [
+                            {'text': nombreNodo, 'id': ruta, 'children': nodosJsTree(ans)}
+                            ]
+                    if (len(ans) > 0):
+                        nodo[0]['type'] = 'folder'
+                    response.write(simplejson.dumps(nodo))
+                    
                 else:
                     ans = list_bucket(ruta, 100, None)
-                nombreNodo = darNombreNodo(ruta)
-                nodo = [
-                        {'text': nombreNodo, 'id': ruta, 'children': nodosJsTree(ans)}
-                        ]
-                if (len(ans) > 0):
-                    nodo[0]['type'] = 'folder'
-                response.write(simplejson.dumps(nodo))
+                    response.write(simplejson.dumps(nodosJsTree(ans, ruta)))
+
             elif (ident == 'list'):
                 ruta = request.GET.get('ruta', '/')
                 ultimo = request.GET.get('ultimo', None)
