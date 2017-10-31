@@ -1,28 +1,4 @@
 
-//TODO homologar con waitOn y waitOff
-var actividad = (function() {
-	var pendientes = 0;
-	var actividadOn = function() {
-		if (pendientes == 0) {
-			$('body').append('<div id="loading"><p>Procesando petici&oacute;n...</p></div>');
-		}
-		pendientes++;
-	};
-
-	var actividadOff = function() {
-		pendientes--;
-		if (pendientes<=0) {
-			pendientes = 0;
-			$('#loading').remove();
-		}
-	};
-	
-	return {
-		on: actividadOn,
-		off: actividadOff,
-	}
-})();
-
 var manejoPopUps = (function() {
 	var mostrarMenuPagina = function() {
 		pila.push('menu_pagina');
@@ -50,10 +26,6 @@ var manejoPopUps = (function() {
 (function($) {
 	var MAX_FILE_SIZE = 500*1024;//en KB
 	var vie = getVieHere();
-	
-	var hayValor = function(valor) {
-		return (valor != undefined && valor != null && (!(typeof valor == 'string') || valor.trim().length > 0));
-	};
 	
 	  var funcionAsignarPropiedadDeNodo = function(vie, nomNodo, nomProp, nuevo, sufijo) {
 		  var sql = "[about='"+nomNodo+"'] [property='"+nomProp+"']";
@@ -241,53 +213,16 @@ var manejoPopUps = (function() {
 			}
 		}
 		
-		var temp = $('<input type="file" class="invisible" accept="image/*">');
-		  temp.on("change", function (e) {
-		        var file = e.target.files[0];
-		        
-		        if (file.size > maximoTamanio) {
-		        	alert('Archivo muy grande! debe ser menor a '+(maximoTamanio/(1024))+'KB');
-		        	return;
-		        }
-		        
-		        var reader = new FileReader();
-		        
-		        reader.readAsDataURL(file);
-		        
-		        var form = new FormData();
-		        form.append('file-0', file);
-		        form.append('folder', dataFolder);
-		        
-		        var nombreAnterior = darIdAnterior();
-		        if (hayValor(nombreAnterior)) {
-		        	form.append('name', nombreAnterior);
-		        }
-		        
-		        actividad.on();
-		        $.ajax({
-		            url: '/storage/',
-		            type: 'POST',
-		            data: form,
-		            headers:{
-		            	'X-CSRFToken':$('[name="csrfmiddlewaretoken"]').val()
-		            },
-		            cache: false,
-		            contentType: false,
-		            processData: false,
-		        }).done(function(data) {
-		        	if (data.error != 0) {
-		        		alert('Error subiendo la imagen');
-		        	} else {
-		        		var valor = asignarSrc(data.id);
-		        		funcionAsignarPropiedadDeNodo(vie, attrs.ident, attrs.propiedad, valor);
-		        	}
-		        }).fail(function() {
-		        	alert('Error cargando imagen');
-		        }).always(function() {
-		        	actividad.off();
-		        });
-		    });
-		  temp.click();
+		var promesaCargue = moduloArchivos.subirArchivo({
+			dataFolder: dataFolder,
+			id: darIdAnterior(),
+			maximoTamanio: maximoTamanio,
+		});
+		
+		$.when(promesaCargue).then(function(data) {
+			var valor = asignarSrc(data.id);
+    		funcionAsignarPropiedadDeNodo(vie, attrs.ident, attrs.propiedad, valor);
+		});
 	  }
 	  
 		function activarImagenes(objeto) {

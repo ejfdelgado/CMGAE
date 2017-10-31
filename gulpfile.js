@@ -20,6 +20,9 @@ gulp.task('default', function() {
     .pipe(gulp.dest('assets/dist/comun'));
   
   gulp.src([
+	'./assets/cmgae/utils.js',
+	'./assets/cmgae/moduloActividad.js',
+	'./assets/cmgae/moduloArchivos.js',
     './assets/cmgae/createmain.js',
   ]).pipe(concat('createmain.min.js'))
     .pipe(babel())
@@ -27,6 +30,11 @@ gulp.task('default', function() {
     .pipe(gulp.dest('assets/dist/admin'));
   
   gulp.src([
+	'./assets/cmgae/utils.js',
+	'./assets/cmgae/moduloActividad.js',        
+	'./assets/cmgae/moduloArchivos.js',
+	'./assets/cmgae/moduloEditorTexto.js',
+	'./assets/cmgae/moduloArbolArchivos.js',
     './assets/cmgae/editor.js',
   ]).pipe(concat('editor.min.js'))
     .pipe(babel())
