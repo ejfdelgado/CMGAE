@@ -4,13 +4,13 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 	
 	var instanciaEditorTexto = moduloEditorTexto(elemEditor);
 	
-	elem.on("changed.jstree", function (e, data) {
+	elem.on("changed.jstree", function (event, data) {
 		if(data.selected.length) {
 			var ref = data.instance.get_node(data.selected[0]);
 		}
 	});
     
-	elem.on("rename_node.jstree", function (e, data) {
+	elem.on("rename_node.jstree", function (event, data) {
 		var anterior = data.old;
 		var nuevo = data.text;
 		var elNodo = data.node;
@@ -28,11 +28,20 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
         for (let i=0; i<data.node.children.length; i++) {
         	let elId = data.node.children[i];
         	let unNodo = refArbol.get_node(elId);
-        	if (unNodo.original.type == 'file') {
-        		elem.jstree(true).set_icon(elId, "/assets/js/jstree/themes/default/file.png");
-        	}
+        	ajustarAspectoNodo(unNodo);
         }
-    })
+    });
+	
+	
+	elem.on("create_node.jstree", function(event, data) {
+		ajustarAspectoNodo(data.node);
+	});
+	
+	var ajustarAspectoNodo = function(unNodo) {
+		if (unNodo.original.type == 'file') {
+    		elem.jstree(true).set_icon(unNodo.id, "/assets/js/jstree/themes/default/file.png");
+    	}
+	};
 	
 	var menuALaMedida = function($node) {
 		var abrir = {

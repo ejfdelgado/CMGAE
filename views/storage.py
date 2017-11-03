@@ -40,9 +40,8 @@ def create_file(response, filename):
     gcs_file.close()
 
 def darRaizStorage():
-    res = '/'+get_application_id()+'.appspot.com'
-    #res = '/'+app_identity.get_default_gcs_bucket_name()
-    logging.info(res)
+    #res = '/'+get_application_id()+'.appspot.com'
+    res = '/'+app_identity.get_default_gcs_bucket_name()
     return res
 
 def transformarRegistroDeArchivo(registro, raiz):

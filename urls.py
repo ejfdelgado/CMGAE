@@ -12,6 +12,7 @@ from views.carrito import CarritoHandler, ProductsHandler
 from views.citas import CitasHandler
 from views.lapseview import LVHandler
 from views.apirest import ApiRestHandler
+from views.prueba import PruebaHandler
 
 urlpatterns = defaults.patterns(
     'views',
@@ -19,6 +20,7 @@ urlpatterns = defaults.patterns(
     (r'^paginar/?(.*)', RESTpaginar),
     (r'^act/?(.*)', RESTfulActions),
     (r'^user/?(.*)', UserHandler),
+    (r'^prueba/?(.*)', PruebaHandler),
     (r'^lapseview/?(.*)', LVHandler),
     (r'^apirest/(\d*)?(.*)', ApiRestHandler),
     (r'^storage/?(.*)', StorageHandler),
