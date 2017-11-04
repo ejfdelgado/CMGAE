@@ -5,14 +5,14 @@ var LLAVE_CARRITO = 'CARRITO_LOCAL';
 var LLAVE_PRODS_CARR = 'TEMP_PRODS';
 
 var TRADUCTOR = {
-		'verif_campo' : {'esp': 'Verifique el campo ', 'eng': 'Verify the field '},
-		'cache_borr_ok' : {'esp': "Cache borrada!", 'eng':'Erased cache!'},
-		'error_ajax' : {'esp':"Error al invocar ajax", 'eng':'Ajax invocation error'},
+	'verif_campo' : {'esp': 'Verifique el campo ', 'eng': 'Verify the field '},
+	'cache_borr_ok' : {'esp': "Cache borrada!", 'eng':'Erased cache!'},
+	'error_ajax' : {'esp':"Error al invocar ajax", 'eng':'Ajax invocation error'},
 };
 
 /*
-Función que facilita la configuración de listas de datos con Midgard
-La configuración de listas es algo como:
+Funciï¿½n que facilita la configuraciï¿½n de listas de datos con Midgard
+La configuraciï¿½n de listas es algo como:
 {
 	'Caracteristica': {
 		ejemplo: '#CaracteristicaEjemplo',
@@ -153,7 +153,7 @@ function mostrarMensaje(papa, msg, clase) {
 
 
 
-//valida un elemento input que responda a val(), prefiere placeholder y después name
+//valida un elemento input que responda a val(), prefiere placeholder y despuï¿½s name
 function escorrecto(elemento) {
 	var validacion = elemento.attr('validacion');
 	var nombre = elemento.attr('placeholder');
@@ -248,7 +248,7 @@ function capturarFormulario(item, data) {
 	 * <div class="contenedor-envio-mensajes">
 	 * <a class="boton-envio-mensaje button special">Enviar</a>
 	 * 
-	 * También para hacer CRUD de datos del usuario
+	 * Tambiï¿½n para hacer CRUD de datos del usuario
 	 * 
 	 * <div class="contenedor-envio-mensajes" data-preload="/user/personal">
 	 * <a class="boton-envio-mensaje" data-url="/user/personal" data-once="false">Salvar</a>
@@ -447,7 +447,7 @@ function capturarFormulario(item, data) {
 		}
 		
 		if (listaBusq.length == 0) {
-			//Si la lista de productos nuevos que no están en local storage es vacia:
+			//Si la lista de productos nuevos que no estï¿½n en local storage es vacia:
 			if (lista !== undefined) {
 				llenarDatosProds(lista, memoriaGlobal);
 			}
@@ -481,7 +481,7 @@ function capturarFormulario(item, data) {
 	}
 	
 	/**
-	 * Completa en el elemento 'lista' los productos que estén allí con datos de contenido [about][typeof]
+	 * Completa en el elemento 'lista' los productos que estï¿½n allï¿½ con datos de contenido [about][typeof]
 	 */
 	function completarInfoProductos(lista, callback, errorcall) {
 		try {
