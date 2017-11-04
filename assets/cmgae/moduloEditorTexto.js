@@ -1,4 +1,5 @@
 //Leer https://ace.c9.io/build/kitchen-sink.html
+if (!hayValor(moduloEditorTexto)) {
 var moduloEditorTexto = (function(ele) {
 	var idLocal = 'pluginEditor';
 	var destruirEditor = function() {
@@ -50,3 +51,4 @@ var moduloEditorTexto = (function(ele) {
 		destruirEditor: destruirEditor,
 	};
 });
+}

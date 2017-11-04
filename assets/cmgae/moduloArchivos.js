@@ -1,4 +1,5 @@
 
+if (!hayValor(moduloArchivos)) {
 var moduloArchivos = (function() {
 	var MAX_FILE_SIZE = 500*1024;//en KB
 	
@@ -124,3 +125,4 @@ var moduloArchivos = (function() {
 		subirArchivo: subirArchivo,
 	};
 })();
+}

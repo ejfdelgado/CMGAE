@@ -1,5 +1,6 @@
 
 //TODO homologar con waitOn y waitOff
+if (!hayValor(moduloActividad)) {
 var moduloActividad = (function() {
 	var pendientes = 0;
 	var actividadOn = function() {
@@ -22,3 +23,4 @@ var moduloActividad = (function() {
 		off: actividadOff,
 	}
 })();
+}

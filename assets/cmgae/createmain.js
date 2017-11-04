@@ -1,28 +1,4 @@
 
-var manejoPopUps = (function() {
-	var mostrarMenuPagina = function() {
-		pila.push('menu_pagina');
-		$('.menu_core').toggleClass('invisible');
-		$('.menu_pagina').toggleClass('invisible');
-		window.scrollTo(0,0);
-	};
-	
-	var mostrarFormularioEdicion = function(nodo, atributo, valor, sufijo) {
-		console.log('mostrarFormularioEdicion', nodo, atributo, valor)
-		$(".formhtml").attr('nodo2', nodo);
-		$(".formhtml").attr('property2', atributo);
-		$(".formhtml").attr('sufijo', sufijo);
-		$('.formhtml textarea').val(valor);
-		$('.formhtml').removeClass('invisible');
-		pila.push("formhtml");
-	};
-	
-	return {
-		'mostrarMenuPagina': mostrarMenuPagina,
-		'mostrarFormularioEdicion': mostrarFormularioEdicion,
-	};
-})();
-
 (function($) {
 	var MAX_FILE_SIZE = 500*1024;//en KB
 	var vie = getVieHere();
@@ -99,7 +75,7 @@ var manejoPopUps = (function() {
 					if (e.shiftKey) {
 						//Se permite editar el estilo
 						let valorAnterior = self.attr('style');
-						manejoPopUps.mostrarFormularioEdicion(padre.attr('about'), propiedad, valorAnterior);
+						moduloMenus.mostrarFormularioEdicion(padre.attr('about'), propiedad, valorAnterior);
 					} else if (e.ctrlKey) {
 						//Se permtie diréctamente actualizar el fondo
 						abrirFileChooser(self, propiedad);
@@ -143,7 +119,7 @@ var manejoPopUps = (function() {
 		if (self.prop("tagName") !== 'IMG') {return;}
 		var attrs = comunEdicionImagenes(self);
 		if (attrs.ok == false) {return;}
-		manejoPopUps.mostrarFormularioEdicion(attrs.ident, attrs.propiedad, self.attr('alt'), '_alt');
+		moduloMenus.mostrarFormularioEdicion(attrs.ident, attrs.propiedad, self.attr('alt'), '_alt');
 	}
 	//Todas las imágenes podrán cambiar con click
 	var abrirFileChooser = function(self, propEstilo) {
@@ -255,7 +231,7 @@ var manejoPopUps = (function() {
 						var padre = actual.closest('[about]');
 						if (padre) {
 							if ($('#midgardcreate-save').css('display') === 'none') {return;}
-							manejoPopUps.mostrarFormularioEdicion(padre.attr('about'), actual.attr('property'), actual.html());
+							moduloMenus.mostrarFormularioEdicion(padre.attr('about'), actual.attr('property'), actual.html());
 						}
 					});
 					actual.attr("act_edt", "ok");

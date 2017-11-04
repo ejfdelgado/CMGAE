@@ -1,5 +1,6 @@
 
 //Leer https://www.jstree.com/plugins/
+if (!hayValor(moduloArbolArchivos)) {
 var moduloArbolArchivos = (function(elem, elemEditor) {
 	
 	var instanciaEditorTexto = moduloEditorTexto(elemEditor);
@@ -155,3 +156,4 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 	
 	return {}
 });
+}
