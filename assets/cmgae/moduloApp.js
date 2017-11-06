@@ -17,10 +17,12 @@ var moduloApp = (function() {
 	};
 	
 	var login = function() {
+		moduloActividad.on();
 		window.location.href = props.URL_LOGIN;
 	};
 	
 	var logout = function() {
+		moduloActividad.on();
 		window.location.href = props.URL_LOGOUT;
 	};
 	
