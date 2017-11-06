@@ -4,7 +4,7 @@ var moduloEdicion = (function() {
 	var mapaIds = {};
 	var activarEdicionOk = false;
 	var activarEdicion = function() {
-		if (activarEdicionOk !== true){return;}
+		if (activarEdicionOk == true){return;}
 		if(typeof Backbone != 'undefined') {
 			  Backbone.sync = function(method, model, options) {
 				  try {
@@ -80,8 +80,8 @@ var moduloEdicion = (function() {
 					  options.error('error '+e);
 				  }
 			  };
+			  activarEdicionOk = true;
 		  }
-		activarEdicionOk = true;
 	};
 	
 	var activarPaginacion = function(nodo) {

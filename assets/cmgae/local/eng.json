@@ -1,0 +1,19 @@
+{
+	"general": {
+		"verif_campo": "Verify the field ",
+		"cache_borr_ok": "Cache erased!",
+		"error_ajax": "Service invocation error",
+		"confirme": "Are you sure?",
+		"procesando": "Loading..."
+	},
+	"menus": {
+		"general": {
+			"configurar": "Configure",
+			"borrar": "Erase content",
+			"borrarcache": "Erase cache",
+			"editar": "Edit",
+			"propiedades": "Page properties",
+			"salir": "Quit"
+		}
+	}
+}

@@ -1,0 +1,19 @@
+{
+	"general": {
+		"verif_campo": "Verifique el campo ",
+		"cache_borr_ok": "Cache borrada",
+		"error_ajax": "Error al invocar servicio",
+		"confirme": "¿Está seguro de realizar la acción?",
+		"procesando": "Procesando petición... :)"
+	},
+	"menus": {
+		"general": {
+			"configurar": "Configurar",
+			"borrar": "Borrar contenido",
+			"borrarcache": "Borrar memoria cache",
+			"editar": "Editar",
+			"propiedades": "Propiedades de página",
+			"salir": "Salir"
+		}
+	}
+}
