@@ -3,9 +3,14 @@
 if (!hayValor(moduloActividad)) {
 var moduloActividad = (function() {
 	var pendientes = 0;
-	var actividadOn = function() {
+	var actividadOn = function(mensaje) {
+		if (!hayValor(mensaje)) {
+			mensaje = '';
+		}
 		if (pendientes == 0) {
-			$('body').append('<div id="loading"><p>Procesando petici&oacute;n...</p></div>');
+			var nuevo = $('<div id="loading"><p></p></div>');
+			nuevo.find('p').html(mensaje);
+			$('body').append(nuevo);
 		}
 		pendientes++;
 	};

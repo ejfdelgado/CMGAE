@@ -15,6 +15,8 @@ gulp.task('default', function() {
   gulp.src([
 	'./assets/cmgae/utils.js',
     './assets/cmgae/moduloActividad.js',
+    './assets/cmgae/moduloHttp.js',
+    './assets/cmgae/moduloLocal.js',
     './assets/cmgae/moduloApp.js',
     './assets/cmgae/moduloMenus.js',
     './assets/cmgae/moduloEdicion.js',
@@ -26,7 +28,9 @@ gulp.task('default', function() {
   
   gulp.src([
 	'./assets/cmgae/utils.js',
-	'./assets/cmgae/moduloActividad.js',
+    './assets/cmgae/moduloActividad.js',
+    './assets/cmgae/moduloHttp.js',
+    './assets/cmgae/moduloLocal.js',
 	'./assets/cmgae/moduloApp.js',
 	'./assets/cmgae/moduloArchivos.js',
 	'./assets/cmgae/moduloMenus.js',
@@ -39,8 +43,10 @@ gulp.task('default', function() {
   
   gulp.src([
 	'./assets/cmgae/utils.js',
+    './assets/cmgae/moduloActividad.js',
+    './assets/cmgae/moduloHttp.js',
+    './assets/cmgae/moduloLocal.js',
 	'./assets/cmgae/moduloMenus.js',
-	'./assets/cmgae/moduloActividad.js',
 	'./assets/cmgae/moduloApp.js',
 	'./assets/cmgae/moduloArchivos.js',
 	'./assets/cmgae/moduloEditorTexto.js',

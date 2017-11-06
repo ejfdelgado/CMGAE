@@ -4,20 +4,7 @@ var moduloMenus = (function() {
 	var pilaLocal = [];
 	
 	var cargarHtml = function(ruta) {
-		var diferido = $.Deferred();
-        moduloActividad.on();
-        $.ajax({
-            url: '/assets/cmgae/menus'+ruta,
-            type: 'GET',
-            cache: false,
-        }).done(function(data) {        	
-        	diferido.resolve(data);
-        }).fail(function() {
-        	diferido.reject();
-        }).always(function() {
-        	moduloActividad.off();
-        });
-		return diferido.promise();
+		return moduloHttp.get('/assets/cmgae/menus'+ruta);
 	};
 	
 	var esUltimoId = function(id) {
@@ -48,6 +35,7 @@ var moduloMenus = (function() {
 	};
 	
 	var activarNodo = function(nodo, otroMapa) {
+		moduloLocal.procesarElemento(nodo);
 		var mapa = {
 			funciones: {
 				'.menu_opc_ingresar': moduloApp.login,

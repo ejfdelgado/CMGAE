@@ -85,7 +85,6 @@ var moduloEdicion = (function() {
 	};
 	
 	var activarPaginacion = function(nodo) {
-		
 		if (!hayValor(nodo)) {
 			nodo = $('body');
 		}
@@ -173,7 +172,7 @@ var moduloEdicion = (function() {
 			}
 		};
 		
-	  nodo.find("a[data-next]").each(function(index, element) {
+	  $.each(nodo.find("a[data-next]"), function(index, element) {
 		var actual = $(element);
 		activatePageA(actual);
 	  });
