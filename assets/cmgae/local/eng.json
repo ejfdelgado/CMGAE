@@ -13,7 +13,8 @@
 			"borrarcache": "Erase cache",
 			"editar": "Edit",
 			"propiedades": "Page properties",
-			"salir": "Quit"
+			"salir": "Quit",
+			"ingresar": "Login"
 		}
 	}
 }

@@ -26,12 +26,14 @@ var moduloMenus = (function() {
 		});
 	};
 	
+	var error = function() {
+		mostrarMenuSoloTexto(moduloLocal.traductir('menus.mensajes.error'));
+	};
+	
 	var notificar = function(promesa) {
 		$.when(promesa).then(function() {
-			mostrarMenuSoloTexto('Hecho!');
-		}, function() {
-			mostrarMenuSoloTexto('Error :(');
-		});
+			mostrarMenuSoloTexto(moduloLocal.traductir('menus.mensajes.hecho'));
+		}, error);
 	};
 	
 	var activarNodo = function(nodo, otroMapa) {
@@ -44,7 +46,8 @@ var moduloMenus = (function() {
 				'.create-ui-toggle2': moduloApp.abrirBarraEdicion,
 				'.menuEliminar': moduloEdicion.funcElegirBorrar,
 			},
-			html: {}
+			html: {},
+			botones: {},
 		};
 		mapa = $.extend(mapa, otroMapa);
 		$.each(mapa.funciones, function(clase, funcion) {
@@ -56,9 +59,49 @@ var moduloMenus = (function() {
 				}
 			});
 		});
+		if (esObjeto(mapa.botones)) {
+			var contenedor = $('<div class="row"><div class="col-xs-12"><div class="text-right botones-aca"></div></div></div>');
+			var predefinido = {texto:'?', clase:'btn-primary', accion: function() {}};
+			$.each(mapa.botones, function(llave, detalle) {
+				predefinir(detalle, predefinido);
+				var nuevoBoton = $('<button type="button" class="btn btn-xs"></button>');
+				nuevoBoton.on('click', detalle.accion);
+				nuevoBoton.addClass(detalle.clase);
+				nuevoBoton.text(detalle.texto);
+				contenedor.find('.botones-aca').append(nuevoBoton);
+			});
+			nodo.append(contenedor);
+		}
 		for (var clase in mapa.html) {
 			nodo.find(clase).html(mapa.html[clase]);
 		}
+	};
+	
+	var confirmar = function() {
+		var promesa = cargarHtml('/confirmar.html');
+		var diferido = $.Deferred();
+		$.when(promesa).then(function(data) {
+			var otros = {
+				'botones': {
+					'aceptar': {
+						'texto': moduloLocal.traducir('menus.botones.aceptar'),
+						'clase':'btn-success',
+						'accion': function() {
+							diferido.resolve();
+						}
+					},
+					'cancelar': {
+						'texto': moduloLocal.traducir('menus.botones.cancelar'),
+						'clase':'btn-danger',
+						'accion': function() {
+							diferido.reject();
+						}
+					}
+				}	
+			};
+			agregarNodoPila('confirmacion', data, otros);
+		});
+		return diferido.promise();
 	};
 	
 	var agregarNodoPila = function(ID, data, otroMapa) {
@@ -125,6 +168,9 @@ var moduloMenus = (function() {
 		'mostrarFormularioEdicion': mostrarFormularioEdicion,
 		'mostrarMenuBasico': mostrarMenuBasico,
 		'mostrarMenuSoloTexto': mostrarMenuSoloTexto,
+		'confirmar': confirmar,
+		'sacarUltimo': sacarUltimo,
+		'error': error,
 	};
 })();
 }

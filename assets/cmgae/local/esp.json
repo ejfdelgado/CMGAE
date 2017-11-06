@@ -13,7 +13,16 @@
 			"borrarcache": "Borrar memoria cache",
 			"editar": "Editar",
 			"propiedades": "Propiedades de página",
-			"salir": "Salir"
+			"salir": "Salir",
+			"ingresar": "Ingresar"
+		},
+		"mensajes": {
+			"hecho": "Hecho!",
+			"error": "Ups, ha ocurrido un error, por favor reintente."
+		},
+		"botones": {
+			"aceptar": "Aceptar",
+			"cancelar": "Cancelar"
 		}
 	}
 }

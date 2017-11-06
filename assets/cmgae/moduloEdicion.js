@@ -183,46 +183,29 @@ var moduloEdicion = (function() {
 		  if (botones.length > 0) {
 			  botones.remove();
 		  } else {
-			  $('[about]').each(function(indice) {
-				  var self = $(this);
+			  $('[about]').each(function(indice, elem) {
+				  var self = $(elem);
 				  var panelEliminar = self.find('.btnEliminar');
 				  if (panelEliminar.length == 0) {
-					  self.prepend($('<div class="btnEliminar">'+
-								'<div class="btnEliminarX btnEliminar2 manito"></div>'+
-								'<div class="btnEliminarX opciones invisible">'+
-								'	<div class="btnEliminar3"></div>'+
-								'	<div class="btnEliminar4 manito">Cancelar</div>'+
-								'	<div class="btnEliminar5 manito">Aceptar</div>'+
-								'</div>'+
-								'</div>'));
+					  self.prepend($('<div class="btnEliminar"><div class="btnEliminarX btnEliminar2 manito"></div></div>'));
 					  panelEliminar = self.find('.btnEliminar');
-					  
 					  let botonEliminar = panelEliminar.find('.btnEliminar2');
-					  let botonCancelar = panelEliminar.find('.btnEliminar4');
-					  let botonAceptar = panelEliminar.find('.btnEliminar5');
-					  
 					  botonEliminar.click(function() {
-						  var self = $(this);
-						  self.addClass('invisible');
-						  self.siblings('.opciones').removeClass('invisible');
-					  });
-					  botonAceptar.click(function() {
-						  var self = $(this);
-						  var entidad = self.closest('[about]');
-						  if (entidad.length > 0) {
+						  var promesa = moduloMenus.confirmar();
+						  $.when(promesa).then(function() {
+							  var entidad = self;
 							  var ident = entidad.attr('about');
 							  var tipoNombre = null;
 							  tipoNombre = entidad.attr('typeof');
 							  
-							  var miLlave = (tipoNombre === null || tipoNombre === undefined ? '' : tipoNombre)+'_'+ident;
+							  var miLlave = (!hayValor(tipoNombre) ? '' : tipoNombre)+'_'+ident;
 							  if (miLlave in mapaIds) {
 								  ident = mapaIds[miLlave]; 
 							  }
-							  
 							  moduloActividad.on();
 							  $.ajax({
 								  type: "DELETE",
-								  url: "/rest/"+(tipoNombre === null || tipoNombre === undefined ? '' : tipoNombre)+'/'+ident,
+								  url: "/rest/"+(!hayValor(tipoNombre) ? '' : tipoNombre)+'/'+ident,
 								})
 								.done(function( msg ) {
 									entidad.remove();
@@ -235,12 +218,10 @@ var moduloEdicion = (function() {
 								.always(function() {
 									moduloActividad.off();
 								});
-						  }
-					  });
-					  botonCancelar.click(function() {
-						  var self = $(this);
-						  self.closest('.opciones').addClass('invisible');
-						  self.closest('.btnEliminar').find('.btnEliminar2').removeClass('invisible');
+							  moduloMenus.sacarUltimo();
+						  }, function() {
+							  moduloMenus.sacarUltimo();
+						  })
 					  });
 				  }
 			  });
