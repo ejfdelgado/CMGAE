@@ -108,7 +108,6 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
             "separator_after": false,
             "label": "Borrar",
             "action": function(obj) {
-            	console.log('borrar');
             	var inst = $.jstree.reference(obj.reference);
             	inst.delete_node($node);
             }

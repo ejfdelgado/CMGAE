@@ -126,3 +126,57 @@ var predefinir = function(objeto, ejemplo) {
 	}
 	return objeto;
 };
+
+/*
+Función que facilita la configuración de listas de datos con Midgard
+La configuración de listas es algo como:
+{
+	'Caracteristica': {
+		ejemplo: '#CaracteristicaEjemplo',
+		campos: [
+		         {nombre:'imagen', tipo:'Text'},
+		         {nombre:'titulo', tipo:'TextSimple'},
+		         {nombre:'contenido', tipo:'nuevo'},
+		],
+		listas: [{nombre:'lista1'}],
+	}
+}
+ */
+var configurarListasEditor = function (vie, configuracionListas) {
+    vie.use(new vie.RdfaService());
+    
+    for (let tipoNombre in configuracionListas) {
+    	let tipoNombreRel = tipoNombre+'Rel';
+    	let unTipo = configuracionListas[tipoNombre];
+    	let confCampos = [];
+    	for (let i=0; i<unTipo.campos.length; i++) {
+    		let unCampo = unTipo.campos[i];
+    		confCampos.push({'id': unCampo.nombre, 'range': unCampo.tipo, 'min': 0, 'max': 1});
+    	}
+    	vie.types.add(tipoNombre, confCampos);
+    	for (let j=0; j<unTipo.listas.length; j++) {
+    		let elem = unTipo.listas[j];
+    		vie.types.add(elem.nombre, [{id:tipoNombreRel, range:tipoNombre, min: 0, max: -1}]);
+    	}
+    	vie.service('rdfa').setTemplate(tipoNombre, tipoNombreRel, jQuery(unTipo.ejemplo).html());
+    }
+};
+
+var tieneAtributo = function(elem, name) {
+	var attr = elem.attr(name);
+	return (typeof attr !== typeof undefined && attr !== false)
+};
+
+var activarConteoRegresivo = function() {
+	//Countdown
+	//<script src="/assets/js/comun/jquery.countdown.min.js"></script>
+	//<div dateProperty="regresivo" data-value="{% buscar leng dicci tipo nodo 'regresivo' '1480809600' %}"><h1 class="mycountdown" data-format="yyyy/MM/dd" data-count-format="%D d&iacute;as %H:%M:%S"></h1></div>
+	$('.mycountdown').each(function(i, obj) {
+		var self = $(obj);
+		var inicio = self.text();
+		var formato = self.attr('data-count-format');
+		self.countdown(inicio, function(event) {
+			$(this).text(event.strftime(formato));
+		});
+	});
+};

@@ -4,7 +4,8 @@
 		"cache_borr_ok": "Cache erased!",
 		"error_ajax": "Service invocation error",
 		"confirme": "Are you sure?",
-		"procesando": "Loading..."
+		"procesando": "Loading...",
+		"verifique": "Verify field "
 	},
 	"menus": {
 		"general": {
@@ -15,6 +16,14 @@
 			"propiedades": "Page properties",
 			"salir": "Quit",
 			"ingresar": "Login"
+		},
+		"mensajes": {
+			"hecho": "Done!",
+			"error": "Ups, some error has occured, please retry."
+		},
+		"botones": {
+			"aceptar": "Accept",
+			"cancelar": "Cancel"
 		}
 	}
 }

@@ -4,7 +4,8 @@
 		"cache_borr_ok": "Cache borrada",
 		"error_ajax": "Error al invocar servicio",
 		"confirme": "¿Está seguro de realizar la acción?",
-		"procesando": "Procesando petición... :)"
+		"procesando": "Procesando petición... :)",
+		"verifique": "Verifique el campo "
 	},
 	"menus": {
 		"general": {

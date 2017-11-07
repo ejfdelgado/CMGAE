@@ -6,7 +6,14 @@ var gulp = require('gulp')
 
 gulp.task('default', function() {
   gulp.src([
-    './assets/cmgae/comun0.js',
+	'./assets/cmgae/utils.js',
+	'./assets/cmgae/moduloActividad.js',
+	'./assets/cmgae/moduloHttp.js',
+	'./assets/cmgae/moduloLocal.js',
+    './assets/cmgae/moduloApp.js',
+    './assets/cmgae/moduloMenus.js',
+    './assets/cmgae/moduloEdicion.js',
+    './assets/cmgae/moduloContactenos.js',
   ]).pipe(concat('comun0.min.js'))
     .pipe(babel())
     .pipe(uglify())
@@ -20,6 +27,7 @@ gulp.task('default', function() {
     './assets/cmgae/moduloApp.js',
     './assets/cmgae/moduloMenus.js',
     './assets/cmgae/moduloEdicion.js',
+    './assets/cmgae/moduloContactenos.js',
     './assets/cmgae/comun.js',
   ]).pipe(concat('comun.min.js'))
     .pipe(babel())
@@ -35,6 +43,7 @@ gulp.task('default', function() {
 	'./assets/cmgae/moduloArchivos.js',
 	'./assets/cmgae/moduloMenus.js',
 	'./assets/cmgae/moduloEdicion.js',
+	'./assets/cmgae/moduloContactenos.js',
     './assets/cmgae/createmain.js',
   ]).pipe(concat('createmain.min.js'))
     .pipe(babel())
@@ -52,6 +61,7 @@ gulp.task('default', function() {
 	'./assets/cmgae/moduloEditorTexto.js',
 	'./assets/cmgae/moduloArbolArchivos.js',
 	'./assets/cmgae/moduloEdicion.js',
+	'./assets/cmgae/moduloContactenos.js',
     './assets/cmgae/editor.js',
   ]).pipe(concat('editor.min.js'))
     .pipe(babel())

@@ -27,12 +27,12 @@ var moduloMenus = (function() {
 	};
 	
 	var error = function() {
-		mostrarMenuSoloTexto(moduloLocal.traductir('menus.mensajes.error'));
+		mostrarMenuSoloTexto(moduloLocal.traducir('menus.mensajes.error'));
 	};
 	
 	var notificar = function(promesa) {
 		$.when(promesa).then(function() {
-			mostrarMenuSoloTexto(moduloLocal.traductir('menus.mensajes.hecho'));
+			mostrarMenuSoloTexto(moduloLocal.traducir('menus.mensajes.hecho'));
 		}, error);
 	};
 	
@@ -137,6 +137,7 @@ var moduloMenus = (function() {
 	};
 	
 	var mostrarMenuPagina = function() {
+		//TODO reconfigurar
 		pila.push('menu_pagina');
 		$('.menu_core').toggleClass('invisible');
 		$('.menu_pagina').toggleClass('invisible');
@@ -144,8 +145,8 @@ var moduloMenus = (function() {
 	};
 	
 	var mostrarFormularioEdicion = function(nodo, atributo, valor, sufijo) {
+		//TODO reconfigurar
 		pila.push("formhtml");
-		console.log('mostrarFormularioEdicion', nodo, atributo, valor)
 		$(".formhtml").attr('nodo2', nodo);
 		$(".formhtml").attr('property2', atributo);
 		$(".formhtml").attr('sufijo', sufijo);

@@ -41,7 +41,7 @@
 			  nuevo = nuevo.replace(/"/g, '&quot;');
 			  objeto2.attr('style', nuevo);
 			  notificarCambio();
-			  //objeto.html(nuevo);//TODO esto dónde va??
+			  //objeto.html(nuevo);//TODO esto dÃ³nde va??
 		  }
 	  };
 	
@@ -77,7 +77,7 @@
 						let valorAnterior = self.attr('style');
 						moduloMenus.mostrarFormularioEdicion(padre.attr('about'), propiedad, valorAnterior);
 					} else if (e.ctrlKey) {
-						//Se permtie diréctamente actualizar el fondo
+						//Se permtie dirï¿½ctamente actualizar el fondo
 						abrirFileChooser(self, propiedad);
 					}
 				});
@@ -121,7 +121,7 @@
 		if (attrs.ok == false) {return;}
 		moduloMenus.mostrarFormularioEdicion(attrs.ident, attrs.propiedad, self.attr('alt'), '_alt');
 	}
-	//Todas las imágenes podrán cambiar con click
+	//Todas las imÃ¡genes podrÃ¡n cambiar con click
 	var abrirFileChooser = function(self, propEstilo) {
 		var attrs = comunEdicionImagenes(self, propEstilo);
 		if (attrs.ok == false) {return;}
@@ -168,16 +168,16 @@
 		
 		var maximoTamanio = MAX_FILE_SIZE;
 		var dataFolder = '/imagenesbasico';
-		//Se valida si el html declara un tamaño máximo específico
+		//Se valida si el html declara un tamaï¿½o mï¿½ximo especï¿½fico
 		try {
 			var valorDataMax = self.attr('data-max');
 			if (hayValor(valorDataMax)) {
 				maximoTamanio = parseInt(valorDataMax)*1024;
 			}
 		} catch(e2) {
-			console.log('Intentó determinar tamaño máximo de imagen pero falló');
+			console.log('IntentÃ³ determinar tamaÃ±o mÃ¡ximo de imagen pero fallÃ³');
 		}
-		//Se valida si el html declara una carpeta específica
+		//Se valida si el html declara una carpeta especï¿½fica
 		var attrDataFolder = self.attr('data-carpeta');
 		if (typeof attrDataFolder !== typeof undefined && attrDataFolder !== false) {
 			attrDataFolder = attrDataFolder.trim();
@@ -235,8 +235,8 @@
 						}
 					});
 					actual.attr("act_edt", "ok");
-					//Se intenta agregar un elemento que permita edición después de creación
-					if (!actual.hasClass('textarea_background')) {//? TODO decidir se para los fondos se va a hacer así
+					//Se intenta agregar un elemento que permita ediciï¿½n despuï¿½s de creaciï¿½n
+					if (!actual.hasClass('textarea_background')) {//? TODO decidir se para los fondos se va a hacer asï¿½
 						var nuevoBoton = $('<button type="button" style="padding: 5px !important;">editar</button>');
 						nuevoBoton.bind('click', function() {
 							actual.click();
