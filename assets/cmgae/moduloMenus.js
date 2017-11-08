@@ -154,17 +154,23 @@ var moduloMenus = (function() {
 		$('.formhtml').removeClass('invisible');
 	};
 	
-	$(document).keyup(function(e) {
-	  if (e.keyCode == 27) {
-	  	if (pilaLocal.length == 0) {
-	  		mostrarMenuBasico();
-	  	} else {
-	  		sacarUltimo();
-	  	}
-	  }
-	});
+	var inicializar = function() {
+		var diferido = $.Deferred();
+		$(document).keyup(function(e) {
+		  if (e.keyCode == 27) {
+		  	if (pilaLocal.length == 0) {
+		  		mostrarMenuBasico();
+		  	} else {
+		  		sacarUltimo();
+		  	}
+		  }
+		});
+		diferido.resolve();
+		return diferido.promise();
+	};
 	
 	return {
+		'inicializar': inicializar,
 		'mostrarMenuPagina': mostrarMenuPagina,
 		'mostrarFormularioEdicion': mostrarFormularioEdicion,
 		'mostrarMenuBasico': mostrarMenuBasico,

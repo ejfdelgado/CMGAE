@@ -28,40 +28,6 @@ CORREO_ENVIOS = 'edgar.jose.fernando.delgado@gmail.com'
 
 COMMON_TEMPLATES = {'configurar.html':{'admin':True}, 'calendario.html':{'admin':False}, 'archivos.html':{'admin':True}}
 
-JS_COMUNES3 = '<script src="/assets/js/comun/jquery-2.1.1.min.js"></script>'\
-            '<script src="/assets/js/comun/skel.min.js"></script>'\
-            '<script src="/assets/js/comun/jquery.scrollex.min.js"></script>'\
-            '<script src="/assets/js/comun/jquery.scrolly.min.js"></script>'\
-            '<script src="/assets/js/comun/date/jquery-dateFormat.min.js"></script>'\
-            '<script src="/assets/js/comun/util.js"></script>'\
-            '<!--[if lte IE 8]><script src="/assets/js/ie/respond.min.js"></script><![endif]-->'
-
-JS_COMUNES0 = '<script src="/assets/dist/comun/comun0.min.js"></script>'\
-            '<script>if (!HAS_USER) {borrarLocalStorage();}</script>'
-#Este se inserta solo para administradores!
-JS_COMUNES1 = '<script src="/assets/js/create2/ui/core.min.js"></script>'\
-            '<script src="/assets/js/create2/ui/position.min.js"></script>'\
-            '<script src="/assets/js/create2/ui/widget.min.js"></script>'\
-            '<script src="/assets/js/create2/ui/button.min.js"></script>'\
-            '<script src="/assets/js/create2/ui/dialog.min.js"></script>'\
-            '<script src="/assets/js/create2/ui/droppable.min.js"></script>'\
-            '<script src="/assets/js/create2/ui/effect.min.js"></script>'\
-            '<script src="/assets/js/create2/ui/effect-highlight.min.js"></script>'\
-            '<script src="/assets/js/create2/rangy-core-1.2.3.js"></script>'\
-            '<script src="/assets/js/create2/underscore-min.js"></script>'\
-            '<script src="/assets/js/create2/backbone-min.js"></script>'\
-            '<script src="/assets/js/create2/hallo-min.js"></script>'\
-            '<script src="/assets/js/create2/vie-min.js"></script>'\
-            '<script src="/assets/js/comun/date/picker.js"></script>'\
-            '<script src="/assets/js/comun/date/picker.date.js"></script>'\
-            '<script src="/assets/js/comun/date/picker.time.js"></script>'\
-            '<script src="/assets/js/comun/date/legacy.js"></script>'\
-            '<script src="/assets/js/create2/create-min.js"></script>'\
-            '<script src="/assets/js/create2/filereader.js"></script>'\
-            '<script src="/assets/dist/admin/createmain.min.js"></script>'
-JS_COMUNES2 = '<script src="/assets/dist/comun/comun.min.js"></script>'\
-            '<script src="/mijavascript.js"></script>'
-
 ANALYTICS = '<script>'\
             '    (function(i,s,o,g,r,a,m){i["GoogleAnalyticsObject"]=r;i[r]=i[r]||function(){'\
             '    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),'\
@@ -276,10 +242,6 @@ def principal(request, data):
             'user': user,
             'entidades' : entidades,
             'cursores' : cursores,
-            'JS_COMUNES0': JS_COMUNES0,
-            'JS_COMUNES1': JS_COMUNES1,
-            'JS_COMUNES2': JS_COMUNES2,
-            'JS_COMUNES3': JS_COMUNES3,
             'DATETIME_NOW': comun.DATETIME_NOW,
             'DATETIME_NOW_LAST': comun.DATETIME_NOW_LAST,
             'DATETIME_NOW_FIRST': comun.DATETIME_NOW_FIRST,

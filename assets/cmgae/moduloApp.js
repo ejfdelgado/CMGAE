@@ -57,6 +57,12 @@ var moduloApp = (function() {
 	  return diferido.promise();
 	};
 	
+	var inicializar = function() {
+		var diferido = $.Deferred();
+		diferido.resolve();
+		return diferido.promise();
+	};
+	
 	return {
 		'esAdmin': esAdmin,
 		'esUsuario': esUsuario,

@@ -9,13 +9,16 @@ if (!hayValor(moduloLocal)) {
 		var datos = null;
 		
 		var inicializar = function() {
+			var diferido = $.Deferred();
 			var promesa = moduloHttp.get('/assets/cmgae/local/'+props.lengua+'.json');
 			$.when(promesa).then(function(nuevos) {
 				datos = JSON.parse(nuevos);
+				diferido.resolve();
 			});
 			//Se formatean las fechas
 			epochAFechaElem($('body'));
 			activarBotonesLenguaje();
+			return diferido.promise();
 		};
 		
 		var traducir = function(llave) {
@@ -102,9 +105,8 @@ if (!hayValor(moduloLocal)) {
 			});
 		};
 		
-		inicializar();
-		
 		return {
+			'inicializar': inicializar,
 			'traducir': traducir,
 			'procesarElemento': procesarElemento,
 			'epochAFechaElem': epochAFechaElem,

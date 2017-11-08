@@ -1,6 +1,6 @@
 
 if (!hayValor(moduloContactenos)){
-	var moduloContactenos = function() {
+	var moduloContactenos = (function() {
 
 		function mostrarMensaje(papa, msg, clase) {
 			var tag = 'div';
@@ -99,6 +99,7 @@ if (!hayValor(moduloContactenos)){
 		};
 		
 		var inicializar = function() {
+			var diferido = $.Deferred();
 			/**
 			 * Sirve para enviar mensajes:
 			 * 
@@ -186,12 +187,12 @@ if (!hayValor(moduloContactenos)){
 					moduloActividad.off();
 				});
 			});
+			diferido.resolve();
+			return diferido.promise();
 		};
-		
-		inicializar();
 		
 		return {
-			
+			'inicializar': inicializar,
 		};
-	};
+	})();
 }

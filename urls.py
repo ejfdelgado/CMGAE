@@ -8,10 +8,6 @@ from views.main import RESTfulActions
 from views.main import ConfigHandler
 from views.users import UserHandler
 from views.storage import StorageHandler
-from views.carrito import CarritoHandler, ProductsHandler
-from views.citas import CitasHandler
-from views.lapseview import LVHandler
-from views.apirest import ApiRestHandler
 from views.prueba import PruebaHandler
 
 urlpatterns = defaults.patterns(
@@ -21,12 +17,7 @@ urlpatterns = defaults.patterns(
     (r'^act/?(.*)', RESTfulActions),
     (r'^user/?(.*)', UserHandler),
     (r'^prueba/?(.*)', PruebaHandler),
-    (r'^lapseview/?(.*)', LVHandler),
-    (r'^apirest/(\d*)?(.*)', ApiRestHandler),
     (r'^storage/?(.*)', StorageHandler),
-    (r'^carrito/?(.*)', CarritoHandler),
-    (r'^citas/?(.*)', CitasHandler),
-    (r'^productos/?(.*)', ProductsHandler),
     (r'^sitemap.xml(.*)', ConfigHandler),
     (r'^robots.txt(.*)', ConfigHandler),
     (r'^mapa.kml(.*)', ConfigHandler),
