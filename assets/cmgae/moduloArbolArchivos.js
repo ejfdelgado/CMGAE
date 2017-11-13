@@ -18,6 +18,10 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 			var ref = data.instance.get_node(data.selected[0]);
 		}
 	});
+	
+	elem.bind("move_node.jstree", function (e, data) {
+		console.log(data);
+	});
     
 	elem.on("rename_node.jstree", function (event, data) {
 		var anterior = data.old;
@@ -226,7 +230,7 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 	    },
 	  "plugins" : [
 	    "contextmenu", "dnd", "search","json_data",
-	    "state", "wholerow"
+	    "state", "wholerow",
 	  ]
 	});
 	
