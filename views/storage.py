@@ -68,6 +68,14 @@ def list_bucket(ruta, tamanio, ultimo):
                                marker=stat.filename)
     return ans;
 
+def renombrar_archivo(response, viejo, nuevo):
+    try:
+        gcs.copy2(viejo, nuevo)
+        gcs.delete(viejo)
+        response.write(simplejson.dumps({'error':0}))
+    except:
+        response.write(simplejson.dumps({'error':1}))
+
 def delete_files(response, filename):
     try:
         gcs.delete(filename)
@@ -143,17 +151,27 @@ def StorageHandler(request, ident):
             elif (ident == 'read'):
                 nombre = request.GET.get('name', None)
                 response = read_file(nombre)
+            elif (ident == 'renombrar'):
+                if (not users.is_current_user_admin()):
+                    response.write(simplejson.dumps({'error':2, 'msg':'No tiene permisos'}))
+                else:
+                    viejo = request.GET.get('viejo', None)
+                    nuevo = request.GET.get('nuevo', None)
+                    if (viejo is None or nuevo is None):
+                        response.write(simplejson.dumps({'error':2, 'msg':'Falta parametros'}))
+                    else:
+                        renombrar_archivo(response, viejo, nuevo)
             elif (ident == 'guid'):
                 response.write(simplejson.dumps({'error':0, 'uid':generarUID()}))
             else:
                 response.write(simplejson.dumps({'error':0}))
         elif request.method == 'DELETE':
             if (ident == 'borrar'):
-                if (users.is_current_user_admin()):
+                if (not users.is_current_user_admin()):
+                    response.write(simplejson.dumps({'error':2, 'msg':'No tiene permisos'}))
+                else:
                     nombre = request.GET.get('name', None)
                     delete_files(response, nombre)
-                else:
-                    response.write(simplejson.dumps({'error':2, 'msg':'No tiene permisos'})) 
         elif request.method == 'POST':
             archivo = request.FILES['file-0']
             uploaded_file_content = archivo.read()

@@ -5,6 +5,14 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 	
 	var instanciaEditorTexto = moduloEditorTexto(elemEditor);
 	
+	var darNombresHijos = function(nodo) {
+		var hijos = copiarJSON(leerObj(nodo, 'children', []));
+		for (let i=0; i<hijos.length; i++) {
+			hijos[i] = moduloArchivos.darNombreId(hijos[i]);
+		}
+		return hijos;
+	};
+	
 	elem.on("changed.jstree", function (event, data) {
 		if(data.selected.length) {
 			var ref = data.instance.get_node(data.selected[0]);
@@ -15,11 +23,36 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 		var anterior = data.old;
 		var nuevo = data.text;
 		var elNodo = data.node;
-		//TODO En el servidor actualizar la ruta y luego actualizar el id
+		var refArbol = data.instance;
+		
 		if (elNodo.original.type == 'folder') {
-			data.instance.set_id(elNodo, data.node.parent + nuevo + '/');
+			//data.instance.set_id(elNodo, data.node.parent + nuevo + '/');
 		} else {
-			data.instance.set_id(elNodo, data.node.parent + nuevo);
+			var viejoId = data.node.parent + anterior;
+			var nuevoId = data.node.parent + nuevo;
+			
+			var funError = function() {
+				elNodo.text = anterior;
+				elNodo.original.text = anterior;
+				refArbol.redraw([elNodo]);
+				moduloMenus.error();
+			};
+			
+			//Validar que otro no se llame igual
+        	var padre = refArbol.get_node(data.node.parent);
+        	var hermanos = darNombresHijos(padre);
+        	if (estaEnLista(nuevo, hermanos)) {
+        		funError();
+        	} else {
+				var promesa = moduloArchivos.renombrar(viejoId, nuevoId);
+				$.when(promesa).then(function(datos) {
+					if (datos.error != 0) {
+						funError();
+					} else {
+						data.instance.set_id(elNodo, nuevoId);
+					}
+				}, funError);
+        	}
 		}
 	});
 	
@@ -60,7 +93,7 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
             			contenido = '';
             		}
             		instanciaEditorTexto.abrirEditor(ref.text, contenido, ref.id);
-            	});
+            	}, moduloMenus.error);
             }
         };
 		var crearCarpeta = {
@@ -120,18 +153,10 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 	            		} else {
 	            			moduloMenus.error();
 	            		}
-	            	});
+	            	}, moduloMenus.error);
             	});
             }
         };
-		
-		var darNombresHijos = function(nodo) {
-			var hijos = copiarJSON(leerObj(nodo, 'children', []));
-			for (let i=0; i<hijos.length; i++) {
-				hijos[i] = moduloArchivos.darNombreId(hijos[i]);
-			}
-			return hijos;
-		};
 		
 		var cargar = {
 	        "separator_before": false,
@@ -160,7 +185,7 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 		                	
 		                });
 	        		}
-	        	});
+	        	}, moduloMenus.error);
 	        }
 		};
 		

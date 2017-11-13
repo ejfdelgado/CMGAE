@@ -180,6 +180,17 @@ var moduloArchivos = (function() {
 		}
 		url+=encodeURIComponent(unId);
 		return moduloHttp.borrar(url);
+	};
+	
+	var renombrar = function(viejo, nuevo) {
+		var url = '/storage/renombrar?';
+		if (moduloApp.esPruebas()) {
+			viejo=PREFIJO_LOCAL+viejo;
+			nuevo=PREFIJO_LOCAL+nuevo;
+		}
+		url+='viejo='+encodeURIComponent(viejo);
+		url+='&nuevo='+encodeURIComponent(nuevo);
+		return moduloHttp.get(url);
 	}
 	
 	return {
@@ -191,6 +202,7 @@ var moduloArchivos = (function() {
 		'generarUrlDadoId': generarUrlDadoId,
 		'darIdDadoUrl': darIdDadoUrl,
 		'borrar': borrar,
+		'renombrar': renombrar,
 		'completarPredeterminados': completarPredeterminados,
 	};
 })();
