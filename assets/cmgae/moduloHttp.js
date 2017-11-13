@@ -18,8 +18,20 @@ if (!hayValor(moduloHttp)) {
 			return diferido.promise();
 		};
 		
+		var darToken = function() {
+			return $('[name="csrfmiddlewaretoken"]').val();
+		};
+		
+		var darHeader = function() {
+			return {
+            	'X-CSRFToken':darToken(),
+            };
+		};
+		
 		return {
 			'get': get,
+			'darToken': darToken,
+			'darHeader': darHeader,
 		}
 	})();
 }

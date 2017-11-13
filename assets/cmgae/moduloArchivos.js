@@ -45,9 +45,7 @@ var moduloArchivos = (function() {
 	            url: '/storage/',
 	            type: 'POST',
 	            data: form,
-	            headers:{
-	            	'X-CSRFToken':$('[name="csrfmiddlewaretoken"]').val()
-	            },
+	            headers:moduloHttp.darHeader(),
 	            cache: false,
 	            contentType: false,
 	            processData: false,
@@ -80,9 +78,7 @@ var moduloArchivos = (function() {
             url: '/storage/',
             type: 'POST',
             data: form,
-            headers:{
-            	'X-CSRFToken':$('[name="csrfmiddlewaretoken"]').val()
-            },
+            headers:moduloHttp.darHeader(),
             cache: false,
             contentType: false,
             processData: false,
@@ -104,7 +100,7 @@ var moduloArchivos = (function() {
 		var diferido = $.Deferred();
 		moduloActividad.on();
         $.ajax({
-            url: '/storage/read?name='+encodeURIComponent(id),
+            url: generarUrlDadoId(id),
             type: 'GET',
             cache: false,
             contentType: false,
@@ -117,12 +113,47 @@ var moduloArchivos = (function() {
         	moduloActividad.off();
         });
         return diferido.promise();
-	}
+	};
+	
+	var generarUrlDadoId = function(unId) {
+		var valor;
+		if (moduloApp.esProduccion()) {
+			valor = 'http://storage.googleapis.com'+unId+'?' + new Date().getTime();
+		} else {
+			var PREFIJO = '/app_default_bucket';
+			if (unId.startsWith(PREFIJO)) {
+				unId = unId.substring(PREFIJO.length);
+			}
+			valor = '/storage/read?name='+encodeURIComponent(unId)
+		}
+		return valor;
+	};
+	
+	var darIdDadoUrl = function(direccion) {
+		if (!hayValor(direccion)) {return null;}
+		if (moduloApp.esProduccion()) {
+			var PATRON_GOOGLE_STORAGE = /^(https?:\/\/storage\.googleapis\.com)([^\?]*)(\?.*)?$/ig;
+			let partes = PATRON_GOOGLE_STORAGE.exec(direccion);
+			if (partes != null && partes.length >= 3) {
+				return partes[2];
+			}
+		} else {
+			var PATRON_LOCAL_STORAGE = /(\/storage\/read\?name=)(.*)/ig;
+			let partes = PATRON_LOCAL_STORAGE.exec(direccion);
+			if (partes != null && partes.length >= 3) {
+				return partes[2];
+			}
+		}
+		return null;
+	};
 	
 	return {
-		leerTextoPlano: leerTextoPlano,
-		escribirTextoPlano: escribirTextoPlano,
-		subirArchivo: subirArchivo,
+		'leerTextoPlano': leerTextoPlano,
+		'escribirTextoPlano': escribirTextoPlano,
+		'subirArchivo': subirArchivo,
+		'generarUrlDadoId': generarUrlDadoId,
+		'darIdDadoUrl': darIdDadoUrl,
+		'completarPredeterminados': completarPredeterminados,
 	};
 })();
 }

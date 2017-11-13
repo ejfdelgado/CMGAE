@@ -6,6 +6,15 @@ var moduloApp = (function() {
 		'URL_LOGOUT': URL_LOGOUT,
 		'HAS_USER': HAS_USER,
 		'IS_ADMIN': IS_ADMIN,
+		'AMBIENTE': AMBIENTE,
+	};
+	
+	var esPruebas = function() {
+		return props.AMBIENTE == 'pruebas';
+	};
+	
+	var esProduccion = function() {
+		return props.AMBIENTE == 'produccion';
 	};
 	
 	var esAdmin = function() {
@@ -70,6 +79,8 @@ var moduloApp = (function() {
 		'logout': logout,
 		'borrarCache': borrarCache,
 		'abrirBarraEdicion': abrirBarraEdicion,
+		'esProduccion': esProduccion,
+		'esPruebas': esPruebas,
 	};
 	
 })();

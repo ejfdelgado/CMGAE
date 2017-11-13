@@ -94,9 +94,6 @@ def procesarTemplate(ruta, base, template_dirs):
             respuesta['busquedas'].append(match[3])
     return respuesta
 
-template = 'var HAS_USER = ;'\
-        'var IS_ADMIN = '
-
 def generarVariablesUsuario(var_full_path, leng):
     texto = '<script>\n'
     usuario = users.get_current_user()
@@ -107,6 +104,11 @@ def generarVariablesUsuario(var_full_path, leng):
     texto += 'var LENGUAJE_PRED = "'+LENGUAJE_PRED+'";\n'
     texto += 'var URL_LOGIN = "'+login_url+'";\n'
     texto += 'var URL_LOGOUT = "'+logout_url+'";\n'
+    
+    if os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine/'):
+        texto += 'var AMBIENTE = "produccion";\n'
+    else:
+        texto += 'var AMBIENTE = "pruebas";\n'
     
     if (usuario is None):
         texto += 'var HAS_USER = false;\n'
@@ -341,7 +343,6 @@ def RESTfulHandler(request, ident):
     class_ = getattr(module, nombre)
     
     def post():
-        logging.info('post '+str(ident)+' with ')
         completo = simplejson.loads(request.raw_post_data)
         todo = completo['payload']
         leng = completo['leng']
@@ -353,7 +354,6 @@ def RESTfulHandler(request, ident):
         response.write(simplejson.dumps(ans))
     
     if request.method == 'GET':
-        logging.info('get')
         if ident:
             llave = ndb.Key(nombre, ident)
             greetings = llave.get()
@@ -361,13 +361,8 @@ def RESTfulHandler(request, ident):
             greetings = buscarTodos(nombre)
         todos = simplejson.dumps(comun.to_dict(greetings))
         response.write(todos)
-        
-    if request.method == 'POST':
-        post()
     
-    if request.method == 'PUT':
-        logging.info('put '+str(ident)+' with ')#tiene problemas con el unicode
-        
+    if request.method == 'POST':
         completo = simplejson.loads(request.raw_post_data)
         tmp = completo['payload']
         leng = completo['leng']

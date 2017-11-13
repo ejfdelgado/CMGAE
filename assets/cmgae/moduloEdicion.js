@@ -3,13 +3,12 @@ if (!hayValor(moduloEdicion)) {
 var moduloEdicion = (function() {
 	var mapaIds = {};
 	var activarEdicionOk = false;
-	var MAX_FILE_SIZE = 500*1024;//en KB
 	var vie = null;
 	
 	try {
 		vie = getVieHere();
 	} catch (e) {
-		
+		console.log('Error obteniendo vie', e)
 	}
 	
 	var activarEdicion = function() {
@@ -59,15 +58,15 @@ var moduloEdicion = (function() {
 					  completo['payload'] = contenido;
 					  completo['leng'] = LENGUAJE;
 					  //completo['tipo'] = tipoNombre;
-					  //completo['csrfmiddlewaretoken'] = "{{ csrf_token }}";
 					  switch (method) {
 					  case 'create':
 					  case 'update':
 						  moduloActividad.on();
 						  $.ajax({
-							  type: "PUT",
+							  type: "POST",
 							  url: "/rest/"+(tipoNombre === null || tipoNombre === undefined ? 'Documento' : tipoNombre)+"/"+matchIdentFinal,
 							  data: JSON.stringify(completo),
+							  headers: moduloHttp.darHeader(),
 							  contentType: "application/json; charset=utf-8",
 							})
 							.done(function( msg ) {
@@ -291,18 +290,16 @@ var moduloEdicion = (function() {
 						padre = self.closest('[about]');
 					}
 					if (padre === undefined) { return; }
-
 					self.on("click", function(e) {
 						if (e.shiftKey) {
 							//Se permite editar el estilo
 							let valorAnterior = self.attr('style');
 							moduloMenus.mostrarFormularioEdicion(padre.attr('about'), propiedad, valorAnterior);
 						} else if (e.ctrlKey) {
-							//Se permtie dir�ctamente actualizar el fondo
+							//Se permtie diréctamente actualizar el fondo
 							abrirFileChooser(self, propiedad);
 						}
 					});
-					
 					self.attr("act_style", "ok");
 				}
 			});
@@ -340,82 +337,22 @@ var moduloEdicion = (function() {
 			if (attrs.ok == false) {return;}
 			moduloMenus.mostrarFormularioEdicion(attrs.ident, attrs.propiedad, self.attr('alt'), '_alt');
 		}
+		
 		//Todas las imágenes podrán cambiar con click
 		var abrirFileChooser = function(self, propEstilo) {
 			var attrs = comunEdicionImagenes(self, propEstilo);
 			if (attrs.ok == false) {return;}
 			
-			var patronFondo = /(background-image\s*:\s*url\s*\(\s*['"]?)([^'^"]*?)(\s*['"]?\))\s*(!\s*important)?\s*(;)?/ig;
-			var asignarSrc = function(unId) {
-				var valor = 'http://storage.googleapis.com'+unId+'?' + new Date().getTime();
-				if (hayValor(propEstilo)) {
-					//Se trata de una imagen de fondo
-					let original = self.attr('style');
-					original = original.replace(patronFondo, '');
-					original = original.trim();
-					if (hayValor(original) && !original.endsWith(';')) {
-						original = original+';';
-					}
-					original+='background-image: url(\''+valor+'\') !important;';
-					self.attr('style', original);
-					return original;
-				} else {
-					self.attr('src', valor);
-				}
-				return valor;
-			};
-			var darIdAnterior = function() {
-				var patronGoogleStorage = /^(https?:\/\/storage\.googleapis\.com)([^\?]*)(\?.*)?$/ig;
-				var direccion = null;
-				if (hayValor(propEstilo)) {
-					let original = self.attr('style');
-					let partesEstilo = patronFondo.exec(original);
-					if (partesEstilo != null && partesEstilo.length > 3) {
-						direccion = partesEstilo[2];
-					}
-				} else {
-					direccion = self.attr('src');
-				}
-				if (!hayValor(direccion)) {return null;}
-				var partes = patronGoogleStorage.exec(direccion);
-				if (partes != null && partes.length >= 3) {
-					return partes[2];
-				}
-				
-				return null;
-			};
-			
-			var maximoTamanio = MAX_FILE_SIZE;
-			var dataFolder = '/imagenesbasico';
-			//Se valida si el html declara un tama�o m�ximo espec�fico
-			try {
-				var valorDataMax = self.attr('data-max');
-				if (hayValor(valorDataMax)) {
-					maximoTamanio = parseInt(valorDataMax)*1024;
-				}
-			} catch(e2) {
-				console.log('Intentó determinar tamaño máximo de imagen pero falló');
-			}
-			//Se valida si el html declara una carpeta espec�fica
-			var attrDataFolder = self.attr('data-carpeta');
-			if (typeof attrDataFolder !== typeof undefined && attrDataFolder !== false) {
-				attrDataFolder = attrDataFolder.trim();
-				if (hayValor(attrDataFolder)) {
-					if (attrDataFolder.charAt(0)!='/') {
-						attrDataFolder = '/'+attrDataFolder;
-					}
-					dataFolder += attrDataFolder;
-				}
-			}
+			var valoresCargue = moduloImagenes.darValoresCargue(self);
 			
 			var promesaCargue = moduloArchivos.subirArchivo({
-				dataFolder: dataFolder,
-				id: darIdAnterior(),
-				maximoTamanio: maximoTamanio,
+				dataFolder: valoresCargue.dataFolder,
+				id: moduloImagenes.darIdAnterior(self, hayValor(propEstilo)),
+				maximoTamanio: valoresCargue.maximoTamanio,
 			});
 			
 			$.when(promesaCargue).then(function(data) {
-				var valor = asignarSrc(data.id);
+				var valor = moduloImagenes.asignarSrc(self, data.id, hayValor(propEstilo));
 	    		funcionAsignarPropiedadDeNodo(vie, attrs.ident, attrs.propiedad, valor);
 			});
 		  };

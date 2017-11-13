@@ -16,11 +16,12 @@ gulp.task('default', function() {
 	'./assets/cmgae/moduloArbolArchivos.js',
 	'./assets/cmgae/moduloApp.js',
 	'./assets/cmgae/moduloContactenos.js',
+	'./assets/cmgae/moduloImagenes.js',
 	'./assets/cmgae/moduloEdicion.js',
 	'./assets/cmgae/moduloMenus.js',
   ]).pipe(concat('modulos.min.js'))
     .pipe(babel())
-    .pipe(uglify())
+    //.pipe(uglify())
     .pipe(gulp.dest('assets/dist'));
   
 });
