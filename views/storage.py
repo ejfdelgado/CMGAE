@@ -170,6 +170,8 @@ def StorageHandler(request, ident):
                         pass
                 nombre = darRaizStorage()+carpeta+'/'+generarUID()+'-'+uploaded_file_filename
             else:
+                if (nombreAnterior is None):
+                    nombreAnterior = carpeta+'/'+uploaded_file_filename
                 nombre = darRaizStorage()+nombreAnterior
             write_retry_params = gcs.RetryParams(backoff_factor=1.1)
             gcs_file = gcs.open(nombre,

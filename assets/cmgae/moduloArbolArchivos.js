@@ -125,24 +125,41 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
             }
         };
 		
+		var darNombresHijos = function(nodo) {
+			var hijos = copiarJSON(leerObj(nodo, 'children', []));
+			for (let i=0; i<hijos.length; i++) {
+				hijos[i] = moduloArchivos.darNombreId(hijos[i]);
+			}
+			return hijos;
+		};
+		
 		var cargar = {
 	        "separator_before": false,
 	        "separator_after": false,
 	        "label": "Cargar archivo",
 	        "action": function(data) {
-	        	var inst = $.jstree.reference(data.reference),
-	        	obj = inst.get_node(data.reference);
+	        	var inst = $.jstree.reference(data.reference);
+	        	var obj = inst.get_node(data.reference);
 	        	var rutaDestino = quitarUltimoSlash(obj.id);
-	        	var promesa = moduloArchivos.subirArchivo({auto: true, tipos:'audio/*|video/*|image/*|text/*', dataFolder:rutaDestino});
+	        	var hijos = darNombresHijos(obj);
+	        	var promesa = moduloArchivos.subirArchivo({
+	        		auto: 'false', 
+	        		tipos:'audio/*|video/*|image/*|text/*', 
+	        		opcionesNegras: hijos,
+	        		dataFolder:rutaDestino,
+	        	});
 	        	$.when(promesa).then(function(resultado) {
-	        		var nuevoNodo = {
-	        				'text':moduloArchivos.darNombreId(resultado.id), 
-	        				'type':'file', 
-	        				'id': moduloArchivos.normalizarId(resultado.id)
-	        				};
-	                inst.create_node(obj, nuevoNodo, "last", function (new_node) {
-	                	
-	                });
+	        		var nombreArchivo = moduloArchivos.darNombreId(resultado.id);
+	        		if (!estaEnLista(nombreArchivo, hijos)) {
+		        		var nuevoNodo = {
+		        				'text': nombreArchivo, 
+		        				'type': 'file', 
+		        				'id': moduloArchivos.normalizarId(resultado.id)
+		        				};
+		                inst.create_node(obj, nuevoNodo, "last", function (new_node) {
+		                	
+		                });
+	        		}
 	        	});
 	        }
 		};

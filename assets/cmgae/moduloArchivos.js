@@ -30,39 +30,50 @@ var moduloArchivos = (function() {
 	        	diferido.reject();
 	        	return;
 	        }
-	        var reader = new FileReader();
-	        reader.readAsDataURL(file);
-	        var form = new FormData();
-	        form.append('file-0', file);
-	        form.append('folder', atributos.dataFolder);
-	        if (hayValor(atributos.id)) {
-	        	form.append('name', atributos.id);
-	        }
-	        if (atributos.auto == 'false') {
-	        	form.append('auto', 'false');
-        	}
-	        //Sobra porque el servidor ya lo está capturando
-	        //form.append('mime', file.type);
-	        moduloActividad.on();
-	        $.ajax({
-	            url: '/storage/',
-	            type: 'POST',
-	            data: form,
-	            headers:moduloHttp.darHeader(),
-	            cache: false,
-	            contentType: false,
-	            processData: false,
-	        }).done(function(data) {
-	        	if (data.error != 0) {
-	        		diferido.reject();
-	        	} else {
-	        		diferido.resolve(data);
+	        var subirReal = function() {
+		        var reader = new FileReader();
+		        reader.readAsDataURL(file);
+		        var form = new FormData();
+		        form.append('file-0', file);
+		        form.append('folder', atributos.dataFolder);
+		        if (hayValor(atributos.id)) {
+		        	form.append('name', atributos.id);
+		        }
+		        if (atributos.auto == 'false') {
+		        	form.append('auto', 'false');
 	        	}
-	        }).fail(function() {
-	        	diferido.reject();
-	        }).always(function() {
-	        	moduloActividad.off();
-	        });
+		        //Sobra porque el servidor ya lo está capturando
+		        //form.append('mime', file.type);
+		        moduloActividad.on();
+		        $.ajax({
+		            url: '/storage/',
+		            type: 'POST',
+		            data: form,
+		            headers:moduloHttp.darHeader(),
+		            cache: false,
+		            contentType: false,
+		            processData: false,
+		        }).done(function(data) {
+		        	if (data.error != 0) {
+		        		diferido.reject();
+		        	} else {
+		        		diferido.resolve(data);
+		        	}
+		        }).fail(function() {
+		        	diferido.reject();
+		        }).always(function() {
+		        	moduloActividad.off();
+		        });
+	        };
+	        
+	        if (estaEnLista(file.name, atributos.opcionesNegras)) {
+	        	var promesaConf = moduloMenus.confirmar();
+	        	$.when(promesaConf).then(function() {
+	        		subirReal();
+	        	});
+	        } else {
+	        	subirReal();
+	        }
 	    });
 	  temp.click();
 	  return diferido.promise();

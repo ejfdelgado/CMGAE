@@ -23,6 +23,15 @@ var esLista = function(value) {
 	return (hayValor(value) && value instanceof Array);
 };
 
+var estaEnLista = function(valor, lista) {
+	if (!esLista(lista)){return false;}
+	return (lista.indexOf(valor) >= 0);
+};
+
+var copiarJSON = function(dato) {
+	return JSON.parse(JSON.stringify(dato));
+};
+
 var esMultilenguaje = function(entrada) {
 	return /^(\S)+(\.\S+)+$/gim.test(entrada)
 };
