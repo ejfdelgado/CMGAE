@@ -114,13 +114,12 @@ var moduloArchivos = (function() {
 		var diferido = $.Deferred();
 		moduloActividad.on();
         $.ajax({
-            url: generarUrlDadoId(id),
+            url: generarUrlDadoId(id, true),
             type: 'GET',
             cache: false,
             contentType: false,
             processData: false,
         }).done(function(data) {
-        	console.log(data);
         	diferido.resolve(data);
         }).fail(function() {
         	diferido.reject();
@@ -137,16 +136,32 @@ var moduloArchivos = (function() {
 		return partes[2];
 	};
 	
-	var normalizarId = function(unId) {
-		if (unId.startsWith(PREFIJO_LOCAL)) {
-			unId = unId.substring(PREFIJO_LOCAL.length);
+	var normalizarId = function(unId, poner) {
+		if (!hayValor(poner)) {
+			poner = false;
+		}
+		var prefijo = null;
+		if (moduloApp.esProduccion()) {
+			prefijo = moduloApp.darRaizCloudStorage();
+		} else {
+			prefijo = PREFIJO_LOCAL;
+		}
+		if (poner === true) {
+			if (!unId.startsWith(prefijo)) {
+				unId = prefijo+unId;
+			}
+		} else {
+			if (unId.startsWith(prefijo)) {
+				unId = unId.substring(prefijo.length);
+			}
 		}
 		return unId;
 	};
 	
-	var generarUrlDadoId = function(unId) {
+	var generarUrlDadoId = function(unId, local) {
 		var valor;
-		if (moduloApp.esProduccion()) {
+		if (local!= true && moduloApp.esProduccion()) {
+			unId = normalizarId(unId, true);
 			valor = 'http://storage.googleapis.com'+unId+'?' + new Date().getTime();
 		} else {
 			unId = normalizarId(unId);
@@ -175,19 +190,12 @@ var moduloArchivos = (function() {
 	
 	var borrar = function(unId) {
 		var url = '/storage/borrar?name=';
-		if (moduloApp.esPruebas()) {
-			url+=PREFIJO_LOCAL;
-		}
 		url+=encodeURIComponent(unId);
 		return moduloHttp.borrar(url);
 	};
 	
 	var renombrar = function(viejo, nuevo) {
 		var url = '/storage/renombrar?';
-		if (moduloApp.esPruebas()) {
-			viejo=PREFIJO_LOCAL+viejo;
-			nuevo=PREFIJO_LOCAL+nuevo;
-		}
 		url+='viejo='+encodeURIComponent(viejo);
 		url+='&nuevo='+encodeURIComponent(nuevo);
 		return moduloHttp.get(url);

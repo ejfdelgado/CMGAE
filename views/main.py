@@ -21,7 +21,7 @@ from google.appengine.api import mail
 from google.appengine.ext import ndb
 
 from models import *
-from views import comun
+from views import comun, storage
 from settings import TEMPLATE_DIRS, ROOT_PATH, LENGUAJE_PRED
 
 CORREO_ENVIOS = 'edgar.jose.fernando.delgado@gmail.com'
@@ -104,6 +104,7 @@ def generarVariablesUsuario(var_full_path, leng):
     texto += 'var LENGUAJE_PRED = "'+LENGUAJE_PRED+'";\n'
     texto += 'var URL_LOGIN = "'+login_url+'";\n'
     texto += 'var URL_LOGOUT = "'+logout_url+'";\n'
+    texto += 'var RAIZ_CLOUD_STORAGE = "'+storage.darRaizStorage()+'";\n'
     
     if os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine/'):
         texto += 'var AMBIENTE = "produccion";\n'

@@ -7,6 +7,7 @@ var moduloApp = (function() {
 		'HAS_USER': HAS_USER,
 		'IS_ADMIN': IS_ADMIN,
 		'AMBIENTE': AMBIENTE,
+		'RAIZ_CLOUD_STORAGE': RAIZ_CLOUD_STORAGE,
 	};
 	
 	var esPruebas = function() {
@@ -23,6 +24,10 @@ var moduloApp = (function() {
 	
 	var esUsuario = function() {
 		return props.HAS_USER;
+	};
+	
+	var darRaizCloudStorage = function() {
+		return props.RAIZ_CLOUD_STORAGE;
 	};
 	
 	var login = function() {
@@ -81,6 +86,7 @@ var moduloApp = (function() {
 		'abrirBarraEdicion': abrirBarraEdicion,
 		'esProduccion': esProduccion,
 		'esPruebas': esPruebas,
+		'darRaizCloudStorage': darRaizCloudStorage,
 	};
 	
 })();

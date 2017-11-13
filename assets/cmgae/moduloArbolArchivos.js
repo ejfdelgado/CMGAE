@@ -183,7 +183,7 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 		        		var nuevoNodo = {
 		        				'text': nombreArchivo, 
 		        				'type': 'file', 
-		        				'id': moduloArchivos.normalizarId(resultado.id)
+		        				'id': moduloArchivos.normalizarId(resultado.id, false)
 		        				};
 		                inst.create_node(obj, nuevoNodo, "last", function (new_node) {
 		                	

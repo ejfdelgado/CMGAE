@@ -70,15 +70,15 @@ def list_bucket(ruta, tamanio, ultimo):
 
 def renombrar_archivo(response, viejo, nuevo):
     try:
-        gcs.copy2(viejo, nuevo)
-        gcs.delete(viejo)
+        gcs.copy2(darRaizStorage()+viejo, darRaizStorage()+nuevo)
+        gcs.delete(darRaizStorage()+viejo)
         response.write(simplejson.dumps({'error':0}))
     except:
         response.write(simplejson.dumps({'error':1}))
 
 def delete_files(response, filename):
     try:
-        gcs.delete(filename)
+        gcs.delete(darRaizStorage()+filename)
         response.write(simplejson.dumps({'error':0}))
     except gcs.NotFoundError:
         response.write(simplejson.dumps({'error':1}))

@@ -26,6 +26,7 @@
 		"HAS_USER",
 		"IS_ADMIN",
 		"AMBIENTE",
+		"RAIZ_CLOUD_STORAGE",
 		"$",
 		"StackTrace",
 		"jQuery",
