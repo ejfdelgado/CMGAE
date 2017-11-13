@@ -27,6 +27,14 @@ var esMultilenguaje = function(entrada) {
 	return /^(\S)+(\.\S+)+$/gim.test(entrada)
 };
 
+var quitarUltimoSlash = function(rutaDestino) {
+	rutaDestino = rutaDestino.trim();
+	if (rutaDestino.endsWith('/')) {
+		rutaDestino = rutaDestino.substring(0, rutaDestino.length-1);
+	}
+	return rutaDestino;
+}
+
 var leerObj = function(obj, nombres, predef, evitarInvocar) {
 	if (!hayValor(nombres) || !esObjeto(obj)){return predef;}
 	var partes = nombres.split('.');

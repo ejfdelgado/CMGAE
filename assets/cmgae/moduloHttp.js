@@ -1,14 +1,21 @@
 if (!hayValor(moduloHttp)) {
 	var moduloHttp = (function() {
 		
-		var get = function(url) {
+		var call = function(url, metodo, encabezados, usarCache) {
+			if (!hayValor(usarCache)) {
+				usarCache = false;
+			}
 			var diferido = $.Deferred();
 		    moduloActividad.on();
-		    $.ajax({
+		    var peticion = {
 		        'url': url,
-		        'type': 'GET',
-		        'cache': false,
-		    }).done(function(datos) {        	
+		        'type': metodo,
+		        'cache': usarCache,
+		    };
+		    if (hayValor(encabezados)) {
+		    	peticion.headers = encabezados;
+		    }
+		    $.ajax(peticion).done(function(datos) {        	
 		    	diferido.resolve(datos);
 		    }).fail(function() {
 		    	diferido.reject();
@@ -16,6 +23,18 @@ if (!hayValor(moduloHttp)) {
 		    	moduloActividad.off();
 		    });
 			return diferido.promise();
+		};
+		
+		var get = function(url, usarCache) {
+			return call(url, 'GET', null, usarCache)
+		};
+		
+		var borrar = function(url) {
+			return call(url, 'DELETE')
+		};
+		
+		var post = function(url) {
+			return call(url, 'POST', darHeader());
 		};
 		
 		var darToken = function() {
@@ -30,6 +49,7 @@ if (!hayValor(moduloHttp)) {
 		
 		return {
 			'get': get,
+			'borrar': borrar,
 			'darToken': darToken,
 			'darHeader': darHeader,
 		}

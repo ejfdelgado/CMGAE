@@ -107,17 +107,52 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
             "separator_before": false,
             "separator_after": false,
             "label": "Borrar",
-            "action": function(obj) {
-            	var inst = $.jstree.reference(obj.reference);
-            	inst.delete_node($node);
+            "action": function(data) {
+            	var promesaConf = moduloMenus.confirmar();
+            	$.when(promesaConf).then(function() {
+		        	var inst = $.jstree.reference(data.reference),
+		        	obj = inst.get_node(data.reference);
+	            	var promesa = moduloArchivos.borrar(obj.id);
+	            	$.when(promesa).then(function(respuesta) {
+	            		if (respuesta.error == 0) {
+		            		var inst = $.jstree.reference(data.reference);
+		                	inst.delete_node($node);
+	            		} else {
+	            			moduloMenus.error();
+	            		}
+	            	});
+            	});
             }
         };
+		
+		var cargar = {
+	        "separator_before": false,
+	        "separator_after": false,
+	        "label": "Cargar archivo",
+	        "action": function(data) {
+	        	var inst = $.jstree.reference(data.reference),
+	        	obj = inst.get_node(data.reference);
+	        	var rutaDestino = quitarUltimoSlash(obj.id);
+	        	var promesa = moduloArchivos.subirArchivo({auto: true, tipos:'audio/*|video/*|image/*|text/*', dataFolder:rutaDestino});
+	        	$.when(promesa).then(function(resultado) {
+	        		var nuevoNodo = {
+	        				'text':moduloArchivos.darNombreId(resultado.id), 
+	        				'type':'file', 
+	        				'id': moduloArchivos.normalizarId(resultado.id)
+	        				};
+	                inst.create_node(obj, nuevoNodo, "last", function (new_node) {
+	                	
+	                });
+	        	});
+	        }
+		};
 		
 		//solo se deben poder mover archivos.
 		if ($node.original.type == 'folder') {
 	        return {
 	            'CrearArchivo': crearArchivo,
 	            'CrearCarpeta': crearCarpeta,
+	            'Cargar': cargar,
 	            "Borrar": borrar,//Solo si no tiene hijos
 	        };
 		} else if ($node.original.type == 'file') {

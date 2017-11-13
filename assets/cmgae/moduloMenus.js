@@ -4,7 +4,7 @@ var moduloMenus = (function() {
 	var pilaLocal = [];
 	
 	var cargarHtml = function(ruta) {
-		return moduloHttp.get('/assets/cmgae/menus'+ruta);
+		return moduloHttp.get('/assets/cmgae/menus'+ruta, true);
 	};
 	
 	var esUltimoId = function(id) {
@@ -87,6 +87,7 @@ var moduloMenus = (function() {
 						'texto': moduloLocal.traducir('menus.botones.aceptar'),
 						'clase':'btn-success',
 						'accion': function() {
+							sacarUltimo();
 							diferido.resolve();
 						}
 					},
@@ -94,6 +95,7 @@ var moduloMenus = (function() {
 						'texto': moduloLocal.traducir('menus.botones.cancelar'),
 						'clase':'btn-danger',
 						'accion': function() {
+							sacarUltimo();
 							diferido.reject();
 						}
 					}

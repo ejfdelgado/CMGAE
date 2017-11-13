@@ -9,6 +9,7 @@ import uuid
 
 import cloudstorage as gcs
 
+from google.appengine.api import users
 from google.appengine.api import app_identity
 
 from django.http import HttpResponse
@@ -24,21 +25,6 @@ def general(response):
                                      'other':'Demo GCS Application running from Version: {}\n'.format(os.environ['CURRENT_VERSION_ID'])
                                      }))
 
-def create_file(response, filename):
-    """Create a file."""
-    response.write(simplejson.dumps({'error':0, 'msg':'Creating file %s\n' % filename}))
-
-    write_retry_params = gcs.RetryParams(backoff_factor=1.1)
-    gcs_file = gcs.open(filename,
-                      'w',
-                      content_type='text/plain',
-                      options={'x-goog-meta-foo': 'foo',
-                               'x-goog-meta-bar': 'bar'},
-                      retry_params=write_retry_params)
-    gcs_file.write('abcde\n')
-    gcs_file.write('f'*1024*4 + '\n')
-    gcs_file.close()
-
 def darRaizStorage():
     #res = '/'+get_application_id()+'.appspot.com'
     res = '/'+app_identity.get_default_gcs_bucket_name()
@@ -52,6 +38,7 @@ def transformarRegistroDeArchivo(registro, raiz):
     
     if (registro.is_dir):
         res['esDir'] = True
+        res['mime'] = None
     else:
         res['esDir'] = False
         res['tamanio'] = registro.st_size
@@ -113,6 +100,7 @@ def nodosJsTree(lista, excepto=None):
                  'id':nodo['filename'],
                  'text':darNombreNodo(nodo['filename']),
                  'children':nodo['esDir'],
+                 'mime':nodo['mime'],
                  'type':'folder' if nodo['esDir'] else 'file'
                  }
         if (excepto is None):
@@ -159,6 +147,13 @@ def StorageHandler(request, ident):
                 response.write(simplejson.dumps({'error':0, 'uid':generarUID()}))
             else:
                 response.write(simplejson.dumps({'error':0}))
+        elif request.method == 'DELETE':
+            if (ident == 'borrar'):
+                if (users.is_current_user_admin()):
+                    nombre = request.GET.get('name', None)
+                    delete_files(response, nombre)
+                else:
+                    response.write(simplejson.dumps({'error':2, 'msg':'No tiene permisos'})) 
         elif request.method == 'POST':
             archivo = request.FILES['file-0']
             uploaded_file_content = archivo.read()
@@ -181,6 +176,7 @@ def StorageHandler(request, ident):
                               'w',
                               content_type=uploaded_file_type,
                               options={
+                                       'x-goog-meta-mime': uploaded_file_type,
                                        'x-goog-acl':'public-read'
                                        },
                               retry_params=write_retry_params)

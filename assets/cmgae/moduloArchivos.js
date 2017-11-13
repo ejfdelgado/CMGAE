@@ -2,6 +2,7 @@
 if (!hayValor(moduloArchivos)) {
 var moduloArchivos = (function() {
 	var MAX_FILE_SIZE = 500*1024;//en KB
+	var PREFIJO_LOCAL = '/app_default_bucket';
 	
 	var completarPredeterminados = function(atributos) {
 		var mapa = {
@@ -40,6 +41,8 @@ var moduloArchivos = (function() {
 	        if (atributos.auto == 'false') {
 	        	form.append('auto', 'false');
         	}
+	        //Sobra porque el servidor ya lo está capturando
+	        //form.append('mime', file.type);
 	        moduloActividad.on();
 	        $.ajax({
 	            url: '/storage/',
@@ -106,6 +109,7 @@ var moduloArchivos = (function() {
             contentType: false,
             processData: false,
         }).done(function(data) {
+        	console.log(data);
         	diferido.resolve(data);
         }).fail(function() {
         	diferido.reject();
@@ -115,15 +119,26 @@ var moduloArchivos = (function() {
         return diferido.promise();
 	};
 	
+	var darNombreId = function(unId) {
+		var PATRON_NOMBRE = /(\/)([^\/]*)$/ig;
+		var partes = PATRON_NOMBRE.exec(unId);
+		if (partes == null) {return null;}
+		return partes[2];
+	};
+	
+	var normalizarId = function(unId) {
+		if (unId.startsWith(PREFIJO_LOCAL)) {
+			unId = unId.substring(PREFIJO_LOCAL.length);
+		}
+		return unId;
+	};
+	
 	var generarUrlDadoId = function(unId) {
 		var valor;
 		if (moduloApp.esProduccion()) {
 			valor = 'http://storage.googleapis.com'+unId+'?' + new Date().getTime();
 		} else {
-			var PREFIJO = '/app_default_bucket';
-			if (unId.startsWith(PREFIJO)) {
-				unId = unId.substring(PREFIJO.length);
-			}
+			unId = normalizarId(unId);
 			valor = '/storage/read?name='+encodeURIComponent(unId)
 		}
 		return valor;
@@ -147,12 +162,24 @@ var moduloArchivos = (function() {
 		return null;
 	};
 	
+	var borrar = function(unId) {
+		var url = '/storage/borrar?name=';
+		if (moduloApp.esPruebas()) {
+			url+=PREFIJO_LOCAL;
+		}
+		url+=encodeURIComponent(unId);
+		return moduloHttp.borrar(url);
+	}
+	
 	return {
+		'darNombreId': darNombreId,
+		'normalizarId': normalizarId,
 		'leerTextoPlano': leerTextoPlano,
 		'escribirTextoPlano': escribirTextoPlano,
 		'subirArchivo': subirArchivo,
 		'generarUrlDadoId': generarUrlDadoId,
 		'darIdDadoUrl': darIdDadoUrl,
+		'borrar': borrar,
 		'completarPredeterminados': completarPredeterminados,
 	};
 })();
