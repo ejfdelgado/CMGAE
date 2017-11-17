@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block encabezado %}
+<link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
+{% endblock %}
+
+{% block content %}
+<div class="panel panel-default abc-jugadores">
+  <div class="panel-heading">
+	<div class="btn-group" role="group" aria-label="...">
+	  <button type="button" class="btn btn-default abc-anterior">Anterior</button>
+	  <button type="button" class="btn btn-success abc-jugar">Jugar</button>
+	  <button type="button" class="btn btn-default abc-siguiente">Siguiente</button>
+	</div>
+  </div>
+  <div class="panel-body">
+  </div>
+</div>
+<div class="panel panel-default abc-pregunta">
+  <div class="panel-heading abc-titulo">
+	<div class="btn-group" role="group" aria-label="...">
+	  <button type="button" class="btn btn-info abc-anterior">Anterior</button>
+	  <button type="button" class="btn btn-default abc-ver-jugadores">Ver Jugadores</button>
+	  <button type="button" class="btn btn-success abc-comenzar">Comenzar</button>
+	  <button type="button" class="btn btn-danger abc-terminar">Terminar</button>
+	  <button type="button" class="btn btn-info abc-siguiente">Siguiente</button>
+	</div>
+  </div>
+  <div class="panel-body">
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/assets/js/comun/bootstrap.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/4.1.3/firebase.js"></script>
+<script>
+	function funcionError(err) {console.log('Error ',err)}
+	// Initialize Firebase
+	var config = {
+	    apiKey: "AIzaSyCWo8e8hTwU-QUhTUBTToIgVbwQBNQlqpM",
+	    authDomain: "proyeccion-colombia1.firebaseapp.com",
+	    databaseURL: "https://proyeccion-colombia1.firebaseio.com",
+	    projectId: "proyeccion-colombia1",
+	    storageBucket: "proyeccion-colombia1.appspot.com",
+	    messagingSenderId: "569221347334"
+	};
+	firebase.initializeApp(config);
+	var database = firebase.database();
+	var ultimaPregunta = database.ref('ultimaPregunta');
+	
+	var modeloJuegoBase = function(todo) {
+		var datos = {
+			todo: todo,
+			actual: null,
+			estado: 0,
+			jPanelJugadores: $('.abc-jugadores'),
+			jPanelPregunta: $('.abc-pregunta'),
+			jugadores: {},
+			indice: 0,
+		};
+		var verJugadores = function() {
+			esconderTodo();
+			datos.jPanelJugadores.show();
+		};
+		var verJuego = function() {
+			esconderTodo();
+			datos.jPanelPregunta.show();
+			terminarJuego();
+		};
+		var borrarJugador = function(llave) {
+			var updates = {};
+			updates['/jugadores/' + llave] = null;
+			var promesa = firebase.database().ref().update(updates);
+			promesa.then(function() {
+				
+			});
+		};
+		
+		var regenerarPuntajes = function() {
+			if (hayValor(datos.jugadores)) {
+				$.each(datos.jugadores, function(jugador, unJugador) {
+					//Se cruza cada jugador con los puntajes
+					unJugador.puntos = 0;
+					if (hayValor(unJugador.respuestas)) {
+						$.each(unJugador.respuestas, function(llaveRespuesta, valorRespuesta) {
+							var posibles = datos.todo[llaveRespuesta].respuestas;
+							unJugador.puntos+=parseInt(posibles[valorRespuesta].puntos); 
+						});
+					}
+				});
+			}
+		};
+		
+		var regenerarJugadores = function(ordenado) {
+			var plantila = '<div>';
+			plantila += '<div class="panel panel-default">';
+			plantila += '<div class="panel-body">';
+			plantila += '<div class="col-xs-6 pull-left">';
+			plantila += '<h3>$1</h3>';
+			plantila += '</div>';
+			plantila += '<div class="col-xs-6 text-right">';
+			plantila += '<button class="btn btn-success">$2</button>';
+			plantila += '</div>';
+			
+			plantila += '<div class="col-xs-12">';
+			plantila += '<a class="abc-chao">chao!</a>';
+			plantila += '</div>';
+			
+			plantila += '</div>';
+			plantila += '</div>';
+			plantila += '</div>';
+			var cuerpoPanel = datos.jPanelJugadores.find('.panel-body'); 
+			cuerpoPanel.empty();
+			if (hayValor(datos.jugadores)) {
+				regenerarPuntajes();
+				var listaJugadores = [];
+				var llavesJugadores = [];
+				$.each(datos.jugadores, function(jugador, unJugador) {
+					listaJugadores.push(unJugador);
+					llavesJugadores.push(jugador);
+				});
+				listaJugadores.sort(function(a, b) {
+					return b.puntos-a.puntos;
+				});
+				$.each(listaJugadores, function(i, unJugador) {
+					var nuevoTexto = plantila;
+					nuevoTexto = nuevoTexto.replace('$1', unJugador.apodo);
+					nuevoTexto = nuevoTexto.replace('$2', unJugador.puntos);
+					var nuevo = $(nuevoTexto);
+					nuevo.find('.abc-chao').on('click', function() {
+						borrarJugador(llavesJugadores[i]);
+					});
+					if (ordenado) {
+						nuevo.addClass('col-xs-12');
+					} else {
+						nuevo.addClass('col-xs-6');
+					}
+					cuerpoPanel.append(nuevo);
+				});
+			}
+		};
+		var siguiente = function() {
+			if (datos.indice == (datos.todo.length-1)) {
+				return;
+			}
+			datos.indice+=1;
+			verJuego();
+		};
+		var anterior = function() {
+			if (datos.indice == 0) {
+				return;
+			}
+			datos.indice-=1;
+			verJuego();
+		};
+		var esconderTodo = function() {
+			datos.jPanelJugadores.hide();
+			datos.jPanelPregunta.hide();
+		};
+		var conectar = function() {
+			datos.db = database.ref('jugadores');
+			datos.db.on("value", function(data) {
+				datos.jugadores = data.val();
+				regenerarJugadores(true);
+			});
+		};
+		var comenzarJuego = function() {
+			var updates = {};
+			var preguntaActual = datos.todo[datos.indice];
+			$.each(preguntaActual.respuestas, function(llave, valor) {
+				valor.color = darColorAleatorio(180);
+			});
+			preguntaActual.id = datos.indice;
+			updates['/ultimaPregunta/'] = preguntaActual;
+			var promesa = firebase.database().ref().update(updates);
+			promesa.then(function() {
+				
+			});
+		};
+		var terminarJuego = function() {
+			var updates = {};
+			updates['/ultimaPregunta/'] = null;
+			var promesa = firebase.database().ref().update(updates);
+			promesa.then(function() {
+				
+			});
+		};
+		
+		var inicializar = function() {
+			$('.abc-jugar').on('click', verJuego);
+			$('.abc-comenzar').on('click', comenzarJuego);
+			$('.abc-terminar').on('click', terminarJuego);
+			$('.abc-anterior').on('click', anterior);
+			$('.abc-siguiente').on('click', siguiente);
+			$('.abc-ver-jugadores').on('click', verJugadores);
+			conectar();
+		};
+		
+		inicializar();
+		
+		return {
+			'verJugadores': verJugadores,
+		};
+	};
+	
+	var idGenerico = '/juegos/base.json';
+	var promesa = moduloArchivos.leerTextoPlano(idGenerico);
+	$.when(promesa).then(function(datos) {
+		if (esNumero(datos.error)) {
+			let plantilla = [
+			         		{
+			        			texto: "¿qué día es hoy?",
+			        			respuestas: {
+			        				lunes: {
+			        					media: "/bla/bla.svg",
+			        					texto: "Lunes",
+			        					puntos: 1,
+			        				},
+			        				martes: {
+			        					media: "/bla/bla.svg",
+			        					texto: "Martes",
+			        					puntos: 0,
+			        				},
+			        			}
+			        		}
+			        	];
+			var promesaEscritura = moduloArchivos.escribirTextoPlano(idGenerico, JSON.stringify(plantilla));
+			$.when(promesaEscritura).then(function(respuesta) {
+				location.reload();
+			}, funcionError);
+		} else {
+			var modeloJuego = modeloJuegoBase(JSON.parse(datos));
+			modeloJuego.verJugadores();			
+		}
+	}, funcionError);
+	
+</script>
+{% endblock %}

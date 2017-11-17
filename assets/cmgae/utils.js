@@ -36,6 +36,32 @@ var esMultilenguaje = function(entrada) {
 	return /^(\S)+(\.\S+)+$/gim.test(entrada)
 };
 
+function darNumeroAleatorio(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+function decimalAHex(d, padding) {
+    var hex = Number(d).toString(16);
+    padding = typeof (padding) === "undefined" || padding === null ? padding = 2 : padding;
+
+    while (hex.length < padding) {
+        hex = "0" + hex;
+    }
+    return hex;
+};
+
+var darColorAleatorio = function(min, max) {
+  if (!esNumero(min)) {min = 0;}
+  if (!esNumero(max)) {max = 255;}
+  if (min<0){min=0;}
+  if (max>255){max=255;}
+  var color = '#';
+  for (var i = 0; i < 3; i++) {
+    color += decimalAHex(darNumeroAleatorio(min, max));
+  }
+  return color;
+};
+
 var quitarUltimoSlash = function(rutaDestino) {
 	rutaDestino = rutaDestino.trim();
 	if (rutaDestino.endsWith('/')) {
@@ -196,4 +222,8 @@ var activarConteoRegresivo = function() {
 			$(this).text(event.strftime(formato));
 		});
 	});
+};
+
+var jsonToHtml = function(val) {
+	return JSON.stringify(val, null, 4).replace('\n', '<br/>');
 };

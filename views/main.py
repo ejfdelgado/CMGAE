@@ -26,7 +26,13 @@ from settings import TEMPLATE_DIRS, ROOT_PATH, LENGUAJE_PRED
 
 CORREO_ENVIOS = 'edgar.jose.fernando.delgado@gmail.com'
 
-COMMON_TEMPLATES = {'configurar.html':{'admin':True}, 'calendario.html':{'admin':False}, 'archivos.html':{'admin':True}}
+COMMON_TEMPLATES = {
+                    'configurar.html':{'admin':True},
+                    'firebase.html':{'admin':False},
+                    'jugar.html':{'admin':False},
+                    'calendario.html':{'admin':False}, 
+                    'archivos.html':{'admin':True}
+                    }
 
 ANALYTICS = '<script>'\
             '    (function(i,s,o,g,r,a,m){i["GoogleAnalyticsObject"]=r;i[r]=i[r]||function(){'\
@@ -149,7 +155,7 @@ def principal(request, data):
         #El usuario no administrativo pasa por memcache
         if not users.is_current_user_admin():
             anterior = memcache.get(var_full_path)
-            if (anterior):
+            if (False):
                 anterior = anterior.replace('__USER__', generarVariablesUsuario(var_full_path, leng), 1)
                 return HttpResponse(anterior, content_type='text/html')
         
