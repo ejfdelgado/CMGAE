@@ -2,28 +2,19 @@
 
 {% block encabezado %}
 <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
+<link rel="stylesheet" href="/assets/css/font-awesome.min.css" />
 {% endblock %}
 
 {% block content %}
 <div class="panel panel-default abc-jugadores">
   <div class="panel-heading">
 	<div class="btn-group" role="group" aria-label="...">
-	  <button type="button" class="btn btn-default abc-anterior">Anterior</button>
-	  <button type="button" class="btn btn-success abc-jugar">Jugar</button>
-	  <button type="button" class="btn btn-default abc-siguiente">Siguiente</button>
+	  <button type="button" class="btn btn-default abc-anterior"><i class="fa fa-step-backward" aria-hidden="true"></i></button>
+	  <button type="button" class="btn btn-success abc-jugar"><i class="fa fa-play" aria-hidden="true"></i></button>
+	  <button type="button" class="btn btn-danger abc-terminar"><i class="fa fa-pause" aria-hidden="true"></i></button>
+	  <button type="button" class="btn btn-default abc-siguiente"><i class="fa fa-step-forward" aria-hidden="true"></i></button>
 	</div>
-  </div>
-  <div class="panel-body">
-  </div>
-</div>
-<div class="panel panel-default abc-pregunta">
-  <div class="panel-heading abc-titulo">
-	<div class="btn-group" role="group" aria-label="...">
-	  <button type="button" class="btn btn-info abc-anterior">Anterior</button>
-	  <button type="button" class="btn btn-default abc-ver-jugadores">Ver Jugadores</button>
-	  <button type="button" class="btn btn-success abc-comenzar">Comenzar</button>
-	  <button type="button" class="btn btn-danger abc-terminar">Terminar</button>
-	  <button type="button" class="btn btn-info abc-siguiente">Siguiente</button>
+	<div class="btn-group pull-right abc-botones-vista" role="group" aria-label="...">
 	</div>
   </div>
   <div class="panel-body">
@@ -56,18 +47,12 @@
 			actual: null,
 			estado: 0,
 			jPanelJugadores: $('.abc-jugadores'),
-			jPanelPregunta: $('.abc-pregunta'),
 			jugadores: {},
 			indice: 0,
+			moduloVista: null,
 		};
-		var verJugadores = function() {
-			esconderTodo();
-			datos.jPanelJugadores.show();
-		};
-		var verJuego = function() {
-			esconderTodo();
-			datos.jPanelPregunta.show();
-			terminarJuego();
+		var asignarModuloVista = function(modulo) {
+			datos.moduloVista = modulo;
 		};
 		var borrarJugador = function(llave) {
 			var updates = {};
@@ -77,102 +62,36 @@
 				
 			});
 		};
-		
-		var regenerarPuntajes = function() {
-			if (hayValor(datos.jugadores)) {
-				$.each(datos.jugadores, function(jugador, unJugador) {
-					//Se cruza cada jugador con los puntajes
-					unJugador.puntos = 0;
-					if (hayValor(unJugador.respuestas)) {
-						$.each(unJugador.respuestas, function(llaveRespuesta, valorRespuesta) {
-							var posibles = datos.todo[llaveRespuesta].respuestas;
-							unJugador.puntos+=parseInt(posibles[valorRespuesta].puntos); 
-						});
-					}
-				});
-			}
-		};
-		
-		var regenerarJugadores = function(ordenado) {
-			var plantila = '<div>';
-			plantila += '<div class="panel panel-default">';
-			plantila += '<div class="panel-body">';
-			plantila += '<div class="col-xs-6 pull-left">';
-			plantila += '<h3>$1</h3>';
-			plantila += '</div>';
-			plantila += '<div class="col-xs-6 text-right">';
-			plantila += '<button class="btn btn-success">$2</button>';
-			plantila += '</div>';
-			
-			plantila += '<div class="col-xs-12">';
-			plantila += '<a class="abc-chao">chao!</a>';
-			plantila += '</div>';
-			
-			plantila += '</div>';
-			plantila += '</div>';
-			plantila += '</div>';
-			var cuerpoPanel = datos.jPanelJugadores.find('.panel-body'); 
-			cuerpoPanel.empty();
-			if (hayValor(datos.jugadores)) {
-				regenerarPuntajes();
-				var listaJugadores = [];
-				var llavesJugadores = [];
-				$.each(datos.jugadores, function(jugador, unJugador) {
-					listaJugadores.push(unJugador);
-					llavesJugadores.push(jugador);
-				});
-				listaJugadores.sort(function(a, b) {
-					return b.puntos-a.puntos;
-				});
-				$.each(listaJugadores, function(i, unJugador) {
-					var nuevoTexto = plantila;
-					nuevoTexto = nuevoTexto.replace('$1', unJugador.apodo);
-					nuevoTexto = nuevoTexto.replace('$2', unJugador.puntos);
-					var nuevo = $(nuevoTexto);
-					nuevo.find('.abc-chao').on('click', function() {
-						borrarJugador(llavesJugadores[i]);
-					});
-					if (ordenado) {
-						nuevo.addClass('col-xs-12');
-					} else {
-						nuevo.addClass('col-xs-6');
-					}
-					cuerpoPanel.append(nuevo);
-				});
-			}
-		};
 		var siguiente = function() {
-			if (datos.indice == (datos.todo.length-1)) {
+			if (datos.indice == (datos.todo.orden.length-1)) {
 				return;
 			}
 			datos.indice+=1;
-			verJuego();
+			datos.moduloVista.irA(datos.indice);
 		};
 		var anterior = function() {
 			if (datos.indice == 0) {
 				return;
 			}
 			datos.indice-=1;
-			verJuego();
-		};
-		var esconderTodo = function() {
-			datos.jPanelJugadores.hide();
-			datos.jPanelPregunta.hide();
+			datos.moduloVista.irA(datos.indice);
 		};
 		var conectar = function() {
 			datos.db = database.ref('jugadores');
 			datos.db.on("value", function(data) {
 				datos.jugadores = data.val();
-				regenerarJugadores(true);
+				datos.moduloVista.asignarJugadores(datos.jugadores);
 			});
+			datos.moduloVista.irA(datos.indice);
 		};
-		var comenzarJuego = function() {
+		var publicarJuego = function() {
 			var updates = {};
-			var preguntaActual = datos.todo[datos.indice];
+			var idPregunta = datos.todo.orden[datos.indice];
+			var preguntaActual = datos.todo.preguntas[idPregunta];
+			preguntaActual.id = idPregunta;
 			$.each(preguntaActual.respuestas, function(llave, valor) {
 				valor.color = darColorAleatorio(180);
 			});
-			preguntaActual.id = datos.indice;
 			updates['/ultimaPregunta/'] = preguntaActual;
 			var promesa = firebase.database().ref().update(updates);
 			promesa.then(function() {
@@ -189,19 +108,17 @@
 		};
 		
 		var inicializar = function() {
-			$('.abc-jugar').on('click', verJuego);
-			$('.abc-comenzar').on('click', comenzarJuego);
+			$('.abc-jugar').on('click', publicarJuego);
 			$('.abc-terminar').on('click', terminarJuego);
 			$('.abc-anterior').on('click', anterior);
 			$('.abc-siguiente').on('click', siguiente);
-			$('.abc-ver-jugadores').on('click', verJugadores);
 			conectar();
 		};
 		
-		inicializar();
-		
 		return {
-			'verJugadores': verJugadores,
+			'borrarJugador': borrarJugador,
+			'asignarModuloVista': asignarModuloVista,
+			'inicializar': inicializar,
 		};
 	};
 	
@@ -209,30 +126,40 @@
 	var promesa = moduloArchivos.leerTextoPlano(idGenerico);
 	$.when(promesa).then(function(datos) {
 		if (esNumero(datos.error)) {
-			let plantilla = [
-			         		{
-			        			texto: "¿qué día es hoy?",
-			        			respuestas: {
-			        				lunes: {
-			        					media: "/bla/bla.svg",
-			        					texto: "Lunes",
-			        					puntos: 1,
-			        				},
-			        				martes: {
-			        					media: "/bla/bla.svg",
-			        					texto: "Martes",
-			        					puntos: 0,
-			        				},
-			        			}
-			        		}
-			        	];
+			let plantilla = {
+				'orden': ['diahoy'],
+         		'preguntas': {
+         			'diahoy': {
+         				vistas: {'score': true, 'preguntas': true},
+	        			texto: "¿qué día es hoy?",
+	        			respuesta: "Hoy es sábado",
+	        			respuestas: {
+	        				'lunes': {
+	        					texto: "Lunes",
+	        					puntos: 1,
+	        				},
+	        				'martes': {
+	        					texto: "Martes",
+	        					puntos: 0,
+	        				},
+	        			}
+	         		}
+        		}
+			};
 			var promesaEscritura = moduloArchivos.escribirTextoPlano(idGenerico, JSON.stringify(plantilla));
 			$.when(promesaEscritura).then(function(respuesta) {
 				location.reload();
 			}, funcionError);
 		} else {
-			var modeloJuego = modeloJuegoBase(JSON.parse(datos));
-			modeloJuego.verJugadores();			
+			var datosJuego = JSON.parse(datos);
+			var modeloJuego = modeloJuegoBase(datosJuego);
+			var moduloVista = moduloJuegoVista(
+					$('.abc-jugadores>.panel-body'),
+					$('.abc-jugadores .abc-botones-vista'),
+					datosJuego, 
+					modeloJuego);
+			modeloJuego.asignarModuloVista(moduloVista);
+			modeloJuego.inicializar();
 		}
 	}, funcionError);
 	

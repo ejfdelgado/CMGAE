@@ -50,6 +50,10 @@ function decimalAHex(d, padding) {
     return hex;
 };
 
+var darHtmlCompleto = function(elem) {
+	return $('<div>').append(elem.clone()).html();
+};
+
 var darColorAleatorio = function(min, max) {
   if (!esNumero(min)) {min = 0;}
   if (!esNumero(max)) {max = 255;}

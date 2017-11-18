@@ -20,6 +20,7 @@ gulp.task('default', function() {
 	'./assets/cmgae/moduloImagenes.js',
 	'./assets/cmgae/moduloEdicion.js',
 	'./assets/cmgae/moduloMenus.js',
+	'./assets/cmgae/moduloJuegoVista.js',
   ]).pipe(concat('modulos.min.js'))
     .pipe(babel())
     //.pipe(uglify())

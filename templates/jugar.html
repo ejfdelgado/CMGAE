@@ -2,6 +2,7 @@
 
 {% block encabezado %}
 <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
+<link rel="stylesheet" href="/assets/css/font-awesome.min.css" />
 {% endblock %}
 
 {% block content %}
@@ -12,7 +13,7 @@
     <!-- Modal content-->
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">¿Cuál es tu apodo?</h4>
+        <h4 class="modal-title">¿Cómo te llamas?</h4>
       </div>
       <div class="modal-body">
 		<div class="form-group">
@@ -76,8 +77,7 @@
 		'mal': moduloSonido('/assets/sonidos/Pacman Death.mp3'),
 	};
 	
-	var jugador = (function() {
-		
+	var moduloJugador = function() {
 		var datos = {
 			apodo: null,
 			llave: null,
@@ -86,9 +86,21 @@
 			datosRemotos: null,
 			ultimaPregunta: null,
 			jPanelPregunta: $('.abc-pregunta'),
+			moduloVista: null,
 		};
 		
+		var leerUltimoApodo = function() {
+			try {return localStorage['apodo'];} catch (e){}
+			return '';
+		};
+		
+		var asignarModuloVista = function(modulo) {
+			datos.moduloVista = modulo;
+		};		
+		
 		var asignarApodo = function(valor) {
+			//Se guarda en el local storage
+			try {localStorage['apodo'] = valor;} catch (e){}
 			datos.apodo = valor;
 			datos.llave = valor.replace(/[^a-z]+/ig, '_');
 			datos.llaveCompleta = '/jugadores/'+datos.llave;
@@ -118,39 +130,8 @@
 		};
 		
 		var regenerarPreguntas = function() {
-			var cuerpoPanel = datos.jPanelPregunta.find('.panel-body'); 
-			cuerpoPanel.empty();
-			
-			if (!hayValor(datos.ultimaPregunta)) {return;}
-			
-			var pregunta = '<div class="col-xs-12">';
-			pregunta+='<div class="text-center"><h3>$1</strong></h3>';
-			pregunta+='</div>';
-			pregunta = pregunta.replace('$1', datos.ultimaPregunta.texto);
-			cuerpoPanel.append(pregunta);
-			
-			var plantila = '<div class="col-xs-6 abc-una-respuesta">';
-			plantila += '<div class="panel panel-default">';
-			plantila += '<div class="panel-body">';
-			
-			plantila += '<div class="col-xs-12 pull-left">';
-			plantila += '<h4>$1</h4>';
-			plantila += '</div>';
-			
-			plantila += '</div>';
-			plantila += '</div>';
-			plantila += '</div>';
-			
-			$.each(datos.ultimaPregunta.respuestas, function(llaveRes, valorRespuesta) {
-				var nuevoTexto = plantila;
-				nuevoTexto = nuevoTexto.replace('$1', valorRespuesta.texto);
-				var nuevo = $(nuevoTexto);
-				nuevo.find('.panel-body').css('background-color', valorRespuesta.color);
-				nuevo.on('click', function() {
-					usuarioEligeRespuesta(llaveRes, valorRespuesta, nuevo, datos.ultimaPregunta.id);
-				});
-				cuerpoPanel.append(nuevo);
-			});
+			datos.moduloVista.asignarPreguntaActual(datos.ultimaPregunta.id, datos.ultimaPregunta);
+			datos.moduloVista.modo('pregunta');
 		};
 		
 		var conectar = function() {
@@ -182,8 +163,15 @@
 		
 		return {
 			'asignarApodo': asignarApodo,
+			'leerUltimoApodo': leerUltimoApodo,
+			'asignarModuloVista': asignarModuloVista,
+			'usuarioEligeRespuesta': usuarioEligeRespuesta,
 		};
-	})();
+	};
+	
+	var jugador = moduloJugador();
+	var moduloVista = moduloJuegoVista($('.abc-pregunta > .panel-body'), null, null, jugador);
+	jugador.asignarModuloVista(moduloVista);
 	
 	var mostrarModal = function(mensaje) {
 		var diferido = $.Deferred();
@@ -201,7 +189,8 @@
 	};
 	
 	//1. Se debe preguntar el nickname
-	var jModalNickName = $('#modalNickName'); 
+	var jModalNickName = $('#modalNickName');
+	jModalNickName.find('input').val(jugador.leerUltimoApodo());
 	jModalNickName.modal({
 		show: true,
 	    backdrop: 'static',
