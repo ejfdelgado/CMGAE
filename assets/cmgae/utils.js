@@ -54,6 +54,14 @@ var darHtmlCompleto = function(elem) {
 	return $('<div>').append(elem.clone()).html();
 };
 
+var darHtmlSeguro = function(texto) {
+	return $('<div>').html(texto).html();
+};
+
+var deHtmlDarSoloTexto = function(texto) {
+	return $('<div>').html(texto).text();
+};
+
 var darColorAleatorio = function(min, max) {
   if (!esNumero(min)) {min = 0;}
   if (!esNumero(max)) {max = 255;}

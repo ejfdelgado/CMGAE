@@ -1,5 +1,145 @@
 
 if (!hayValor(moduloJuegoVista)) {
+	
+	var pluginsModuloVistaJuego = {
+		'score': {
+			boton: {icono:'fa-star', color: 'btn-default'},
+			programa: function(metadata) {
+				return {
+					'url': '/assets/cmgae/juego/modos/score.html', 
+					'funInicio': function(plantilla) {
+						return $(plantilla);
+					},
+					'lista': metadata.jugadores,
+					'funIter': function(plantilla, i, llave, unJugador) {
+						plantilla = plantilla.replace('$1', darHtmlSeguro(unJugador.apodo));
+						plantilla = plantilla.replace('$2', unJugador.puntos);
+						var nuevo = $(plantilla);
+						nuevo.find('.abc-chao').on('click', function() {
+							metadata.moduloJuego.borrarJugador(llave);
+						});
+						return nuevo;
+					},
+					'funOrdenar': function(a, b) {
+						return b.puntos-a.puntos;
+					}
+				};
+			},
+		},
+		'pregunta': {
+			boton: {icono:'fa-question', color: 'btn-info'},
+			programa: function(metadata) {
+				return {
+					'url':'/assets/cmgae/juego/modos/pregunta.html', 
+					'funInicio':function(plantilla) {
+						plantilla = plantilla.replace('$1', darHtmlSeguro(metadata.preguntaActual.texto));
+						return $(plantilla);
+					},
+					'lista':metadata.preguntaActual.respuestas,
+					'funIter':function(plantilla, i, llave, elemento) {
+						plantilla = plantilla.replace('$2', darHtmlSeguro(elemento.texto));
+						var nuevo = $(plantilla);
+						nuevo.find('.panel-body').css('background-color', elemento.color);
+						nuevo.on('click', function() {
+							if (esFuncion(metadata.moduloJuego.usuarioEligeRespuesta)) {
+								metadata.moduloJuego.usuarioEligeRespuesta(llave, elemento, nuevo, metadata.preguntaActual.id);
+							}
+						});
+						return nuevo;
+					}
+				};
+			},
+		},
+		'respuesta': {
+			boton: {icono:'fa-check', color: 'btn-primary'},
+			programa: function(metadata) {
+				return {
+					'url':'/assets/cmgae/juego/modos/respuesta.html', 
+					'funInicio':function(plantilla) {
+						plantilla = plantilla.replace('$1', darHtmlSeguro(metadata.preguntaActual.respuesta));
+						return $(plantilla);
+					}
+				};
+			},
+		},
+		'barras': {
+			boton: {icono:'fa-check', color: 'btn-danger'},
+			programa: function(metadata) {
+				return {
+					'url':'/assets/cmgae/juego/modos/barras.html', 
+					'funInicio': function(plantilla) {
+						return $(plantilla);
+					},
+					'recargarHtml': false,
+					'funFinalizar':function() {
+						//1. Se crea la data
+						if (!hayValor(metadata.data)) {
+							metadata.data = {
+							  labels: [],
+							  datasets: [{
+							    label: "# de Personas",
+							    backgroundColor: "rgba(255,99,132,0.2)",
+							    borderColor: "rgba(255,99,132,1)",
+							    borderWidth: 2,
+							    hoverBackgroundColor: "rgba(255,99,132,0.4)",
+							    hoverBorderColor: "rgba(255,99,132,1)",
+							    data: [],
+							  }]
+							};
+						}
+						
+						metadata.data.labels = [];
+						metadata.data.datasets[0].data = [];
+						$.each(metadata.preguntaActual.respuestas, function(llave, valor) {
+							metadata.data.labels.push(valor.texto);
+							metadata.data.datasets[0].data.push(darNumeroAleatorio(3, 10));
+						});
+
+						//2. Se crean las opciones
+						if (!hayValor(metadata.chart)) {
+							var options = {
+								responsive: true,
+			                    legend: {position: 'top',},
+			                    title: {
+			                        display: true,
+			                        text: deHtmlDarSoloTexto(metadata.preguntaActual.texto),
+			                    },
+			                    maintainAspectRatio: false,
+							  scales: {
+							    yAxes: [{
+							      stacked: true,
+							      gridLines: {
+							        display: true,
+							        color: "rgba(255,99,132,0.2)"
+							      }
+							    }],
+							    xAxes: [{
+							      gridLines: {
+							        display: false
+							      }
+							    }]
+							  }
+							};
+							//Se inicializar el chart
+							metadata.chart = Chart.Bar('chart', {
+							  options: options,
+							  data: metadata.data,
+							});
+						} else {
+							metadata.chart.update();
+						}
+					}
+				};
+			},
+		},
+		'blanco': {
+			boton: null,
+			programa: function(metadata) {
+				return null;
+			},
+		}
+	};
+	
 	var moduloJuegoVista = function(jElem, jElemHead, juego, moduloJuego) {
 		var datos = {
 			elem: $(jElem),
@@ -10,12 +150,8 @@ if (!hayValor(moduloJuegoVista)) {
 			idPregunta: null,
 			preguntaActual: null,
 			moduloJuego: moduloJuego,
-		};
-		
-		var botones = {
-			'score': function(llave) {return generarBoton(llave, {icono:'fa-star', color: 'btn-default'});},
-			'pregunta': function(llave) {return generarBoton(llave, {icono:'fa-question', color: 'btn-info'});},
-			'respuesta': function(llave) {return generarBoton(llave, {icono:'fa-check', color: 'btn-primary'});},
+			metadata: null,
+			ultimaPlantilla: null,
 		};
 		
 		var asignarModuloJuego = function(moduloJuego) {
@@ -27,78 +163,54 @@ if (!hayValor(moduloJuegoVista)) {
 			datos.preguntaActual = preguntaActual;
 		};
 		
-		var modos = {
-			'blanco': function() {
-				datos.elem.empty();
-			},
-			'score': function() {
-				regenerarPuntajes();
-				remplazarContenido(
-					'/assets/cmgae/juego/modos/score.html', 
-					function(plantilla) {
-						return $(plantilla);
-					},
-					datos.jugadores,
-					function(plantilla, i, llave, unJugador) {
-						plantilla = plantilla.replace('$1', unJugador.apodo);
-						plantilla = plantilla.replace('$2', unJugador.puntos);
-						var nuevo = $(plantilla);
-						nuevo.find('.abc-chao').on('click', function() {
-							datos.moduloJuego.borrarJugador(llave);
-						});
-						return nuevo;
-					}, function(a, b) {
-						return b.puntos-a.puntos;
-					});
-			},
-			'pregunta': function() {
-				datos.elem.empty();
-				remplazarContenido(
-						'/assets/cmgae/juego/modos/pregunta.html', 
-						function(plantilla) {
-							plantilla = plantilla.replace('$1', datos.preguntaActual.texto);
-							return $(plantilla);
-						},
-						datos.preguntaActual.respuestas,
-						function(plantilla, i, llave, elemento) {
-							plantilla = plantilla.replace('$2', elemento.texto);
-							var nuevo = $(plantilla);
-							nuevo.find('.panel-body').css('background-color', elemento.color);
-							nuevo.on('click', function() {
-								if (esFuncion(datos.moduloJuego.usuarioEligeRespuesta)) {
-									datos.moduloJuego.usuarioEligeRespuesta(llave, elemento, nuevo, datos.preguntaActual.id);
-								}
-							});
-							return nuevo;
-						});
-			},
-			'respuesta': function() {
-				datos.elem.empty();
+		var botones = {};
+		var modos = {};
+		
+		for (let llave in pluginsModuloVistaJuego) {
+			let unPlugin = pluginsModuloVistaJuego[llave];
+			botones[llave] = unPlugin.boton;
+			modos[llave] = unPlugin.programa;
+		}
+		
+		var actualizar = function() {
+			regenerarPuntajes();
+			var temp = modos[datos.modo](datos.metadata);
+			if (hayValor(temp)) {
+				remplazarContenido(temp);
 			}
 		};
 		
-		var modo = function(llave) {
+		var asignarModo = function(llave) {
+			console.log('asignarModo', llave);
 			if (!estaEnLista(llave, Object.keys(modos))) {
 				return;
 			}
-			modos[llave]();
-		};
-		
-		var asignarModo = function(valor) {
-			datos.modo = valor;
+			if (datos.modo !== llave) {
+				//Se recrea la metadata
+				datos.metadata = {
+					'preguntaActual': datos.preguntaActual,
+					'moduloJuego': datos.moduloJuego,
+					'jugadores': datos.jugadores,
+				};
+			}
+			datos.modo = llave;
+			actualizar();
 		};
 		
 		var asignarPrimerModo = function() {
-			datos.modo = Object.keys(datos.preguntaActual.vistas)[0];
+			console.log('asignarPrimerModo');
+			asignarModo(Object.keys(datos.preguntaActual.vistas)[0]);
 		};
 		
 		var asignarJugadores = function(jugadores) {
+			console.log('asignarJugadores', datos.modo)
 			datos.jugadores = jugadores;
 			//Pide actualizar el modo actual
 			if (!hayValor(datos.modo)) {
 				asignarPrimerModo();
+			} else {
+				asignarModo(datos.modo);
 			}
-			modo(datos.modo);
 		};
 		
 		var regenerarPuntajes = function() {
@@ -120,20 +232,27 @@ if (!hayValor(moduloJuegoVista)) {
 			}
 		};
 		
-		var remplazarContenido = function(url, funInicio, lista, funIter, funOrdenar) {
-			var promesa = moduloHttp.get(url, true);
-			promesa.then(function(plantilla) {
-				datos.elem.empty();
-				datos.elem.append(funInicio(plantilla));
-				if (hayValor(lista)) {
+		var remplazarContenido = function(props) {
+			if (!hayValor(props.recargarHtml)) {
+				props.recargarHtml = true;
+			}
+			
+			var funcionDespues = function(plantilla, tieneContenido) {
+				console.log('funcionDespues', tieneContenido)
+				datos.ultimaPlantilla = props.url;
+				if (tieneContenido) {
+					datos.elem.empty();
+					datos.elem.append(props.funInicio(plantilla, datos.metadata));
+				}
+				if (hayValor(props.lista)) {
 					var listaValores = [];
 					var llavesLlaves = [];
-					$.each(lista, function(llaveLista, valorLista) {
+					$.each(props.lista, function(llaveLista, valorLista) {
 						listaValores.push(valorLista);
 						llavesLlaves.push(llaveLista);
 					});
-					if (esFuncion(funOrdenar)) {
-						listaValores.sort(funOrdenar);
+					if (esFuncion(props.funOrdenar)) {
+						listaValores.sort(props.funOrdenar);
 					}
 					var repetido = datos.elem.find('.abc-repetir');
 					if (repetido.length > 0) {
@@ -141,13 +260,25 @@ if (!hayValor(moduloJuegoVista)) {
 						repetido.removeClass('invisible');
 						var plantilla = darHtmlCompleto(repetido);
 						$.each(listaValores, function(i, unJugador) {
-							var nuevo = funIter(plantilla, i, llavesLlaves[i], unJugador);
+							var nuevo = props.funIter(plantilla, i, llavesLlaves[i], unJugador, datos.metadata);
 							repetido.after(nuevo);
 						});
 						repetido.remove();
 					}
 				}
-			});
+				if (esFuncion(props.funFinalizar)) {
+					props.funFinalizar(datos.metadata);
+				}
+			};
+			
+			if (props.recargarHtml == false && datos.ultimaPlantilla == props.url) {
+				funcionDespues(null, false);
+			} else {
+				var promesa = moduloHttp.get(props.url, true);
+				promesa.then(function(plantilla) {
+					funcionDespues(plantilla, true);
+				});
+			}
 		};
 		
 		var generarBoton = function(llave, config) {
@@ -155,7 +286,7 @@ if (!hayValor(moduloJuegoVista)) {
 			boton.addClass(config.color);
 			boton.find('i').addClass(config.icono);
 			boton.on('click', function() {
-				modos[llave]();
+				asignarModo(llave);
 			});
 			return boton;
 		};
@@ -163,11 +294,12 @@ if (!hayValor(moduloJuegoVista)) {
 		var regenerarBotonesVista = function(pregunta) {
 			datos.elemHead.empty();
 			$.each(pregunta.vistas, function(llave, val) {
-				var boton = botones[llave](llave);
+				var boton = generarBoton(llave, botones[llave]);
 				datos.elemHead.append(boton);
 			})
 		};
 		
+		//Va a una pregunta específica
 		var irA = function(indice) {
 			datos.idPregunta = datos.juego.orden[indice];
 			datos.preguntaActual = datos.juego.preguntas[datos.idPregunta];
@@ -177,11 +309,12 @@ if (!hayValor(moduloJuegoVista)) {
 		
 		return {
 			'asignarJugadores': asignarJugadores,
-			'modo': modo,
 			'irA': irA,
 			'asignarModo': asignarModo,
 			'asignarPreguntaActual': asignarPreguntaActual,
 			'asignarModuloJuego': asignarModuloJuego,
+			'asignarPrimerModo': asignarPrimerModo,
+			'actualizar': actualizar,
 		};
 	};
 }

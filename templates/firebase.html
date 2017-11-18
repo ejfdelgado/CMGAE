@@ -3,6 +3,7 @@
 {% block encabezado %}
 <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
 <link rel="stylesheet" href="/assets/css/font-awesome.min.css" />
+<link rel="stylesheet" href="/assets/css/juego/main.css" />
 {% endblock %}
 
 {% block content %}
@@ -25,6 +26,7 @@
 
 {% block scripts %}
 <script src="/assets/js/comun/bootstrap.min.js"></script>
+<script src="/assets/js/chartjs/Chart.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/4.1.3/firebase.js"></script>
 <script>
 	function funcionError(err) {console.log('Error ',err)}
@@ -43,10 +45,8 @@
 	
 	var modeloJuegoBase = function(todo) {
 		var datos = {
+			publicado: false,
 			todo: todo,
-			actual: null,
-			estado: 0,
-			jPanelJugadores: $('.abc-jugadores'),
 			jugadores: {},
 			indice: 0,
 			moduloVista: null,
@@ -68,6 +68,9 @@
 			}
 			datos.indice+=1;
 			datos.moduloVista.irA(datos.indice);
+			if (datos.publicado) {
+				publicarJuego();
+			} 
 		};
 		var anterior = function() {
 			if (datos.indice == 0) {
@@ -75,10 +78,14 @@
 			}
 			datos.indice-=1;
 			datos.moduloVista.irA(datos.indice);
+			if (datos.publicado) {
+				publicarJuego();
+			} 
 		};
 		var conectar = function() {
 			datos.db = database.ref('jugadores');
 			datos.db.on("value", function(data) {
+				console.log('cambio jugadores!')
 				datos.jugadores = data.val();
 				datos.moduloVista.asignarJugadores(datos.jugadores);
 			});
@@ -95,7 +102,7 @@
 			updates['/ultimaPregunta/'] = preguntaActual;
 			var promesa = firebase.database().ref().update(updates);
 			promesa.then(function() {
-				
+				datos.publicado = true;
 			});
 		};
 		var terminarJuego = function() {
@@ -103,7 +110,7 @@
 			updates['/ultimaPregunta/'] = null;
 			var promesa = firebase.database().ref().update(updates);
 			promesa.then(function() {
-				
+				datos.publicado = false;
 			});
 		};
 		

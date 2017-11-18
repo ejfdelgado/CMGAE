@@ -125,13 +125,19 @@
 			}
 			//Solo se muestra la que la persona escogió
 			elem.removeClass('col-xs-6');
+			elem.removeClass('col-sm-6');
+			elem.removeClass('col-md-6');
 			elem.addClass('col-xs-12');
 			elem.show();
 		};
 		
 		var regenerarPreguntas = function() {
-			datos.moduloVista.asignarPreguntaActual(datos.ultimaPregunta.id, datos.ultimaPregunta);
-			datos.moduloVista.modo('pregunta');
+			if (hayValor(datos.ultimaPregunta)) {
+				datos.moduloVista.asignarPreguntaActual(datos.ultimaPregunta.id, datos.ultimaPregunta);
+				datos.moduloVista.asignarModo('pregunta');
+			} else {
+				datos.moduloVista.asignarModo('blanco');
+			}
 		};
 		
 		var conectar = function() {
@@ -200,7 +206,7 @@
 		//Se valida que el nombre no sea vacio
 		var apodo = jModalNickName.find('input[name="apodo"]').val();
 		if (!hayValor(apodo)) {
-			mostrarModal('No puede ser un apodo vacio');
+			mostrarModal('Ups, faltó que escribieras tu nombre!');
 		} else {
 			jModalNickName.modal('hide');
 			jugador.asignarApodo(apodo);
