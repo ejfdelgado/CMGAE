@@ -1,6 +1,30 @@
 
 if (!hayValor(moduloJuegoVista)) {
 	
+	var totalizarSumaRespuestas = function(metadata) {
+		var totales = {};
+		if (hayValor(metadata.jugadores)) {
+			let llavePregunta = metadata.idPregunta;
+			$.each(metadata.jugadores, function(jugador, unJugador) {
+				//Se cruza cada jugador con la elección
+				if (hayValor(unJugador.respuestas)) {
+					var eleccion = unJugador.respuestas[llavePregunta];
+					if (hayValor(eleccion)) {
+						if (!esNumero(totales[eleccion])) {
+							totales[eleccion]=0;
+						}
+						if (esNumero(eleccion)) {
+							totales[eleccion]+=eleccion;
+						} else {
+							totales[eleccion]+=1;
+						}
+					}
+				}
+			});
+		}
+		return totales;
+	};
+	
 	var pluginsModuloVistaJuego = {
 		'score': {
 			boton: {icono:'fa-star', color: 'btn-default'},
@@ -50,6 +74,12 @@ if (!hayValor(moduloJuegoVista)) {
 				};
 			},
 		},
+		'blanco': {
+			boton: null,
+			programa: function(metadata) {
+				return null;
+			},
+		},
 		'respuesta': {
 			boton: {icono:'fa-check', color: 'btn-primary'},
 			programa: function(metadata) {
@@ -63,7 +93,7 @@ if (!hayValor(moduloJuegoVista)) {
 			},
 		},
 		'barras': {
-			boton: {icono:'fa-check', color: 'btn-danger'},
+			boton: {icono:'fa-bar-chart', color: 'btn-danger'},
 			programa: function(metadata) {
 				return {
 					'url':'/assets/cmgae/juego/modos/barras.html', 
@@ -91,29 +121,7 @@ if (!hayValor(moduloJuegoVista)) {
 						metadata.data.labels = [];
 						metadata.data.datasets[0].data = [];
 						
-						var totales = {};
-						
-						if (hayValor(metadata.jugadores)) {
-							let llavePregunta = metadata.idPregunta;
-							$.each(metadata.jugadores, function(jugador, unJugador) {
-								//Se cruza cada jugador con la elección
-								if (hayValor(unJugador.respuestas)) {
-									var eleccion = unJugador.respuestas[llavePregunta];
-									if (hayValor(eleccion)) {
-										if (!esNumero(totales[eleccion])) {
-											totales[eleccion]=0;
-										}
-										if (esNumero(eleccion)) {
-											totales[eleccion]+=eleccion;
-										} else {
-											totales[eleccion]+=1;
-										}
-									}
-								}
-							});
-						}
-						
-						console.log(totales)
+						var totales = totalizarSumaRespuestas(metadata);
 						
 						$.each(metadata.preguntaActual.respuestas, function(llave, valor) {
 							metadata.data.labels.push(valor.texto);
@@ -161,12 +169,72 @@ if (!hayValor(moduloJuegoVista)) {
 				};
 			},
 		},
-		'blanco': {
-			boton: null,
+		'dona': {
+			boton: {icono:'fa-pie-chart', color: 'btn-danger'},
 			programa: function(metadata) {
-				return null;
+				return {
+					'url':'/assets/cmgae/juego/modos/dona.html', 
+					'funInicio': function(plantilla) {
+						return $(plantilla);
+					},
+					'recargarHtml': false,
+					'funFinalizar':function() {
+						//1. Se crea la data
+						if (!hayValor(metadata.config)) {
+							metadata.config = {
+						        type: 'doughnut',
+						        data: {
+						            datasets: [{
+						                data: [],
+						                backgroundColor: [],
+						                label: '# de Personas'
+						            }],
+						            labels: []
+						        },
+						        options: {
+						            responsive: true,
+						            legend: {
+						                position: 'top',
+						            },
+						            title: {
+						                display: true,
+						                text: ''
+						            },
+						            animation: {
+						                animateScale: true,
+						                animateRotate: true
+						            }
+						        }
+						    };
+						}
+						
+						metadata.config.data.labels = [];
+						metadata.config.data.datasets[0].data = [];
+						
+						var totales = totalizarSumaRespuestas(metadata);
+						
+						$.each(metadata.preguntaActual.respuestas, function(llave, valor) {
+							metadata.config.data.labels.push(valor.texto);
+							metadata.config.data.datasets[0].backgroundColor.push(valor.color);
+							if (esNumero(totales[llave])) {
+								metadata.config.data.datasets[0].data.push(totales[llave]);
+							} else {
+								metadata.config.data.datasets[0].data.push(0);
+							}
+						});
+
+						//2. Se crean las opciones
+						if (!hayValor(metadata.chart)) {
+					        var ctx = document.getElementById("chart-area").getContext("2d");
+					        metadata.chart = new Chart(ctx, metadata.config);
+							//Se inicializar el chart
+						} else {
+							metadata.chart.update();
+						}
+					}
+				};
 			},
-		}
+		},
 	};
 	
 	var moduloJuegoVista = function(jElem, jElemHead, juego, moduloJuego) {
@@ -313,6 +381,7 @@ if (!hayValor(moduloJuegoVista)) {
 		};
 		
 		var generarBoton = function(llave, config) {
+			if (!hayValor(config)){return null;}
 			var boton = $('<button type="button" class="btn abc-jugar"><i class="fa" aria-hidden="true"></i></button>');
 			boton.addClass(config.color);
 			boton.find('i').addClass(config.icono);
@@ -326,7 +395,9 @@ if (!hayValor(moduloJuegoVista)) {
 			datos.elemHead.empty();
 			$.each(pregunta.vistas, function(llave, val) {
 				var boton = generarBoton(llave, botones[llave]);
-				datos.elemHead.append(boton);
+				if (hayValor(boton)) {
+					datos.elemHead.append(boton);
+				}
 			})
 		};
 		
@@ -334,6 +405,9 @@ if (!hayValor(moduloJuegoVista)) {
 		var irA = function(indice) {
 			datos.idPregunta = datos.juego.orden[indice];
 			datos.preguntaActual = datos.juego.preguntas[datos.idPregunta];
+			$.each(datos.preguntaActual.respuestas, function(llave, valor) {
+				valor.color = darColorAleatorio(180);
+			});
 			regenerarBotonesVista(datos.preguntaActual);
 			asignarPrimerModo();
 		};

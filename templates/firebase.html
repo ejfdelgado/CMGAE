@@ -96,9 +96,6 @@
 			var idPregunta = datos.todo.orden[datos.indice];
 			var preguntaActual = datos.todo.preguntas[idPregunta];
 			preguntaActual.id = idPregunta;
-			$.each(preguntaActual.respuestas, function(llave, valor) {
-				valor.color = darColorAleatorio(180);
-			});
 			updates['/ultimaPregunta/'] = preguntaActual;
 			var promesa = firebase.database().ref().update(updates);
 			promesa.then(function() {
