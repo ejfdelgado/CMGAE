@@ -90,9 +90,38 @@ if (!hayValor(moduloJuegoVista)) {
 						
 						metadata.data.labels = [];
 						metadata.data.datasets[0].data = [];
+						
+						var totales = {};
+						
+						if (hayValor(metadata.jugadores)) {
+							let llavePregunta = metadata.idPregunta;
+							$.each(metadata.jugadores, function(jugador, unJugador) {
+								//Se cruza cada jugador con la elección
+								if (hayValor(unJugador.respuestas)) {
+									var eleccion = unJugador.respuestas[llavePregunta];
+									if (hayValor(eleccion)) {
+										if (!esNumero(totales[eleccion])) {
+											totales[eleccion]=0;
+										}
+										if (esNumero(eleccion)) {
+											totales[eleccion]+=eleccion;
+										} else {
+											totales[eleccion]+=1;
+										}
+									}
+								}
+							});
+						}
+						
+						console.log(totales)
+						
 						$.each(metadata.preguntaActual.respuestas, function(llave, valor) {
 							metadata.data.labels.push(valor.texto);
-							metadata.data.datasets[0].data.push(darNumeroAleatorio(3, 10));
+							if (esNumero(totales[llave])) {
+								metadata.data.datasets[0].data.push(totales[llave]);
+							} else {
+								metadata.data.datasets[0].data.push(0);
+							}
 						});
 
 						//2. Se crean las opciones
@@ -187,12 +216,13 @@ if (!hayValor(moduloJuegoVista)) {
 			}
 			if (datos.modo !== llave) {
 				//Se recrea la metadata
-				datos.metadata = {
-					'preguntaActual': datos.preguntaActual,
-					'moduloJuego': datos.moduloJuego,
-					'jugadores': datos.jugadores,
-				};
+				datos.metadata = {};
 			}
+			datos.metadata['idPregunta'] = datos.idPregunta;
+			datos.metadata['preguntaActual'] = datos.preguntaActual;
+			datos.metadata['moduloJuego'] = datos.moduloJuego;
+			datos.metadata['jugadores'] = datos.jugadores;
+			
 			datos.modo = llave;
 			actualizar();
 		};
@@ -214,6 +244,7 @@ if (!hayValor(moduloJuegoVista)) {
 		};
 		
 		var regenerarPuntajes = function() {
+			console.log('regenerarPuntajes');
 			if (hayValor(datos.jugadores)) {
 				$.each(datos.jugadores, function(jugador, unJugador) {
 					//Se cruza cada jugador con los puntajes
