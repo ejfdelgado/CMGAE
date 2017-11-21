@@ -70,7 +70,6 @@
 	};
 	firebase.initializeApp(config);
 	var database = firebase.database();
-	var ultimaPregunta = database.ref('ultimaPregunta');
 	
 	var sonidos = {
 		'bien': moduloSonido('/assets/sonidos/Mario Grow.mp3'),
@@ -82,11 +81,15 @@
 			apodo: null,
 			llave: null,
 			llaveCompleta: null,
-			db: null,
 			datosRemotos: null,
 			ultimaPregunta: null,
 			jPanelPregunta: $('.abc-pregunta'),
 			moduloVista: null,
+		};
+		
+		var remotos = {
+			usuario: null,
+			ultimaPregunta: null,
 		};
 		
 		var leerUltimoApodo = function() {
@@ -140,13 +143,26 @@
 			}
 		};
 		
+		var desconectar = function() {
+			remotos.usuario.off();
+			remotos.ultimaPregunta.off();
+			firebase.database().goOffline();
+			firebase.app().delete();
+		};
+		
 		var conectar = function() {
-			datos.db = database.ref(datos.llaveCompleta);
-			ultimaPregunta.on('value', function(data) {
-				datos.ultimaPregunta = data.val();
-				regenerarPreguntas();
+			remotos.usuario = database.ref(datos.llaveCompleta);
+			remotos.ultimaPregunta = database.ref('ultimaPregunta');
+			
+			remotos.ultimaPregunta.on('value', function(data) {
+				if (data.val() == 'fin') {
+					desconectar();
+				} else {
+					datos.ultimaPregunta = data.val();
+					regenerarPreguntas();	
+				}
 			});
-			datos.db.on("value", function(data) {
+			remotos.usuario.on("value", function(data) {
 				var existente = data.val();
 				if (!hayValor(existente)) {
 					//Asigna el valor inicial

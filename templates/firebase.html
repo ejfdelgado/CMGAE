@@ -9,13 +9,16 @@
 {% block content %}
 <div class="panel panel-default abc-jugadores">
   <div class="panel-heading">
-	<div class="btn-group" role="group" aria-label="...">
+  <div class="container">
+	<div class="btn-group" role="group">
 	  <button type="button" class="btn btn-default abc-anterior"><i class="fa fa-step-backward" aria-hidden="true"></i></button>
 	  <button type="button" class="btn btn-success abc-jugar"><i class="fa fa-play" aria-hidden="true"></i></button>
-	  <button type="button" class="btn btn-danger abc-terminar"><i class="fa fa-pause" aria-hidden="true"></i></button>
+	  <button type="button" class="btn btn-info abc-terminar"><i class="fa fa-pause" aria-hidden="true"></i></button>
+	  <button type="button" class="btn btn-danger abc-salir"><i class="fa fa-stop" aria-hidden="true"></i></button>
 	  <button type="button" class="btn btn-default abc-siguiente"><i class="fa fa-step-forward" aria-hidden="true"></i></button>
 	</div>
 	<div class="btn-group pull-right abc-botones-vista" role="group" aria-label="...">
+	</div>
 	</div>
   </div>
   <div class="panel-body">
@@ -102,6 +105,7 @@
 				datos.publicado = true;
 			});
 		};
+		
 		var terminarJuego = function() {
 			var updates = {};
 			updates['/ultimaPregunta/'] = null;
@@ -111,9 +115,19 @@
 			});
 		};
 		
+		var salirDeJuego = function() {
+			var updates = {};
+			updates['/ultimaPregunta/'] = 'fin';
+			var promesa = firebase.database().ref().update(updates);
+			promesa.then(function() {
+				datos.publicado = false;
+			});
+		};
+		
 		var inicializar = function() {
 			$('.abc-jugar').on('click', publicarJuego);
 			$('.abc-terminar').on('click', terminarJuego);
+			$('.abc-salir').on('click', salirDeJuego);
 			$('.abc-anterior').on('click', anterior);
 			$('.abc-siguiente').on('click', siguiente);
 			conectar();

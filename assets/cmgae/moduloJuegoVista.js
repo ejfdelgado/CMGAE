@@ -1,28 +1,50 @@
 
 if (!hayValor(moduloJuegoVista)) {
 	
+	//Responde: ¿cuántas personas eligieron una pregunta dada?
 	var totalizarSumaRespuestas = function(metadata) {
 		var totales = {};
 		if (hayValor(metadata.jugadores)) {
 			let llavePregunta = metadata.idPregunta;
+			let respuestas = metadata.preguntaActual.respuestas;
+			let llavesRespuestas = Object.keys(respuestas);
 			$.each(metadata.jugadores, function(jugador, unJugador) {
 				//Se cruza cada jugador con la elección
 				if (hayValor(unJugador.respuestas)) {
 					var eleccion = unJugador.respuestas[llavePregunta];
 					if (hayValor(eleccion)) {
-						if (!esNumero(totales[eleccion])) {
-							totales[eleccion]=0;
-						}
-						if (esNumero(eleccion)) {
-							totales[eleccion]+=eleccion;
-						} else {
-							totales[eleccion]+=1;
+						if (estaEnLista(''+eleccion, llavesRespuestas)) {
+							if (!esNumero(totales[eleccion])) {
+								totales[eleccion] = 1;
+							} else {
+								totales[eleccion]+=1;
+							}
 						}
 					}
 				}
 			});
 		}
 		return totales;
+	};
+	
+	var regenerarPuntajes = function(datos) {
+		console.log('regenerarPuntajes');
+		if (hayValor(datos.jugadores)) {
+			$.each(datos.jugadores, function(jugador, unJugador) {
+				//Se cruza cada jugador con los puntajes
+				unJugador.puntos = 0;
+				if (hayValor(unJugador.respuestas)) {
+					$.each(unJugador.respuestas, function(llavePregunta, valorRespuesta) {
+						if (hayValor(datos.juego.preguntas[llavePregunta])) {
+							var posibles = datos.juego.preguntas[llavePregunta].respuestas;
+							if (hayValor(posibles[valorRespuesta])) {
+								unJugador.puntos+=parseInt(posibles[valorRespuesta].puntos);
+							}
+						}
+					});
+				}
+			});
+		}
 	};
 	
 	var pluginsModuloVistaJuego = {
@@ -32,6 +54,7 @@ if (!hayValor(moduloJuegoVista)) {
 				return {
 					'url': '/assets/cmgae/juego/modos/score.html', 
 					'funInicio': function(plantilla) {
+						regenerarPuntajes(metadata);
 						return $(plantilla);
 					},
 					'lista': metadata.jugadores,
@@ -45,7 +68,7 @@ if (!hayValor(moduloJuegoVista)) {
 						return nuevo;
 					},
 					'funOrdenar': function(a, b) {
-						return b.puntos-a.puntos;
+						return a.puntos-b.puntos;
 					}
 				};
 			},
@@ -55,6 +78,7 @@ if (!hayValor(moduloJuegoVista)) {
 			programa: function(metadata) {
 				return {
 					'url':'/assets/cmgae/juego/modos/pregunta.html', 
+					'recargarHtml': false,
 					'funInicio':function(plantilla) {
 						plantilla = plantilla.replace('$1', darHtmlSeguro(metadata.preguntaActual.texto));
 						return $(plantilla);
@@ -85,6 +109,7 @@ if (!hayValor(moduloJuegoVista)) {
 			programa: function(metadata) {
 				return {
 					'url':'/assets/cmgae/juego/modos/respuesta.html', 
+					'recargarHtml': false,
 					'funInicio':function(plantilla) {
 						plantilla = plantilla.replace('$1', darHtmlSeguro(metadata.preguntaActual.respuesta));
 						return $(plantilla);
@@ -98,6 +123,7 @@ if (!hayValor(moduloJuegoVista)) {
 				return {
 					'url':'/assets/cmgae/juego/modos/barras.html', 
 					'funInicio': function(plantilla) {
+						plantilla = plantilla.replace('$1', darHtmlSeguro(metadata.preguntaActual.texto));
 						return $(plantilla);
 					},
 					'recargarHtml': false,
@@ -137,10 +163,6 @@ if (!hayValor(moduloJuegoVista)) {
 							var options = {
 								responsive: true,
 			                    legend: {position: 'top',},
-			                    title: {
-			                        display: true,
-			                        text: deHtmlDarSoloTexto(metadata.preguntaActual.texto),
-			                    },
 			                    maintainAspectRatio: false,
 							  scales: {
 							    yAxes: [{
@@ -175,6 +197,7 @@ if (!hayValor(moduloJuegoVista)) {
 				return {
 					'url':'/assets/cmgae/juego/modos/dona.html', 
 					'funInicio': function(plantilla) {
+						plantilla = plantilla.replace('$1', darHtmlSeguro(metadata.preguntaActual.texto));
 						return $(plantilla);
 					},
 					'recargarHtml': false,
@@ -249,6 +272,7 @@ if (!hayValor(moduloJuegoVista)) {
 			moduloJuego: moduloJuego,
 			metadata: null,
 			ultimaPlantilla: null,
+			ultimaPregunta: null,
 		};
 		
 		var asignarModuloJuego = function(moduloJuego) {
@@ -270,10 +294,12 @@ if (!hayValor(moduloJuegoVista)) {
 		}
 		
 		var actualizar = function() {
-			regenerarPuntajes();
 			var temp = modos[datos.modo](datos.metadata);
 			if (hayValor(temp)) {
 				remplazarContenido(temp);
+			} else {
+				//Solo borra todo
+				datos.elem.empty();
 			}
 		};
 		
@@ -290,6 +316,7 @@ if (!hayValor(moduloJuegoVista)) {
 			datos.metadata['preguntaActual'] = datos.preguntaActual;
 			datos.metadata['moduloJuego'] = datos.moduloJuego;
 			datos.metadata['jugadores'] = datos.jugadores;
+			datos.metadata['juego'] = datos.juego;
 			
 			datos.modo = llave;
 			actualizar();
@@ -311,26 +338,6 @@ if (!hayValor(moduloJuegoVista)) {
 			}
 		};
 		
-		var regenerarPuntajes = function() {
-			console.log('regenerarPuntajes');
-			if (hayValor(datos.jugadores)) {
-				$.each(datos.jugadores, function(jugador, unJugador) {
-					//Se cruza cada jugador con los puntajes
-					unJugador.puntos = 0;
-					if (hayValor(unJugador.respuestas)) {
-						$.each(unJugador.respuestas, function(llavePregunta, valorRespuesta) {
-							if (hayValor(datos.juego.preguntas[llavePregunta])) {
-								var posibles = datos.juego.preguntas[llavePregunta].respuestas;
-								if (hayValor(posibles[valorRespuesta])) {
-									unJugador.puntos+=parseInt(posibles[valorRespuesta].puntos);
-								}
-							}
-						});
-					}
-				});
-			}
-		};
-		
 		var remplazarContenido = function(props) {
 			if (!hayValor(props.recargarHtml)) {
 				props.recargarHtml = true;
@@ -339,6 +346,7 @@ if (!hayValor(moduloJuegoVista)) {
 			var funcionDespues = function(plantilla, tieneContenido) {
 				console.log('funcionDespues', tieneContenido)
 				datos.ultimaPlantilla = props.url;
+				datos.ultimaPregunta = datos.idPregunta;
 				if (tieneContenido) {
 					datos.elem.empty();
 					datos.elem.append(props.funInicio(plantilla, datos.metadata));
@@ -370,7 +378,10 @@ if (!hayValor(moduloJuegoVista)) {
 				}
 			};
 			
-			if (props.recargarHtml == false && datos.ultimaPlantilla == props.url) {
+			if (
+					props.recargarHtml == false && 
+					datos.ultimaPlantilla == props.url &&
+					datos.ultimaPregunta == datos.idPregunta) {
 				funcionDespues(null, false);
 			} else {
 				var promesa = moduloHttp.get(props.url, true);
