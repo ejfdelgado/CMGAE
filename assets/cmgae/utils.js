@@ -248,3 +248,14 @@ var copiarEnPortapapeles = function(texto) {
   document.execCommand("copy");
   document.body.removeChild(aux);
 };
+
+var darParametrosUrl = function() {
+	var regex = /([^&=?]*)=([^&=?]*)/ig;
+	var str = location.search;
+	var result;
+	var res = {};
+	while ((result = regex.exec(str)) ) {
+		res[result[1]]=result[2];
+	}
+	return res;
+};

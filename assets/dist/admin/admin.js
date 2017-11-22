@@ -4,7 +4,8 @@ $(document).ready(function() {
 	$.when(promesaLocal).then(function() {
 		moduloMenus.inicializar();
 		moduloContactenos.inicializar();
-		if (moduloApp.esAdmin()) {
+		var params = darParametrosUrl();
+		if (moduloApp.esAdmin() && params.editar != 'false') {
 			moduloEdicion.inicializar();
 		}
 	});

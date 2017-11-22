@@ -15,7 +15,8 @@
 			"editar": "Edit",
 			"propiedades": "Page properties",
 			"salir": "Quit",
-			"ingresar": "Login"
+			"ingresar": "Login",
+			"archivos": "File management"
 		},
 		"mensajes": {
 			"hecho": "Done!",

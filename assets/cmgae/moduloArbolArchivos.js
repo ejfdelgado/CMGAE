@@ -214,6 +214,23 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 				}
 		};
 		
+		var copiarRutaLocal = {
+		        "separator_before": false,
+		        "separator_after": false,
+		        "label": "Copiar Ruta Local",
+				"action": function(data) {
+					var inst = $.jstree.reference(data.reference);
+					var obj = inst.get_node(data.reference);
+					var url = moduloArchivos.generarUrlDadoId(obj.id, true);
+					if (url.toLowerCase().endsWith('.css')) {
+						url = '<link rel="stylesheet" href="'+url+'"/>';
+					} else if (url.toLowerCase().endsWith('.js')) {
+						url = '<script src="'+url+'"></script>'
+					}
+					copiarEnPortapapeles(url);
+				}
+		};
+		
 		//solo se deben poder mover archivos.
 		if ($node.original.type == 'folder') {
 	        return {
@@ -226,6 +243,7 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 	        return {
 	            'Abrir': abrir,
 	            'copiarRuta': copiarRuta,
+	            'copiarRutaLocal': copiarRutaLocal,
 	            'Renombrar': renombrar,
 	            "Borrar": borrar,
 	        };
