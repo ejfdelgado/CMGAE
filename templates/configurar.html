@@ -9,11 +9,6 @@
 	<nav>
 		<ul>
 			<li><a onclick="seleccionarPanel('#general')">General</a></li>
-			<li><a onclick="seleccionarPanel('#sitemap')">Sitemap</a></li>
-			<li><a onclick="seleccionarPanel('#robots')">Robots</a></li>
-			<li><a onclick="seleccionarPanel('#mapa')">Mapa</a></li>
-			<li><a onclick="seleccionarPanel('#codigo')">script</a></li>
-			<li><a onclick="seleccionarPanel('#estilo')">css</a></li>
 			<li><a onclick="seleccionarPanel('#propiedades')">propiedades</a></li>
 		</ul>
 	</nav>
@@ -34,62 +29,6 @@
 				<div class="right2"><div class="all3"><h1><span>og:url</span></h1><div property="url" textplain="true">{% buscar leng dicci tipo nodo 'url' 'http://www.dominio.com' %}</div></div></div>
 				<div class="right2"><div class="all3"><h1><span>og:type</span></h1><div property="type" textplain="true">{% buscar leng dicci tipo nodo 'type' 'website' %}</div></div></div>
 				<div class="right2"><div class="all3"><h1><span>analytics</span></h1><div property="analytics" textplain="true">{% buscar leng dicci tipo nodo 'analytics' '' %}</div></div></div>
-			</div>
-		</div>
-	</div>
-	{% endwith %}
-	{% with nodo='/sitemap.xml' tipo='Configuracion' %}
-	<div id="sitemap" class="panelConfig invisible" about="{{ nodo }}" typeof="{{ tipo }}">
-		<div class="right">
-			<div class="right1b">
-				<div class="right2">
-				<div class="all3"><h1><span>contenido</span></h1>
-					<textarea property="contenido" rows="10" >{% buscar leng dicci tipo nodo 'contenido' '<?xml version="1.0" encoding="UTF-8"?>&#13;<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">&#13;<url><loc>http://www.dominio.com/</loc><lastmod>2015-09-31T18:49Z</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>&#13;</urlset>&#13;' %}</textarea>
-				</div></div>
-			</div>
-		</div>
-	</div>
-	{% endwith %}
-	{% with nodo='/robots.txt' tipo='Configuracion' %}
-	<div id="robots" class="panelConfig invisible" about="{{ nodo }}" typeof="{{ tipo }}">
-		<div class="right">
-			<div class="right1b">
-				<div class="right2"><div class="all3"><h1><span>contenido</span></h1>
-				<textarea property="contenido" rows="10" >{% buscar leng dicci tipo nodo 'contenido' 'User-agent: *&#13;Crawl-delay: 10&#13;# Directories&#13;Disallow: /assets/&#13;Disallow: /images/&#13;# Files&#13;Disallow: /README.txt&#13;' %}</textarea>
-				</div></div>
-			</div>
-		</div>
-	</div>
-	{% endwith %}
-	{% with nodo='/mapa.kml' tipo='Configuracion' %}
-	<div id="mapa" class="panelConfig invisible" about="{{ nodo }}" typeof="{{ tipo }}">
-		<div class="right">
-			<div class="right1b">
-				<div class="right2"><div class="all3"><h1><span>contenido</span></h1>
-				<textarea property="contenido" rows="10" >{% buscar leng dicci tipo nodo 'contenido' '' %}</textarea>
-				</div></div>
-			</div>
-		</div>
-	</div>
-	{% endwith %}
-	{% with nodo='/mijavascript.js' tipo='Configuracion' %}
-	<div id="codigo" class="panelConfig invisible" about="{{ nodo }}" typeof="{{ tipo }}">
-		<div class="right">
-			<div class="right1b">
-				<div class="right2"><div class="all3"><h1><span>contenido</span></h1>
-				<textarea property="contenido" rows="10" >{% buscar leng dicci tipo nodo 'contenido' '' %}</textarea>
-				</div></div>
-			</div>
-		</div>
-	</div>
-	{% endwith %}
-	{% with nodo='/miestilo.css' tipo='Configuracion' %}
-	<div id="estilo" class="panelConfig invisible" about="{{ nodo }}" typeof="{{ tipo }}">
-		<div class="right">
-			<div class="right1b">
-				<div class="right2"><div class="all3"><h1><span>contenido</span></h1>
-				<textarea property="contenido" rows="10" >{% buscar leng dicci tipo nodo 'contenido' '' %}</textarea>
-				</div></div>
 			</div>
 		</div>
 	</div>

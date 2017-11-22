@@ -26,14 +26,6 @@ from settings import TEMPLATE_DIRS, ROOT_PATH, LENGUAJE_PRED
 
 CORREO_ENVIOS = 'edgar.jose.fernando.delgado@gmail.com'
 
-COMMON_TEMPLATES = {
-                    'configurar.html':{'admin':True},
-                    'firebase.html':{'admin':False},
-                    'jugar.html':{'admin':False},
-                    'calendario.html':{'admin':False}, 
-                    'archivos.html':{'admin':True}
-                    }
-
 ANALYTICS = '<script>'\
             '    (function(i,s,o,g,r,a,m){i["GoogleAnalyticsObject"]=r;i[r]=i[r]||function(){'\
             '    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),'\
@@ -42,8 +34,6 @@ ANALYTICS = '<script>'\
             '    ga("create", "$1", "auto");'\
             '    ga("send", "pageview");'\
             '</script>'
-
-
 
 def buscarTodos(nombre):
     module = __import__('models')
@@ -167,6 +157,14 @@ def principal(request, data):
         else:
             leng = LENGUAJE_PRED
         
+        puntoExtension = data.rfind('.')
+        extension = data[puntoExtension:]
+        mime = 'text/html'
+        if (extension.startswith(".xml")):
+            mime = 'text/xml'
+        elif (extension.startswith(".xml")):
+            mime = 'text/plain'
+        
         user = users.get_current_user()
         
         #El usuario no administrativo pasa por memcache
@@ -174,7 +172,7 @@ def principal(request, data):
             anterior = memcache.get(var_full_path)
             if (anterior):
                 anterior = anterior.replace('__USER__', generarVariablesUsuario(var_full_path, leng), 1)
-                return HttpResponse(anterior, content_type='text/html')
+                return HttpResponse(anterior, content_type=mime)
         
         #Se lee el template para saber cuales ids se deben buscar de la base de datos
         llavesEntidades = []
@@ -183,23 +181,30 @@ def principal(request, data):
         
         #Buscar un template valido para la url
         ruta = data
-        #1. Se le quita la extensión
-        puntoExtension = ruta.rfind('.')
-        if (puntoExtension >= 0):
-            ruta = ruta[:puntoExtension]
-        #2. Se itera por los diferentes slash y se mira si existe template
-        ultimoIndice = len(ruta)
-        while True:
-            rutaParcial = ruta[:ultimoIndice]
-            ultimoIndice = ruta.rfind('/', 0, ultimoIndice)
-            if (not rutaExiste(rutaParcial+'.html') == 0 or ultimoIndice <= 0):
-                break
+        varRutaExiste = 0
+        #0. Primero se mira si tal vez existe la ruta exacta
+        varRutaExiste = rutaExiste(ruta)
+        if (varRutaExiste == 0):
+            #1. Se le quita la extensión
+            if (puntoExtension >= 0):
+                ruta = ruta[:puntoExtension]
+            #2. Se itera por los diferentes slash y se mira si existe template
+            ultimoIndice = len(ruta)
+            
+            while True:
+                rutaParcial = ruta[:ultimoIndice]+'.html'
+                ultimoIndice = ruta.rfind('/', 0, ultimoIndice)
+                varRutaExiste = rutaExiste(rutaParcial)
+                if (not (varRutaExiste == 0) or ultimoIndice <= 0):
+                    break
+        else:
+            rutaParcial = ruta
         
         #Si no encontró se queda con el index
-        if (ultimoIndice <= 0):
+        if (varRutaExiste == 0 and ultimoIndice <= 0):
             data = 'index.html'
         else:
-            data = rutaParcial+'.html'
+            data = rutaParcial
             
         todo = procesarTemplate(data, var_path)
         
@@ -259,7 +264,7 @@ def principal(request, data):
             'DATE_NOW': comun.DATE_NOW
         }
         
-        respuesta = direct_to_template(request, data, context)
+        respuesta = direct_to_template(request, data, context, mime)
         
         if not users.is_current_user_admin():
             memcache.set(var_full_path, respuesta.content)

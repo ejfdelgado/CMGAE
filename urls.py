@@ -5,7 +5,6 @@ from django.conf.urls import defaults
 from views.main import RESTfulHandler
 from views.main import RESTpaginar
 from views.main import RESTfulActions
-from views.main import ConfigHandler
 from views.users import UserHandler
 from views.storage import StorageHandler
 
@@ -16,11 +15,6 @@ urlpatterns = defaults.patterns(
     (r'^act/?(.*)', RESTfulActions),
     (r'^user/?(.*)', UserHandler),
     (r'^storage/?(.*)', StorageHandler),
-    (r'^sitemap.xml(.*)', ConfigHandler),
-    (r'^robots.txt(.*)', ConfigHandler),
-    (r'^mapa.kml(.*)', ConfigHandler),
-    (r'^miestilo.css(.*)', ConfigHandler),
-    (r'^mijavascript.js(.*)', ConfigHandler),
     (r'^(.*)$', 'main.principal'),
     
 )
