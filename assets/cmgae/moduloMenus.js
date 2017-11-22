@@ -36,6 +36,10 @@ var moduloMenus = (function() {
 		}, error);
 	};
 	
+	var verPropiedadesDePagina = function() {
+		$('.menu_pagina').toggleClass('invisible');
+	};
+	
 	var activarNodo = function(nodo, otroMapa) {
 		moduloLocal.procesarElemento(nodo);
 		var mapa = {
@@ -45,6 +49,7 @@ var moduloMenus = (function() {
 				'.menu_opc_borrar_cache': moduloApp.borrarCache,
 				'.create-ui-toggle2': moduloApp.abrirBarraEdicion,
 				'.menuEliminar': moduloEdicion.funcElegirBorrar,
+				'.menu_opc_propiedades_pagina': verPropiedadesDePagina,
 			},
 			html: {},
 			botones: {},
