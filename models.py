@@ -24,22 +24,7 @@ class Documento(ndb.Expando):
     def to_dict(self):
         return to_dict_(self)
 
-class lista1(ndb.Expando):
-    _default_indexed = False
-    def to_dict(self):
-        return to_dict_(self)
-    
-class lista2(ndb.Expando):
-    _default_indexed = False
-    def to_dict(self):
-        return to_dict_(self)
-    
-class lista3(ndb.Expando):
-    _default_indexed = False
-    def to_dict(self):
-        return to_dict_(self)
-
-class lista6(ndb.Expando):
+class lista(ndb.Expando):
     _default_indexed = False
     def to_dict(self):
         return to_dict_(self)

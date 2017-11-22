@@ -182,8 +182,24 @@ def principal(request, data):
         module = __import__('models')
         
         #Buscar un template valido para la url
-        if (rutaExiste(data) == 0):
+        ruta = data
+        #1. Se le quita la extensión
+        puntoExtension = ruta.rfind('.')
+        if (puntoExtension >= 0):
+            ruta = ruta[:puntoExtension]
+        #2. Se itera por los diferentes slash y se mira si existe template
+        ultimoIndice = len(ruta)
+        while True:
+            rutaParcial = ruta[:ultimoIndice]
+            ultimoIndice = ruta.rfind('/', 0, ultimoIndice)
+            if (not rutaExiste(rutaParcial+'.html') == 0 or ultimoIndice <= 0):
+                break
+        
+        #Si no encontró se queda con el index
+        if (ultimoIndice <= 0):
             data = 'index.html'
+        else:
+            data = rutaParcial+'.html'
             
         todo = procesarTemplate(data, var_path)
         
