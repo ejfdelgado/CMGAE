@@ -96,7 +96,7 @@ var moduloArchivos = (function() {
             cache: false,
             contentType: false,
             processData: false,
-        }).done(function(data) {        	
+        }).done(function(data) {
         	if (data.error != 0) {
         		diferido.reject();
         	} else {
@@ -199,7 +199,23 @@ var moduloArchivos = (function() {
 		url+='viejo='+encodeURIComponent(viejo);
 		url+='&nuevo='+encodeURIComponent(nuevo);
 		return moduloHttp.get(url);
-	}
+	};
+	
+	var crearBasico = function() {
+		var idIndex = '/public/index.html';
+		var promesa = leerTextoPlano(idIndex);
+		$.when(promesa).then(function(datos) {
+			let temp = leerObj(datos, 'error', null);
+			if (esNumero(temp) && temp != 0) {
+				//Se busca crear
+				let contenido = '{% extends "base.html" %}{% block content %}It works from cloud storage!{% endblock %}';
+				let promesaEscritura = escribirTextoPlano(idIndex, contenido);
+				$.when(promesaEscritura).then(function() {
+					location.reload();
+				});
+			}
+		});
+	};
 	
 	return {
 		'darNombreId': darNombreId,
@@ -212,6 +228,7 @@ var moduloArchivos = (function() {
 		'borrar': borrar,
 		'renombrar': renombrar,
 		'completarPredeterminados': completarPredeterminados,
+		'crearBasico': crearBasico,
 	};
 })();
 }

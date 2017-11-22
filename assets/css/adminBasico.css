@@ -9,3 +9,58 @@
 	margin-top: 10px;
 	width: 50%;
 }
+
+.btnEliminar {
+	position: relative;
+	top: 0;
+	left: 5px;
+}
+
+.btnEliminarX {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 9999999;
+}
+
+.btnEliminar2 {
+	background: url("../img/delete.png") no-repeat 0 0 transparent;
+	width: 30px;
+	height: 30px;
+}
+
+.btnEliminar2:hover {
+	background: url("../img/delete-h.png") no-repeat 0 0 transparent;
+}
+
+.btnEliminar3 {
+	background: url("../img/q.png") no-repeat 0 0 transparent;
+	width: 30px;
+	height: 30px;
+	display: inline-block;
+}
+/*cancelar*/
+.btnEliminar4 {
+	border-radius: 10px;
+    background: #23AF14;
+    padding: 1px;
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.btnEliminar4:hover {
+	background: #0A6B00;
+}
+
+/*Aceptar*/
+.btnEliminar5 {
+	border-radius: 10px;
+    background: #AF1414;
+    padding: 1px;
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.btnEliminar5:hover {
+	background: #790000;
+}

@@ -3,8 +3,6 @@
 
 import os
 
-todos_los_temas = ['photon']
-
 APPEND_SLASH = False
 LENGUAJE_PRED = 'esp'
 DEBUG = os.environ['SERVER_SOFTWARE'].startswith('Dev')
@@ -13,12 +11,11 @@ ROOT_URLCONF = 'urls'
 TEMPLATE_DEBUG = DEBUG
 TEMPLATE_CONTEXT_PROCESSORS = ()
 TEMPLATE_DIRS = (
-    os.path.join(os.path.dirname(__file__), 'templates/'+todos_los_temas[0]),
     os.path.join(ROOT_PATH, 'templates'),
 )
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.load_template_source',
-    'mydjangoloaders.CloudStorageLoader'
+    'mydjangoloaders.CloudStorageLoader',
+    'django.template.loaders.filesystem.load_template_source'
 )
 
 TRADUCTOR = {

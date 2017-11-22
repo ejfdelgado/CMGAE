@@ -5,11 +5,36 @@ var moduloEdicion = (function() {
 	var activarEdicionOk = false;
 	var vie = null;
 	
-	try {
-		vie = getVieHere();
-	} catch (e) {
-		console.log('Error obteniendo vie', e)
+	if (typeof getVieHere !== 'undefined' && esFuncion(getVieHere)) {
+		try {
+			vie = getVieHere();
+		} catch (e) {
+			console.log('Error obteniendo vie', e)
+		}
 	}
+	
+	if (!hayValor(vie) && typeof VIE !== 'undefined') {
+		vie = new VIE();
+	}
+	
+	var configureEditorsHere = function() {
+		jQuery('body').midgardCreate('configureEditor', 'default', 'halloWidget', {
+			plugins: {'halloformat': {},'halloblock': {},'hallolists': {},'hallolink': {},'halloreundo': {},}});
+
+		jQuery('body').midgardCreate('configureEditor', 'plaintext', 'halloWidget', {
+			plugins: {'halloreundo': {}}});
+
+		jQuery('body').midgardCreate('setEditorForProperty', 'TextSimple', 'plaintext');
+
+		jQuery('body').midgardCreate('configureEditor', 'nuevo', 'halloWidget', {
+			plugins: {
+				halloformat: {},
+				halloblacklist: {
+					tags: ['br']
+				}
+			}
+		});
+	};
 	
 	var activarEdicion = function() {
 		if (activarEdicionOk == true){return;}
@@ -540,7 +565,9 @@ var moduloEdicion = (function() {
 			      //'feature': 'midgardCollectionAdd'
 			    },
 			  });
+			  
 			  configureEditorsHere();
+			  
 			  var templatebotoneditar = "<div class='editableicon'></div>";
 			  $('.formhtml .cancelar').click(function() {
 				  $('.formhtml').addClass('invisible');

@@ -148,7 +148,6 @@ var moduloMenus = (function() {
 	
 	var mostrarFormularioEdicion = function(nodo, atributo, valor, sufijo) {
 		//TODO reconfigurar
-		pila.push("formhtml");
 		$(".formhtml").attr('nodo2', nodo);
 		$(".formhtml").attr('property2', atributo);
 		$(".formhtml").attr('sufijo', sufijo);

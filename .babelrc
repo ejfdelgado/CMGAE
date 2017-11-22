@@ -26,6 +26,7 @@
 		"HAS_USER",
 		"IS_ADMIN",
 		"AMBIENTE",
+		"VIE",
 		"RAIZ_CLOUD_STORAGE",
 		"$",
 		"Chart",

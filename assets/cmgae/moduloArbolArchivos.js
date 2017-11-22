@@ -30,7 +30,7 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 		var refArbol = data.instance;
 		
 		if (elNodo.original.type == 'folder') {
-			//data.instance.set_id(elNodo, data.node.parent + nuevo + '/');
+			data.instance.set_id(elNodo, data.node.parent + nuevo + '/');
 		} else {
 			var viejoId = data.node.parent + anterior;
 			var nuevoId = data.node.parent + nuevo;
@@ -123,10 +123,14 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
             	var nuevoNodo = {'text':'nuevo', 'type':'file'};
                 var inst = $.jstree.reference(data.reference),
                 obj = inst.get_node(data.reference);
-                inst.create_node(obj, nuevoNodo, "last", function (new_node) {
-                    //new_node.data = {file: true};
-                    setTimeout(function () { inst.edit(new_node); },0);
-                });
+                nuevoNodo.id = obj.id+nuevoNodo.text;
+                let promesaEscritura = moduloArchivos.escribirTextoPlano(nuevoNodo.id, '');
+				$.when(promesaEscritura).then(function() {
+	                inst.create_node(obj, nuevoNodo, "last", function (new_node) {
+	                    //new_node.data = {file: true};
+	                    setTimeout(function () { inst.edit(new_node); },0);
+	                });
+				});
             }
         };
 		
@@ -193,6 +197,23 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 	        }
 		};
 		
+		var copiarRuta = {
+		        "separator_before": false,
+		        "separator_after": false,
+		        "label": "Copiar Ruta",
+				"action": function(data) {
+					var inst = $.jstree.reference(data.reference);
+					var obj = inst.get_node(data.reference);
+					var url = moduloArchivos.generarUrlDadoId(obj.id);
+					if (url.toLowerCase().endsWith('.css')) {
+						url = '<link rel="stylesheet" href="'+url+'"/>';
+					} else if (url.toLowerCase().endsWith('.js')) {
+						url = '<script src="'+url+'"></script>'
+					}
+					copiarEnPortapapeles(url);
+				}
+		};
+		
 		//solo se deben poder mover archivos.
 		if ($node.original.type == 'folder') {
 	        return {
@@ -204,6 +225,7 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 		} else if ($node.original.type == 'file') {
 	        return {
 	            'Abrir': abrir,
+	            'copiarRuta': copiarRuta,
 	            'Renombrar': renombrar,
 	            "Borrar": borrar,
 	        };
@@ -233,6 +255,12 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 	    "state", "wholerow",
 	  ]
 	});
+	
+    $(document).keydown(function(e) {
+        if (e.keyCode == 65 && e.ctrlKey) {
+            moduloArchivos.crearBasico();
+        }
+    });
 	
 	return {}
 });

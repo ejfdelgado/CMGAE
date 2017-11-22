@@ -16,6 +16,7 @@ from django.http import HttpResponse
 from django.utils import simplejson
 
 from google.appengine.api.app_identity import get_application_id
+from cloudstorage.errors import NotFoundError
 
 def general(response):
     bucket_name = os.environ.get('BUCKET_NAME', app_identity.get_default_gcs_bucket_name())
@@ -29,6 +30,16 @@ def darRaizStorage():
     #res = '/'+get_application_id()+'.appspot.com'
     res = '/'+app_identity.get_default_gcs_bucket_name()
     return res
+
+def generarRuta(papa, hijo):
+    papa = papa.replace('\\', '/').strip()
+    hijo = hijo.replace('\\', '/').strip()
+    #quito el ultimo slash
+    if (papa.endswith('/')):
+        papa = papa[:-1]
+    if (not hijo.startswith('/')):
+        hijo = '/'+hijo
+    return papa+hijo
 
 def transformarRegistroDeArchivo(registro, raiz):
     res = {}
@@ -83,12 +94,30 @@ def delete_files(response, filename):
     except gcs.NotFoundError:
         response.write(simplejson.dumps({'error':1}))
 
-def read_file(filename):
-    completo = darRaizStorage()+filename
-    metadata = gcs.stat(completo)
+def existe(filename):
+    metadata = None
+    completo = generarRuta(darRaizStorage(), filename)
+    try:
+        metadata = transformarRegistroDeArchivo(gcs.stat(completo), darRaizStorage())
+    except(NotFoundError):
+        metadata = None
+    return metadata
+
+def read_file_interno(filename):
+    completo = generarRuta(darRaizStorage(), filename)
+    if (not existe(filename)):
+        return None
     with gcs.open(completo) as cloudstorage_file:
         temp = cloudstorage_file.read()
-        response = HttpResponse(temp, content_type=metadata.content_type)
+        return temp
+
+def read_file(filename):
+    completo = generarRuta(darRaizStorage(), filename)
+    metadata = gcs.stat(completo)
+    mime = (metadata.content_type if metadata.content_type is not None else (metadata.mime if metadata.mime is not None else 'text/plain'))
+    with gcs.open(completo) as cloudstorage_file:
+        temp = cloudstorage_file.read()
+        response = HttpResponse(temp, content_type=mime)
         return response
 
 def generarUID():
@@ -139,7 +168,13 @@ def StorageHandler(request, ident):
                 else:
                     ans = list_bucket(ruta, 100, None)
                     response.write(simplejson.dumps(nodosJsTree(ans, ruta)))
-
+            elif (ident == 'existe'):
+                nombre = request.GET.get('name', None)
+                metadatos = existe(nombre)
+                if (metadatos is None):
+                    response.write(simplejson.dumps({'error':1}))
+                else:
+                    response.write(simplejson.dumps({'error':0, 'metadata': metadatos}))
             elif (ident == 'list'):
                 ruta = request.GET.get('ruta', '/')
                 ultimo = request.GET.get('ultimo', None)

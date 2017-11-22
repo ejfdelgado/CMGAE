@@ -31,37 +31,6 @@
 		<link rel="stylesheet" href="/assets/css/font-awesome.min.css" />
 		<link rel="stylesheet" href="/assets/css/font-awesome.css" />
 		
-		<!-- CSS's del template -->
-		<!-- link rel="stylesheet" href="/assets/templates/photon/css/main.css" /-->
-		
-		<link rel="stylesheet" href="/miestilo.css" />
-		<link rel="stylesheet" href="/assets/css/rrssb.css" />
-		
-		<style>
-		body {
-			font-family: 'CicleFina';
-		}
-		</style>
-		
-		<script type="text/html" id="TestimonioEjemplo">
-			         <li about="" typeof="Testimonio">
-			            <span class="image"><img property="imagen" src="/images/fotoPerfil.jpg" alt="" data-carpeta="/perfiles"></span>
-			            <h3 property="titulo">Jane Doe</h3>
-			            <p property="contenido">Sed magna etiam</p>
-			         </li>
-		</script>
-		
-		<script type="text/html" id="CaracteristicaEjemplo">
-			<div class="4u 12u$(medium)" about="" typeof="Caracteristica">
-				<span class="image fit"><img property="imagen" src="/images/pic02.jpg" alt="" data-carpeta="/caracteristica-mini"/></span>
-				<h3 property="titulo"></h3>
-				<div property="contenido"></div>
-				<ul class="actions">
-					<li><a href="#" class="button">M&aacute;s</a></li>
-				</ul>
-			</div>
-		</script>
-		
 		__USER__
 		
 		{% block encabezado %}{% endblock %}
@@ -95,7 +64,6 @@
         <script src="/assets/js/comun/date/jquery-dateFormat.min.js"></script>
         <script src="/assets/js/comun/util.js"></script>
         <!--[if lte IE 8]><script src="/assets/js/ie/respond.min.js"></script><![endif]-->
-        <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
 		
 		{% if admin %}
 		<script src="/assets/js/create2/ui/core.min.js"></script>
@@ -119,8 +87,9 @@
         <script src="/assets/js/create2/filereader.js"></script>
 		{% endif %}
 		
-		<script src="/assets/templates/photon/js/main.js"></script>
 		<script src="/assets/dist/modulos.min.js"></script>
+		
+		{% block scripts %}{% endblock %}
 		
 		{% if admin %}
 		<script src="/assets/dist/admin/admin.js"></script>
@@ -131,8 +100,5 @@
 		{{ ANALYTICS }}
 		{% endautoescape %}
 		
-		<script src="/assets/js/comun/rrssb.min.js"></script>
-		
-		{% block scripts %}{% endblock %}
 	</body>
 </html>

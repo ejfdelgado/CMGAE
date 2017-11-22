@@ -239,3 +239,12 @@ var activarConteoRegresivo = function() {
 var jsonToHtml = function(val) {
 	return JSON.stringify(val, null, 4).replace('\n', '<br/>');
 };
+
+var copiarEnPortapapeles = function(texto) {
+  var aux = document.createElement("input");
+  aux.setAttribute("value", texto);
+  document.body.appendChild(aux);
+  aux.select();
+  document.execCommand("copy");
+  document.body.removeChild(aux);
+};

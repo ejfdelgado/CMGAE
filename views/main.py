@@ -54,20 +54,38 @@ def buscarTodos(nombre):
         
     return greetings
 
-def procesarTemplate(ruta, base, template_dirs):
-    completo = ''
-    
+def rutaExiste(ruta):
+    valor = 0;
+    if (ruta is not None and len(str(ruta).strip())>0):
+        if (storage.existe(storage.generarRuta('/public', ruta)) is not None):
+            valor = 1
+        elif (os.path.isfile(os.path.join(TEMPLATE_DIRS[0], ruta))):
+            valor = 2
+    return valor;
+
+def leerRuta(ruta):
+    ubicacion = rutaExiste(ruta)
+    if (ubicacion == 0):
+        return None
+    elif (ubicacion == 1):
+        return storage.read_file_interno(storage.generarRuta('/public', ruta))
+    elif (ubicacion == 2):
+        completo = ''
+        for words in open(os.path.join(TEMPLATE_DIRS[0], ruta), 'r').readlines():
+            completo = completo + words
+        return completo
+
+def procesarTemplate(ruta, base):
     respuesta = {'nodos':[], 'busquedas':[]}
-    
-    for words in open(ruta, 'r').readlines():
-        completo = completo + words
+    completo = leerRuta(ruta)
+    if (completo is None):
+        return respuesta
     
     #validar si tiene padre
     padreBusqueda = re.findall('{%( +)extends( +)[\'"](.*?)[\'"]( +)%}', completo, re.MULTILINE | re.IGNORECASE | re.DOTALL)
     if (len(padreBusqueda) > 0):
         padreNombre = padreBusqueda[0][2]
-        tmpl = os.path.join(template_dirs, padreNombre)
-        respuesta = procesarTemplate(tmpl, base, template_dirs)  
+        respuesta = procesarTemplate(padreNombre, base)  
     
     #for match in re.findall('{%( +)with( +)(.*?)( +)as( +)nodo( +)%}(.*?){%( +)endwith( +)%}', completo, re.MULTILINE | re.IGNORECASE | re.DOTALL):
     for match in re.findall('{%( +)with( +)(.*?)( +)%}(.*?){%( +)endwith( +)%}', completo, re.MULTILINE | re.IGNORECASE | re.DOTALL):
@@ -131,7 +149,6 @@ def generarVariablesUsuario(var_full_path, leng):
             texto += 'var IS_ADMIN = false;\n'
     texto += '</script>\n'
     return texto
-        
 
 #data no recibe los parametros despues de ? y de #
 def principal(request, data):
@@ -155,51 +172,20 @@ def principal(request, data):
         #El usuario no administrativo pasa por memcache
         if not users.is_current_user_admin():
             anterior = memcache.get(var_full_path)
-            if (False):
+            if (anterior):
                 anterior = anterior.replace('__USER__', generarVariablesUsuario(var_full_path, leng), 1)
                 return HttpResponse(anterior, content_type='text/html')
-        
-        #Buscar un template valido para la url
-        partes = data.split('/')
-        archivo = None
-        directorio = None
-        archivoExistente = None
-        
-        if (not data in COMMON_TEMPLATES.keys()):
-            for parte in partes:
-                #Se elimina la extension
-                parte = parte.split('.')[0]
-                if (archivo == None):
-                    archivo = os.path.join(TEMPLATE_DIRS[0], parte+'.html')
-                    directorio = os.path.join(TEMPLATE_DIRS[0], parte)
-                else:
-                    archivo = os.path.join(directorio, parte+'.html')
-                    directorio = os.path.join(directorio, parte)
-                    
-                if (os.path.isfile(archivo)):
-                    archivoExistente = archivo
-                    break
-                
-            #se valida la direccion
-            if (archivoExistente == None):
-                archivoExistente = 'index.html'
-            tmpl = os.path.join(TEMPLATE_DIRS[0], archivoExistente)
-        else:
-            if ((COMMON_TEMPLATES[data]['admin'] and users.is_current_user_admin()) or not COMMON_TEMPLATES[data]['admin']):
-                archivo = os.path.join(ROOT_PATH, 'templates/'+data)
-                archivoExistente = archivo
-                tmpl = archivo
-            else:
-                archivo = os.path.join(ROOT_PATH, 'templates/403.html')
-                archivoExistente = archivo
-                tmpl = archivo
         
         #Se lee el template para saber cuales ids se deben buscar de la base de datos
         llavesEntidades = []
         identificadores = []
         module = __import__('models')
         
-        todo = procesarTemplate(tmpl, var_path, TEMPLATE_DIRS[0])
+        #Buscar un template valido para la url
+        if (rutaExiste(data) == 0):
+            data = 'index.html'
+            
+        todo = procesarTemplate(data, var_path)
         
         for parte in todo['nodos']:
             class_ = getattr(module, parte['tipo'])
@@ -257,7 +243,7 @@ def principal(request, data):
             'DATE_NOW': comun.DATE_NOW
         }
         
-        respuesta = direct_to_template(request, archivoExistente, context)
+        respuesta = direct_to_template(request, data, context)
         
         if not users.is_current_user_admin():
             memcache.set(var_full_path, respuesta.content)

@@ -128,3 +128,8 @@ nav>ul>li>a:hover {
 #general img {
 	width: 100%;
 }
+
+textarea {
+	width: 100%;
+	color: black;
+}

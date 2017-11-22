@@ -8,7 +8,6 @@ from views.main import RESTfulActions
 from views.main import ConfigHandler
 from views.users import UserHandler
 from views.storage import StorageHandler
-from views.prueba import PruebaHandler
 
 urlpatterns = defaults.patterns(
     'views',
@@ -16,7 +15,6 @@ urlpatterns = defaults.patterns(
     (r'^paginar/?(.*)', RESTpaginar),
     (r'^act/?(.*)', RESTfulActions),
     (r'^user/?(.*)', UserHandler),
-    (r'^prueba/?(.*)', PruebaHandler),
     (r'^storage/?(.*)', StorageHandler),
     (r'^sitemap.xml(.*)', ConfigHandler),
     (r'^robots.txt(.*)', ConfigHandler),
