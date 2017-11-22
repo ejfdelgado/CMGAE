@@ -164,6 +164,12 @@ def principal(request, data):
             mime = 'text/xml'
         elif (extension.startswith(".xml")):
             mime = 'text/plain'
+        elif (extension.startswith(".kml")):
+            mime = 'application/octet-stream'
+        elif (extension.startswith(".css")):
+            mime = 'text/css'
+        elif (extension.startswith(".js")):
+            mime = 'text/javascript'
         
         user = users.get_current_user()
         
@@ -407,39 +413,5 @@ def RESTfulHandler(request, ident):
             response.write('{"error":0, "msg": "'+nombre+' ('+str(ident)+') borrado"}')
         else:
             return HttpResponse(status=403)
-    return response
-
-def ConfigHandler(request, otro):
-    minuscula = request.path.lower()
-    mimeType = 'text/plain'
-    if minuscula.endswith(".xml"):
-        mimeType = 'text/xml'
-    if minuscula.endswith(".kml"):
-        mimeType = 'application/octet-stream'
-    if minuscula.endswith(".css"):
-        mimeType = 'text/css'
-    if minuscula.endswith(".js"):
-        mimeType = 'text/javascript'
-    
-    if not users.is_current_user_admin():
-        anterior = memcache.get(request.path)
-        if (anterior):
-            logging.info('hit!')
-            return HttpResponse(anterior, content_type=mimeType)
-    
-    response = HttpResponse("", content_type=mimeType)
-    
-    llave = ndb.Key(Configuracion, request.path)
-    nodo = llave.get()
-    if (nodo):
-        #html_parser = HTMLParser.HTMLParser()
-        #texto = re.sub(r'(<).{,4}(>)', '', nodo.contenido, flags=re.IGNORECASE)
-        texto = getattr(nodo, 'contenido_'+LENGUAJE_PRED)
-        #texto = html_parser.unescape(texto)
-        response.write(texto)
-        
-        if not users.is_current_user_admin():
-            memcache.set(request.path, response.content)
-        
     return response
    
