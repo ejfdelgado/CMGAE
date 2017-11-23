@@ -37,7 +37,11 @@ var moduloMenus = (function() {
 	};
 	
 	var verPropiedadesDePagina = function() {
-		$('.menu_pagina').toggleClass('invisible');
+		$('.menu_pagina').removeClass('invisible');
+	};
+	
+	var esconderPropiedadesDePagina = function() {
+		$('.menu_pagina').addClass('invisible');
 	};
 	
 	var activarNodo = function(nodo, otroMapa) {
@@ -164,6 +168,7 @@ var moduloMenus = (function() {
 		var diferido = $.Deferred();
 		$(document).keyup(function(e) {
 		  if (e.keyCode == 27) {
+			esconderPropiedadesDePagina();
 		  	if (pilaLocal.length == 0) {
 		  		mostrarMenuBasico();
 		  	} else {

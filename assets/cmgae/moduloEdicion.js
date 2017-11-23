@@ -5,18 +5,6 @@ var moduloEdicion = (function() {
 	var activarEdicionOk = false;
 	var vie = null;
 	
-	if (typeof getVieHere !== 'undefined' && esFuncion(getVieHere)) {
-		try {
-			vie = getVieHere();
-		} catch (e) {
-			console.log('Error obteniendo vie', e)
-		}
-	}
-	
-	if (!hayValor(vie) && typeof VIE !== 'undefined') {
-		vie = new VIE();
-	}
-	
 	var configureEditorsHere = function() {
 		jQuery('body').midgardCreate('configureEditor', 'default', 'halloWidget', {
 			plugins: {'halloformat': {},'halloblock': {},'hallolists': {},'hallolink': {},'halloreundo': {},}});
@@ -416,8 +404,8 @@ var moduloEdicion = (function() {
 							}
 						});
 						actual.attr("act_edt", "ok");
-						//Se intenta agregar un elemento que permita edici�n despu�s de creaci�n
-						if (!actual.hasClass('textarea_background')) {//? TODO decidir se para los fondos se va a hacer as�
+						//Se intenta agregar un elemento que permita edición después de creación
+						if (!actual.hasClass('textarea_background')) {//? TODO decidir se para los fondos se va a hacer así
 							var nuevoBoton = $('<button type="button" style="padding: 5px !important;">editar</button>');
 							nuevoBoton.bind('click', function() {
 								actual.click();
@@ -504,6 +492,19 @@ var moduloEdicion = (function() {
 	
 	  var inicializar = function() {
 		  var diferido = $.Deferred();
+		  
+			if (typeof getVieHere !== 'undefined' && esFuncion(getVieHere)) {
+				try {
+					vie = getVieHere();
+				} catch (e) {
+					console.log('Error obteniendo vie', e)
+				}
+			}
+			
+			if (!hayValor(vie) && typeof VIE !== 'undefined') {
+				vie = new VIE();
+			}
+		  
 		  //Cuando se instancia inicializa la paginación de lo que exista en el body
 		  activarEdicion();
 		  activarPaginacion();
