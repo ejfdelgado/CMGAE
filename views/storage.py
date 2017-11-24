@@ -216,7 +216,7 @@ def StorageHandler(request, ident):
             carpeta = request.POST.get('folder', '')
             auto = request.POST.get('auto', 'true')
             if (auto == 'true'):
-                if (not nombreAnterior is None):
+                if (not nombreAnterior is None and nombreAnterior.index('no-borrar') < 0):
                     try:
                         gcs.delete(nombreAnterior)
                     except:
