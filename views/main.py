@@ -162,7 +162,7 @@ def principal(request, data):
         mime = 'text/html'
         if (extension.startswith(".xml")):
             mime = 'text/xml'
-        elif (extension.startswith(".xml")):
+        elif (extension.startswith(".txt")):
             mime = 'text/plain'
         elif (extension.startswith(".kml")):
             mime = 'application/octet-stream'

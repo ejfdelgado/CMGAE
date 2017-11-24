@@ -81,7 +81,7 @@ def list_bucket(ruta, tamanio, ultimo):
 
 def renombrar_archivo(response, viejo, nuevo):
     try:
-        gcs.copy2(darRaizStorage()+viejo, darRaizStorage()+nuevo)
+        gcs.copy2(darRaizStorage()+viejo, darRaizStorage()+nuevo, {'x-goog-acl':'public-read'})
         gcs.delete(darRaizStorage()+viejo)
         response.write(simplejson.dumps({'error':0}))
     except:

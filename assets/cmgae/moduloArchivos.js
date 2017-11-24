@@ -81,7 +81,19 @@ var moduloArchivos = (function() {
 	
 	var escribirTextoPlano = function(id, contenido) {
 		var diferido = $.Deferred();
+		var extension = '.txt';
+		var indicePunto = id.indexOf('.');
 		var blobAttrs = { type: "text/plain"};
+		if (indicePunto>=0) {
+			let extension = id.substring(indicePunto);
+			extension = extension.toLowerCase();
+			if (extension.startsWith('.css')) {
+				blobAttrs.type = 'text/css';
+			} else if (extension.startsWith('.js')) {
+				blobAttrs.type = 'text/javascript';
+			}
+		}
+		
 		var file = new File([contenido], id, blobAttrs);
 		var form = new FormData();
         form.append('file-0', file);
