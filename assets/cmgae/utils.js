@@ -259,3 +259,13 @@ var darParametrosUrl = function() {
 	}
 	return res;
 };
+
+var urlContieneExtension = function(url, tipos) {
+	url = url.toLowerCase();
+	for (let i=0; i<tipos.length; i++) {
+		if (url.indexOf('.'+tipos[i]) >= 0) {
+			return true;
+		}
+	}
+	return false;
+};

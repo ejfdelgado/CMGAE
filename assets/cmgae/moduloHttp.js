@@ -1,9 +1,12 @@
 if (!hayValor(moduloHttp)) {
 	var moduloHttp = (function() {
 		
-		var call = function(url, metodo, encabezados, usarCache) {
+		var call = function(url, metodo, encabezados, usarCache, payload, params) {
 			if (!hayValor(usarCache)) {
 				usarCache = false;
+			}
+			if (hayValor(params)) {
+				url += '?'+$.param(params);
 			}
 			var diferido = $.Deferred();
 		    moduloActividad.on();
@@ -11,9 +14,14 @@ if (!hayValor(moduloHttp)) {
 		        'url': url,
 		        'type': metodo,
 		        'cache': usarCache,
+		        'headers': {},
 		    };
 		    if (hayValor(encabezados)) {
 		    	peticion.headers = encabezados;
+		    }
+		    if (hayValor(payload)) {
+		    	peticion.data = JSON.stringify(payload),
+		    	peticion.headers.contentType = "application/json; charset=utf-8";
 		    }
 		    $.ajax(peticion).done(function(datos) {        	
 		    	diferido.resolve(datos);
@@ -25,16 +33,20 @@ if (!hayValor(moduloHttp)) {
 			return diferido.promise();
 		};
 		
-		var get = function(url, usarCache) {
-			return call(url, 'GET', null, usarCache)
+		var get = function(url, usarCache, params) {
+			return call(url, 'GET', null, usarCache, null, params)
 		};
 		
 		var borrar = function(url) {
 			return call(url, 'DELETE')
 		};
 		
-		var post = function(url) {
-			return call(url, 'POST', darHeader());
+		var put = function(url, payload, params) {
+			return call(url, 'PUT', null, false, payload, params);
+		};
+		
+		var post = function(url, payload, params) {
+			return call(url, 'POST', darHeader(), false, payload, params);
 		};
 		
 		var darToken = function() {
@@ -49,6 +61,7 @@ if (!hayValor(moduloHttp)) {
 		
 		return {
 			'get': get,
+			'post': post,
 			'borrar': borrar,
 			'darToken': darToken,
 			'darHeader': darHeader,

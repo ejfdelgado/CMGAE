@@ -290,7 +290,7 @@ def RESTfulActions(request, ident):
             else:
                 response.write(simplejson.dumps({'error':0}))
             return response
-    if request.method == 'PUT':
+    if request.method == 'POST':
         if ident == 'correo':
             try:
                 tmp = simplejson.loads(request.raw_post_data)

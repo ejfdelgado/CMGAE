@@ -118,7 +118,7 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 		var crearArchivo = {
             "separator_before": false,
             "separator_after": false,
-            "label": "Crear archivo",
+            "label": "Nuevo archivo",
             "action": function(data) {
             	var nuevoNodo = {'text':'nuevo', 'type':'file'};
                 var inst = $.jstree.reference(data.reference),
@@ -169,7 +169,7 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 		var cargar = {
 	        "separator_before": false,
 	        "separator_after": false,
-	        "label": "Cargar archivo",
+	        "label": "Subir",
 	        "action": function(data) {
 	        	var inst = $.jstree.reference(data.reference);
 	        	var obj = inst.get_node(data.reference);
@@ -200,14 +200,14 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 		var copiarRuta = {
 		        "separator_before": false,
 		        "separator_after": false,
-		        "label": "Copiar Ruta",
+		        "label": "URL",
 				"action": function(data) {
 					var inst = $.jstree.reference(data.reference);
 					var obj = inst.get_node(data.reference);
 					var url = moduloArchivos.generarUrlDadoId(obj.id);
-					if (url.toLowerCase().endsWith('.css')) {
+					if (urlContieneExtension(url, ['css'])) {
 						url = '<link rel="stylesheet" href="'+url+'"/>';
-					} else if (url.toLowerCase().endsWith('.js')) {
+					} else if (urlContieneExtension(url, ['js'])) {
 						url = '<script src="'+url+'"></script>'
 					}
 					copiarEnPortapapeles(url);
@@ -217,14 +217,14 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 		var copiarRutaLocal = {
 		        "separator_before": false,
 		        "separator_after": false,
-		        "label": "Copiar Ruta Local",
+		        "label": "URL Local",
 				"action": function(data) {
 					var inst = $.jstree.reference(data.reference);
 					var obj = inst.get_node(data.reference);
 					var url = moduloArchivos.generarUrlDadoId(obj.id, true);
-					if (url.toLowerCase().endsWith('.css')) {
+					if (urlContieneExtension(url, ['css'])) {
 						url = '<link rel="stylesheet" href="'+url+'"/>';
-					} else if (url.toLowerCase().endsWith('.js')) {
+					} else if (urlContieneExtension(url, ['js'])) {
 						url = '<script src="'+url+'"></script>'
 					}
 					copiarEnPortapapeles(url);

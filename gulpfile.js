@@ -16,7 +16,6 @@ gulp.task('default', function() {
 	'./assets/cmgae/moduloArchivos.js',
 	'./assets/cmgae/moduloArbolArchivos.js',
 	'./assets/cmgae/moduloApp.js',
-	'./assets/cmgae/moduloContactenos.js',
 	'./assets/cmgae/moduloImagenes.js',
 	'./assets/cmgae/moduloEdicion.js',
 	'./assets/cmgae/moduloMenus.js',

@@ -77,6 +77,11 @@ var moduloApp = (function() {
 		return diferido.promise();
 	};
 	
+	var enviarCorreo = function(datos) {
+		var promesa = moduloHttp.post('/act/correo', datos);
+		return promesa;
+	};
+	
 	return {
 		'esAdmin': esAdmin,
 		'esUsuario': esUsuario,
@@ -87,6 +92,7 @@ var moduloApp = (function() {
 		'esProduccion': esProduccion,
 		'esPruebas': esPruebas,
 		'darRaizCloudStorage': darRaizCloudStorage,
+		'enviarCorreo': enviarCorreo,
 	};
 	
 })();
