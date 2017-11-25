@@ -20,8 +20,8 @@ if (!hayValor(moduloImagenes)) {
 			}
 			return valor;
 		};
-		
-		var darIdAnterior = function(elem, esEstilo) {
+
+		var darUrlAnterior = function(elem, esEstilo) {
 			var direccion = null;
 			if (esEstilo) {
 				let original = elem.attr('style');
@@ -32,6 +32,11 @@ if (!hayValor(moduloImagenes)) {
 			} else {
 				direccion = elem.attr('src');
 			}
+			return direccion;
+		};
+
+		var darIdAnterior = function(elem, esEstilo) {
+			var direccion = darUrlAnterior(elem, esEstilo);
 			return moduloArchivos.darIdDadoUrl(direccion);
 		};
 		
@@ -63,6 +68,7 @@ if (!hayValor(moduloImagenes)) {
 		return {
 			'asignarSrc': asignarSrc,
 			'darIdAnterior': darIdAnterior,
+			'darUrlAnterior': darUrlAnterior,
 			'darValoresCargue': darValoresCargue,
 		};
 	})();

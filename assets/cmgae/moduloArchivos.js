@@ -37,11 +37,20 @@ var moduloArchivos = (function() {
 		        form.append('file-0', file);
 		        form.append('folder', atributos.dataFolder);
 		        if (hayValor(atributos.id)) {
-		        	form.append('name', atributos.id);
+		        	form.append('name', decodeURIComponent(atributos.id));
 		        }
 		        if (atributos.auto == 'false') {
 		        	form.append('auto', 'false');
 	        	}
+		        
+		        if (hayValor(atributos.url)) {
+		        	console.log(atributos.url)
+		        	let queryParams = darParametrosUrl(atributos.url);
+		        	console.log(queryParams)
+		        	if ('no-borrar' in queryParams) {
+		        		form.append('no-borrar', 'true');
+		        	}
+		        }
 		        //Sobra porque el servidor ya lo está capturando
 		        //form.append('mime', file.type);
 		        moduloActividad.on();
@@ -185,16 +194,16 @@ var moduloArchivos = (function() {
 	var darIdDadoUrl = function(direccion) {
 		if (!hayValor(direccion)) {return null;}
 		if (moduloApp.esProduccion()) {
-			var PATRON_GOOGLE_STORAGE = /^(https?:\/\/storage\.googleapis\.com)([^\?]*)(\?.*)?$/ig;
+			var PATRON_GOOGLE_STORAGE = /^(https?:\/\/storage\.googleapis\.com)([^\?]+)(\?.*)?$/ig;
 			let partes = PATRON_GOOGLE_STORAGE.exec(direccion);
 			if (partes != null && partes.length >= 3) {
 				return partes[2];
 			}
 		} else {
-			var PATRON_LOCAL_STORAGE = /(\/storage\/read\?name=)(.*)/ig;
+			var PATRON_LOCAL_STORAGE = /(\/storage\/read).*(name=)([^\?&]+)/ig;
 			let partes = PATRON_LOCAL_STORAGE.exec(direccion);
 			if (partes != null && partes.length >= 3) {
-				return partes[2];
+				return partes[3];
 			}
 		}
 		return null;

@@ -249,13 +249,18 @@ var copiarEnPortapapeles = function(texto) {
   document.body.removeChild(aux);
 };
 
-var darParametrosUrl = function() {
-	var regex = /([^&=?]*)=([^&=?]*)/ig;
-	var str = location.search;
+var darParametrosUrl = function(str) {
+	if (!hayValor(str)) {
+		str = location.search
+	}
+	var regex = /([^&=?]+)=([^&=?]+)/ig;
 	var result;
 	var res = {};
 	while ((result = regex.exec(str)) ) {
-		res[result[1]]=result[2];
+		if (!esLista(res[result[1]])) {
+			res[result[1]] = [];
+		}
+		res[result[1]].push(result[2]);
 	}
 	return res;
 };

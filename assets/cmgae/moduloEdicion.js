@@ -358,11 +358,14 @@ var moduloEdicion = (function() {
 			
 			var valoresCargue = moduloImagenes.darValoresCargue(self);
 			
-			var promesaCargue = moduloArchivos.subirArchivo({
+			var parametros = {
 				dataFolder: valoresCargue.dataFolder,
 				id: moduloImagenes.darIdAnterior(self, hayValor(propEstilo)),
+				url: moduloImagenes.darUrlAnterior(self, hayValor(propEstilo)),
 				maximoTamanio: valoresCargue.maximoTamanio,
-			});
+			};
+			
+			var promesaCargue = moduloArchivos.subirArchivo(parametros);
 			
 			$.when(promesaCargue).then(function(data) {
 				var valor = moduloImagenes.asignarSrc(self, data.id, hayValor(propEstilo));

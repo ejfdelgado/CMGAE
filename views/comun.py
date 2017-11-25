@@ -3,7 +3,7 @@ Created on 5/03/2016
 
 @author: Edgar
 '''
-
+import re
 import datetime
 from django.utils import simplejson
 from google.appengine.ext import ndb
@@ -13,6 +13,19 @@ DATETIME_NOW = fechaAhora.strftime("%Y, %m, %d, %H, %M, %S")
 DATETIME_NOW_LAST = fechaAhora.strftime("%Y, %m, %d, 23, 59, 59")
 DATETIME_NOW_FIRST = fechaAhora.strftime("%Y, %m, %d, 0, 0, 0")
 DATE_NOW = fechaAhora.strftime("%Y, %m, %d")
+
+def diferenciarIdDeQueryParam(ident):
+    encontrado = re.search('^([^\?]*)(\?)?(.*)?$', ident)
+    respuesta = {'identificador': ident, 'parametros': {}}
+    if (not (encontrado is None)):
+        respuesta['identificador'] = encontrado.group(1)
+        pattern = re.compile(r'([^&=?]+)=([^&=?]+)')
+        for (llave, valor) in re.findall(pattern, encontrado.group(3)):
+            if (not llave in respuesta['parametros']):
+                respuesta['parametros'][llave] = [valor]
+            else:
+                respuesta['parametros'][llave].append(valor)
+    return respuesta
 
 def llenarYpersistir(class_, nuevo, todo, leng):
     for key, value in todo.iteritems():

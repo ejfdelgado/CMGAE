@@ -216,9 +216,9 @@ def StorageHandler(request, ident):
             carpeta = request.POST.get('folder', '')
             auto = request.POST.get('auto', 'true')
             if (auto == 'true'):
-                if (not nombreAnterior is None and nombreAnterior.index('no-borrar') < 0):
+                if (not nombreAnterior is None and request.POST.get('no-borrar', None) is None):
                     try:
-                        gcs.delete(nombreAnterior)
+                        gcs.delete(darRaizStorage()+nombreAnterior)
                     except:
                         pass
                 nombre = darRaizStorage()+carpeta+'/'+generarUID()+'-'+uploaded_file_filename
