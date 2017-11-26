@@ -267,7 +267,8 @@ def principal(request, data):
             'DATETIME_NOW': comun.DATETIME_NOW,
             'DATETIME_NOW_LAST': comun.DATETIME_NOW_LAST,
             'DATETIME_NOW_FIRST': comun.DATETIME_NOW_FIRST,
-            'DATE_NOW': comun.DATE_NOW
+            'DATE_NOW': comun.DATE_NOW,
+            'LOCATION': request.build_absolute_uri()
         }
         
         respuesta = direct_to_template(request, data, context, mime)
