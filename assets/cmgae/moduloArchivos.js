@@ -138,12 +138,11 @@ var moduloArchivos = (function() {
             url: generarUrlDadoId(id, true),
             type: 'GET',
             cache: false,
-            contentType: false,
-            processData: false,
+            dataType: 'text',
         }).done(function(data) {
         	diferido.resolve(data);
-        }).fail(function() {
-        	diferido.reject();
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+        	diferido.reject(textStatus+':'+errorThrown);
         }).always(function() {
         	moduloActividad.off();
         });

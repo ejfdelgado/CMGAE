@@ -26,8 +26,11 @@ var moduloMenus = (function() {
 		});
 	};
 	
-	var error = function() {
-		mostrarMenuSoloTexto(moduloLocal.traducir('menus.mensajes.error'));
+	var error = function(mensaje) {
+		if (!hayValor(mensaje)){
+			mensaje = '';
+		}
+		mostrarMenuSoloTexto(moduloLocal.traducir('menus.mensajes.error')+' '+mensaje);
 	};
 	
 	var notificar = function(promesa) {
