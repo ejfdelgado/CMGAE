@@ -14,6 +14,7 @@ var moduloEditorTexto = (function(ele) {
 		    {'patron': /.*\.html/ig, 'editor': 'ace/mode/html'},
 		    {'patron': /.*\.json/ig, 'editor': 'ace/mode/json'},
 		    {'patron': /.*\.css/ig, 'editor': 'ace/mode/css'},
+		    {'patron': /.*\.scss/ig, 'editor': 'ace/mode/scss'},
 		    {'patron': /.*\.xml/ig, 'editor': 'ace/mode/xml'},
 		];
 		destruirEditor();

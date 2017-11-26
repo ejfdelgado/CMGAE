@@ -222,7 +222,7 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 					var inst = $.jstree.reference(data.reference);
 					var obj = inst.get_node(data.reference);
 					var url = moduloArchivos.generarUrlDadoId(obj.id, true);
-					if (urlContieneExtension(url, ['css'])) {
+					if (urlContieneExtension(url, ['css', 'scss'])) {
 						url = '<link rel="stylesheet" href="'+url+'"/>';
 					} else if (urlContieneExtension(url, ['js'])) {
 						url = '<script src="'+url+'"></script>'
