@@ -96,7 +96,7 @@ var moduloArchivos = (function() {
 		if (indicePunto>=0) {
 			let extension = id.substring(indicePunto);
 			extension = extension.toLowerCase();
-			if (extension.startsWith('.css')) {
+			if (extension.startsWith('.css') || extension.startsWith('.scss')) {
 				blobAttrs.type = 'text/css';
 			} else if (extension.startsWith('.js')) {
 				blobAttrs.type = 'text/javascript';

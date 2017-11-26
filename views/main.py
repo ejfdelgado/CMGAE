@@ -11,6 +11,7 @@ from time import gmtime, strftime
 import HTMLParser
 import traceback
 
+from scss import Compiler
 from django.views.generic.simple import direct_to_template
 from django.http import HttpResponse
 from django.utils import simplejson
@@ -166,7 +167,7 @@ def principal(request, data):
             mime = 'text/plain'
         elif (extension.startswith(".kml")):
             mime = 'application/octet-stream'
-        elif (extension.startswith(".css")):
+        elif (extension.startswith(".css") or extension.startswith(".scss")):
             mime = 'text/css'
         elif (extension.startswith(".js")):
             mime = 'text/javascript'
@@ -273,10 +274,14 @@ def principal(request, data):
         
         respuesta = direct_to_template(request, data, context, mime)
         
+        if (extension.startswith(".scss")):
+            respuesta.content = Compiler().compile_string(respuesta.content)
+        
         if not users.is_current_user_admin():
             memcache.set(var_full_path, respuesta.content)
         
         respuesta.content = respuesta.content.decode('utf-8').replace('__USER__', generarVariablesUsuario(var_full_path, leng), 1)
+        
         return respuesta
 
 def RESTfulActions(request, ident):
@@ -415,4 +420,3 @@ def RESTfulHandler(request, ident):
         else:
             return HttpResponse(status=403)
     return response
-   
