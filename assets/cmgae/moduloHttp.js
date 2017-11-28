@@ -62,6 +62,7 @@ if (!hayValor(moduloHttp)) {
 		return {
 			'get': get,
 			'post': post,
+			'put': put,
 			'borrar': borrar,
 			'darToken': darToken,
 			'darHeader': darHeader,

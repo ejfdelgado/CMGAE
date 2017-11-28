@@ -78,7 +78,7 @@ var moduloApp = (function() {
 	};
 	
 	var enviarCorreo = function(datos) {
-		var promesa = moduloHttp.post('/act/correo', datos);
+		var promesa = moduloHttp.put('/act/correo', datos);
 		return promesa;
 	};
 	

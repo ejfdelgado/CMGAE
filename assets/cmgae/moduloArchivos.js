@@ -3,6 +3,7 @@ if (!hayValor(moduloArchivos)) {
 var moduloArchivos = (function() {
 	var MAX_FILE_SIZE = 500*1024;//en KB
 	var PREFIJO_LOCAL = '/app_default_bucket';
+	var PREFIJO_RAIZ_PUBLICA = '/public';
 	
 	var completarPredeterminados = function(atributos) {
 		var mapa = {
@@ -156,6 +157,10 @@ var moduloArchivos = (function() {
 		return partes[2];
 	};
 	
+	/*
+	 * poner: Agrega el prefijo dependiendo de si es producción o local
+	 * /app_default_bucket o RAIZ_CLOUD_STORAGE
+	 */
 	var normalizarId = function(unId, poner) {
 		if (!hayValor(poner)) {
 			poner = false;
@@ -222,7 +227,7 @@ var moduloArchivos = (function() {
 	};
 	
 	var crearBasico = function() {
-		var idIndex = '/public/index.html';
+		var idIndex = PREFIJO_RAIZ_PUBLICA+'/index.html';
 		var promesa = leerTextoPlano(idIndex);
 		$.when(promesa).then(function(datos) {
 			let temp = leerObj(datos, 'error', null);
@@ -237,6 +242,10 @@ var moduloArchivos = (function() {
 		});
 	};
 	
+	var darRaizPublica = function() {
+		return PREFIJO_RAIZ_PUBLICA;
+	}
+	
 	return {
 		'darNombreId': darNombreId,
 		'normalizarId': normalizarId,
@@ -249,6 +258,7 @@ var moduloArchivos = (function() {
 		'renombrar': renombrar,
 		'completarPredeterminados': completarPredeterminados,
 		'crearBasico': crearBasico,
+		'darRaizPublica': darRaizPublica,
 	};
 })();
 }

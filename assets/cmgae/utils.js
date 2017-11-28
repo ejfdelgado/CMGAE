@@ -274,3 +274,11 @@ var urlContieneExtension = function(url, tipos) {
 	}
 	return false;
 };
+
+var eliminarPrefijo = function(texto, prefijo) {
+	if (!hayValor(texto)){return '';}
+	if (!hayValor(prefijo)){return texto;}
+	if (texto.startsWith(prefijo)) {
+		return texto.substring(prefijo.length, texto.length);
+	}
+};

@@ -221,7 +221,8 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 				"action": function(data) {
 					var inst = $.jstree.reference(data.reference);
 					var obj = inst.get_node(data.reference);
-					var url = moduloArchivos.generarUrlDadoId(obj.id, true);
+					var url = moduloArchivos.normalizarId(obj.id);
+					url = eliminarPrefijo(url, moduloArchivos.darRaizPublica());
 					if (urlContieneExtension(url, ['css', 'scss'])) {
 						url = '<link rel="stylesheet" href="'+url+'"/>';
 					} else if (urlContieneExtension(url, ['js'])) {
