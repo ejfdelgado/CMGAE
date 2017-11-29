@@ -242,6 +242,17 @@ var moduloArchivos = (function() {
 		});
 	};
 	
+	var borrarCacheConId = function(id) {
+		var url = normalizarId(id);
+		url = eliminarPrefijo(url, darRaizPublica());
+		var promesas = {};
+		promesas[0] = moduloHttp.borrar(url);
+		if (url === '/index.html') {
+			promesas[1] = moduloHttp.borrar('/');
+		}
+		return promesas;
+	};
+	
 	var darRaizPublica = function() {
 		return PREFIJO_RAIZ_PUBLICA;
 	}
@@ -259,6 +270,7 @@ var moduloArchivos = (function() {
 		'completarPredeterminados': completarPredeterminados,
 		'crearBasico': crearBasico,
 		'darRaizPublica': darRaizPublica,
+		'borrarCacheConId': borrarCacheConId,
 	};
 })();
 }

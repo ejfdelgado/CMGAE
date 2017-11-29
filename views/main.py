@@ -7,6 +7,7 @@ Created on 17/01/2016
 import os
 import logging
 import re
+import sys, traceback
 from time import gmtime, strftime
 import HTMLParser
 import traceback
@@ -26,6 +27,7 @@ from views import comun, storage
 from settings import TEMPLATE_DIRS, ROOT_PATH, LENGUAJE_PRED
 
 CORREO_ENVIOS = 'edgar.jose.fernando.delgado@gmail.com'
+PREFIJO_MEMCACHE_ADMIN = '@'
 
 ANALYTICS = '<script>'\
             '    (function(i,s,o,g,r,a,m){i["GoogleAnalyticsObject"]=r;i[r]=i[r]||function(){'\
@@ -143,12 +145,16 @@ def generarVariablesUsuario(var_full_path, leng):
 
 #data no recibe los parametros despues de ? y de #
 def principal(request, data):
+    
+    #incluye los parametros del get no va a ignorar el lenguaje (solo se usa para memcache)
+    var_full_path = request.get_full_path()
+    llaveParaMemcache = var_full_path
+    if users.is_current_user_admin():
+        llaveParaMemcache = PREFIJO_MEMCACHE_ADMIN+llaveParaMemcache
+    #incluye hasta la ? y va a ignorar el lenguaje
+    var_path = request.path
+    
     if request.method == 'GET':
-        #incluye los parametros del get no va a ignorar el lenguaje (solo se usa para memcache)
-        var_full_path = request.get_full_path()
-        #incluye hasta la ? y va a ignorar el lenguaje
-        var_path = request.path
-        
         leng = re.findall('^(\/leng-)([a-zA-Z]{3})(\/)', var_path)
         
         if (len(leng) > 0):
@@ -174,12 +180,10 @@ def principal(request, data):
         
         user = users.get_current_user()
         
-        #El usuario no administrativo pasa por memcache
-        if not users.is_current_user_admin():
-            anterior = memcache.get(var_full_path)
-            if (anterior):
-                anterior = anterior.replace('__USER__', generarVariablesUsuario(var_full_path, leng), 1)
-                return HttpResponse(anterior, content_type=mime)
+        anterior = memcache.get(llaveParaMemcache)
+        if (anterior):
+            anterior = anterior.replace('__USER__', generarVariablesUsuario(var_full_path, leng), 1)
+            return HttpResponse(anterior, content_type=mime)
         
         #Se lee el template para saber cuales ids se deben buscar de la base de datos
         llavesEntidades = []
@@ -277,12 +281,20 @@ def principal(request, data):
         if (extension.startswith(".scss")):
             respuesta.content = Compiler().compile_string(respuesta.content)
         
-        if not users.is_current_user_admin():
-            memcache.set(var_full_path, respuesta.content)
-        
+        memcache.set(llaveParaMemcache, respuesta.content)
         respuesta.content = respuesta.content.decode('utf-8').replace('__USER__', generarVariablesUsuario(var_full_path, leng), 1)
-        
         return respuesta
+    elif request.method == 'DELETE':
+        if users.is_current_user_admin():
+            response = HttpResponse("", content_type='application/json')
+            try:
+                memcache.delete(llaveParaMemcache)
+                response.write(simplejson.dumps({'error':0}))
+            except Exception, e:
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                response = HttpResponse("", content_type='application/json')
+                response.write(simplejson.dumps({'error':1, 'msg': 'Error de servidor: '+repr(traceback.format_tb(exc_traceback))+'->'+str(e)}))
+            return response
 
 def RESTfulActions(request, ident):
     response = HttpResponse("", content_type='application/json')

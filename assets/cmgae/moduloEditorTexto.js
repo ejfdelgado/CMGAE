@@ -39,8 +39,9 @@ var moduloEditorTexto = (function(ele) {
 	
 	var guardarArchivo = function(id) {
 		var editor = ace.edit(idLocal);
-		var promesa = moduloArchivos.escribirTextoPlano(id, editor.getValue());
-		$.when(promesa).then(function() {
+		var promesasTodas = moduloArchivos.borrarCacheConId(id);
+		promesasTodas['guardado'] = moduloArchivos.escribirTextoPlano(id, editor.getValue()); 
+		$.when(promesasTodas).then(function() {
 			alert('Archivo guardado!');
 		}, function() {
 			alert('Error subiendo el archivo');

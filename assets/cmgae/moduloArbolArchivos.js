@@ -232,6 +232,22 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 				}
 		};
 		
+		var borrarCacheArchivo = {
+		        "separator_before": false,
+		        "separator_after": false,
+		        "label": "Borrar Cache",
+				"action": function(data) {
+					var inst = $.jstree.reference(data.reference);
+					var obj = inst.get_node(data.reference);
+					var promesas = moduloArchivos.borrarCacheConId(obj.id);
+					$.when(promesas, function() {
+						
+					}, function() {
+						
+					});
+				}
+		};
+		
 		//solo se deben poder mover archivos.
 		if ($node.original.type == 'folder') {
 	        return {
@@ -245,6 +261,7 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 	            'Abrir': abrir,
 	            'copiarRuta': copiarRuta,
 	            'copiarRutaLocal': copiarRutaLocal,
+	            //'borrarCacheArchivo': borrarCacheArchivo,
 	            'Renombrar': renombrar,
 	            "Borrar": borrar,
 	        };
