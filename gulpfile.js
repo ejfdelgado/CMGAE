@@ -8,10 +8,22 @@ var gulp = require('gulp')
 gulp.task('default', function() {
 
   gulp.src(['./bower_components/chart.js/dist/Chart.min.js'])
-  .pipe(gulpCopy('./assets/js/chartjs/', { prefix: 3 }));
+  .pipe(gulpCopy('./assets/js/chartjs/', { prefix: 10 }));
   
-  gulp.src(['./bower_components/jquery/dist/jquery.min.js'])
-  .pipe(gulpCopy('./assets/js/comun/', { prefix: 3 }));
+  gulp.src(['./bower_components/jquery.enhsplitter/js/jquery.enhsplitter.js'])
+  .pipe(gulpCopy('./assets/js/enhsplitter/', { prefix: 10 }));
+  
+  gulp.src(['./bower_components/jstree/dist/**/*'])
+  .pipe(gulpCopy('./assets/js/jstree/', { prefix: 3 }));
+  
+  gulp.src(['./bower_components/ace/lib/ace/**/*'])
+  .pipe(gulpCopy('./assets/js/ace/', { prefix: 4 }));
+  
+  gulp.src([
+            './bower_components/jquery/jquery.min.js',
+            './bower_components/jquery/dist/jquery.min.js'
+            ])
+  .pipe(gulpCopy('./assets/js/comun/', { prefix: 10 }));
 	
   gulp.src([
 	'./assets/cmgae/utils.js',

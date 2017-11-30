@@ -1,5 +1,5 @@
 {
-  "name": "CMGAE",
+  "name": "cmgae",
   "version": "0.0.1",
   "ignore": [
     "node_modules",
@@ -7,7 +7,10 @@
   ],
   "dependencies": {
     "chart.js": "^2.7.1",
-    "jquery": "^2.1.1"
+    "create": "*",
+    "jquery.enhsplitter": "^1.2.3",
+    "jstree": "^3.3.4",
+    "ace": "^1.2.9"
   },
   "overrides": {}
 }

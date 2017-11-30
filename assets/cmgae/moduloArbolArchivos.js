@@ -77,7 +77,7 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 	
 	var ajustarAspectoNodo = function(unNodo) {
 		if (unNodo.original.type == 'file') {
-    		elem.jstree(true).set_icon(unNodo.id, "/assets/js/jstree/themes/default/file.png");
+    		elem.jstree(true).set_icon(unNodo.id, "/assets/js/cmgae/jstree/file.png");
     	}
 	};
 	
