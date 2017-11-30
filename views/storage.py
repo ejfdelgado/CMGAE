@@ -241,7 +241,7 @@ def StorageHandler(request, ident):
             
     except Exception, e:
         exc_type, exc_value, exc_traceback = sys.exc_info()
-        response = HttpResponse("", content_type='application/json')
+        response = HttpResponse("", content_type='application/json', status=500)
         response.write(simplejson.dumps({'error':1, 'msg': 'Error de servidor: '+repr(traceback.format_tb(exc_traceback))+'->'+str(e)}))
 
     return response

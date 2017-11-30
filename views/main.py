@@ -322,19 +322,18 @@ def principal(request, data):
 
 def RESTfulActions(request, ident):
     response = HttpResponse("", content_type='application/json')
-    
-    if request.method == 'GET':
-        if not users.is_current_user_admin():
-            return HttpResponse(status=401)
-        if ident == 'clearmemcache':
-            if not memcache.flush_all():
-                response.write(simplejson.dumps({'error':0, 'msg':'No se logro vaciar la memoria'}))
-            else:
-                response.write(simplejson.dumps({'error':0}))
-            return response
-    if request.method == 'PUT':
-        if ident == 'correo':
-            try:
+    try:
+        if request.method == 'GET':
+            if not users.is_current_user_admin():
+                return HttpResponse(status=401)
+            if ident == 'clearmemcache':
+                if not memcache.flush_all():
+                    raise 'No se logro vaciar la memoria'
+                else:
+                    response.write(simplejson.dumps({'error':0}))
+                return response
+        if request.method == 'PUT':
+            if ident == 'correo':
                 tmp = simplejson.loads(request.raw_post_data)
                 
                 texto = "<h1>Correo recibido por la p&aacute;gina</h1><br/><br/>"
@@ -361,9 +360,12 @@ def RESTfulActions(request, ident):
                 message.send()
                 
                 response.write(simplejson.dumps({'error':0}))
-            except:
-                response.write(simplejson.dumps({'error':1, 'msg':'Error enviando el correo.'}))
-            return response
+                return response
+    except Exception, e:
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        response = HttpResponse("", content_type='application/json', status=500)
+        response.write(simplejson.dumps({'error':1, 'msg': 'Error de servidor: '+repr(traceback.format_tb(exc_traceback))+'->'+str(e)}))
+        return response
 
 def RESTpaginar(request, ident):
     response = HttpResponse("", content_type='application/json')
@@ -387,72 +389,76 @@ def RESTpaginar(request, ident):
 
 def RESTfulHandler(request, ident):
     response = HttpResponse("", content_type='application/json')
-    
-    tokens = re.findall('(/?)(\w+)/(.*)$', ident)
-    if len(tokens) > 0:
-        nombre = tokens[0][1]
-        ident = tokens[0][2]
-    else:
-        nombre = 'Documento'
+    try:
+        tokens = re.findall('(/?)(\w+)/(.*)$', ident)
+        if len(tokens) > 0:
+            nombre = tokens[0][1]
+            ident = tokens[0][2]
+        else:
+            nombre = 'Documento'
+            
+        if ident.isnumeric():
+            ident = long(ident)
         
-    if ident.isnumeric():
-        ident = long(ident)
-    
-    if not users.is_current_user_admin() and request.method in ['POST', 'PUT', 'DELETE']:
-        return HttpResponse(status=401)
-    
-    module = __import__('models')
-    class_ = getattr(module, nombre)
-    
-    def post():
-        completo = simplejson.loads(request.raw_post_data)
-        todo = completo['payload']
-        leng = completo['leng']
-        nuevo = class_(id=ident)
-        otro = comun.llenarYpersistir(class_, nuevo, todo, leng)
-        ans = {}
-        ans['error'] = 0
-        ans['payload'] = otro
-        response.write(simplejson.dumps(ans))
-    
-    if request.method == 'GET':
-        if ident:
-            llave = ndb.Key(nombre, ident)
-            greetings = llave.get()
-        else:
-            greetings = buscarTodos(nombre)
-        todos = simplejson.dumps(comun.to_dict(greetings))
-        response.write(todos)
-    
-    if request.method == 'POST':
-        completo = simplejson.loads(request.raw_post_data)
-        tmp = completo['payload']
-        leng = completo['leng']
-        viejo = None
-        if ident:
-            llave = ndb.Key(nombre, ident)
-        else:
-            if (tmp.has_key('id')):
-                llave = ndb.Key(nombre, tmp['id'])
-            else:
-                llave = None
-        if (llave):
-            viejo = llave.get()
-        if viejo:
-            otro = comun.llenarYpersistir(class_, viejo, tmp, leng)
+        if not users.is_current_user_admin() and request.method in ['POST', 'PUT', 'DELETE']:
+            return HttpResponse(status=401)
+        
+        module = __import__('models')
+        class_ = getattr(module, nombre)
+        
+        def post():
+            completo = simplejson.loads(request.raw_post_data)
+            todo = completo['payload']
+            leng = completo['leng']
+            nuevo = class_(id=ident)
+            otro = comun.llenarYpersistir(class_, nuevo, todo, leng)
             ans = {}
             ans['error'] = 0
             ans['payload'] = otro
             response.write(simplejson.dumps(ans))
-        else:
-            post()
-
-    if request.method == 'DELETE':
-        logging.info('delete '+str(ident))
-        if ident:
-            llave = ndb.Key(nombre, ident)
-            llave.delete()
-            response.write('{"error":0, "msg": "'+nombre+' ('+str(ident)+') borrado"}')
-        else:
-            return HttpResponse(status=403)
-    return response
+        
+        if request.method == 'GET':
+            if ident:
+                llave = ndb.Key(nombre, ident)
+                greetings = llave.get()
+            else:
+                greetings = buscarTodos(nombre)
+            todos = simplejson.dumps(comun.to_dict(greetings))
+            response.write(todos)
+        
+        if request.method == 'POST':
+            completo = simplejson.loads(request.raw_post_data)
+            tmp = completo['payload']
+            leng = completo['leng']
+            viejo = None
+            if ident:
+                llave = ndb.Key(nombre, ident)
+            else:
+                if (tmp.has_key('id')):
+                    llave = ndb.Key(nombre, tmp['id'])
+                else:
+                    llave = None
+            if (llave):
+                viejo = llave.get()
+            if viejo:
+                otro = comun.llenarYpersistir(class_, viejo, tmp, leng)
+                ans = {}
+                ans['error'] = 0
+                ans['payload'] = otro
+                response.write(simplejson.dumps(ans))
+            else:
+                post()
+    
+        if request.method == 'DELETE':
+            if ident:
+                llave = ndb.Key(nombre, ident)
+                llave.delete()
+                response.write('{"error":0, "msg": "'+nombre+' ('+str(ident)+') borrado"}')
+            else:
+                return HttpResponse(status=403)
+        return response
+    except Exception, e:
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        response = HttpResponse("", content_type='application/json', status=500)
+        response.write(simplejson.dumps({'error':1, 'msg': 'Error de servidor: '+repr(traceback.format_tb(exc_traceback))+'->'+str(e)}))
+        return response
