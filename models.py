@@ -37,19 +37,7 @@ class Caracteristica(ndb.Expando):
     def to_dict(self):
         return to_dict_(self)
 
-class Testimonio(ndb.Expando):
-    _default_indexed = False
-    date = ndb.DateTimeProperty(auto_now_add=True)
-    modif = ndb.DateTimeProperty(auto_now=True)
-    def to_dict(self):
-        return to_dict_(self)
-
 class Configuracion(ndb.Expando):
-    _default_indexed = False
-    def to_dict(self):
-        return to_dict_(self)
-    
-class Usuario(ndb.Expando):
     _default_indexed = False
     def to_dict(self):
         return to_dict_(self)

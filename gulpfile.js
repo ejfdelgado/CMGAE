@@ -16,8 +16,8 @@ gulp.task('default', function() {
   gulp.src(['./bower_components/jstree/dist/**/*'])
   .pipe(gulpCopy('./assets/js/jstree/', { prefix: 3 }));
   
-  gulp.src(['./bower_components/ace/lib/ace/**/*'])
-  .pipe(gulpCopy('./assets/js/ace/', { prefix: 4 }));
+  //gulp.src(['./bower_components/ace/lib/ace/**/*'])
+  //.pipe(gulpCopy('./assets/js/ace/', { prefix: 4 }));
   
   gulp.src([
             './bower_components/jquery/jquery.min.js',

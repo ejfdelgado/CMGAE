@@ -28,6 +28,7 @@ from settings import TEMPLATE_DIRS, ROOT_PATH, LENGUAJE_PRED
 
 CORREO_ENVIOS = 'edgar.jose.fernando.delgado@gmail.com'
 PREFIJO_MEMCACHE_ADMIN = '@'
+PREFIJO_MEMCACHE_RUTAS = '$'
 
 ANALYTICS = '<script>'\
             '    (function(i,s,o,g,r,a,m){i["GoogleAnalyticsObject"]=r;i[r]=i[r]||function(){'\
@@ -111,6 +112,28 @@ def procesarTemplate(ruta, base):
             respuesta['busquedas'].append(match[3])
     return respuesta
 
+def agregarRutaParaMemcache(raiz, nueva):
+    llaveAyuda = PREFIJO_MEMCACHE_RUTAS+raiz
+    anterior = memcache.get(llaveAyuda)
+    if not isinstance(anterior, list):
+        anterior = [nueva]
+        memcache.set(llaveAyuda, anterior)
+    else:
+        if not nueva in anterior:
+            anterior.append(nueva)
+            memcache.set(llaveAyuda, anterior)
+
+def borrarRutasDeMemcache(raiz, actual):
+    llaveAyuda = PREFIJO_MEMCACHE_RUTAS+raiz
+    lista = memcache.get(llaveAyuda)
+    if not isinstance(lista, list):
+        lista = [actual]
+    else:
+        if not actual in lista:
+            lista.append(actual)
+    lista.append(llaveAyuda)
+    memcache.delete_multi(lista)
+
 def generarVariablesUsuario(var_full_path, leng):
     texto = '<script>\n'
     usuario = users.get_current_user()
@@ -145,156 +168,157 @@ def generarVariablesUsuario(var_full_path, leng):
 
 #data no recibe los parametros despues de ? y de #
 def principal(request, data):
-    
-    #incluye los parametros del get no va a ignorar el lenguaje (solo se usa para memcache)
-    var_full_path = request.get_full_path()
-    llaveParaMemcache = var_full_path
-    if users.is_current_user_admin():
-        llaveParaMemcache = PREFIJO_MEMCACHE_ADMIN+llaveParaMemcache
-    #incluye hasta la ? y va a ignorar el lenguaje
-    var_path = request.path
-    
-    if request.method == 'GET':
-        leng = re.findall('^(\/leng-)([a-zA-Z]{3})(\/)', var_path)
-        
-        if (len(leng) > 0):
-            leng = leng[0][1].lower()
-            var_path = var_path[9:]
-            data = data[9:]
-        else:
-            leng = LENGUAJE_PRED
-        
-        puntoExtension = data.rfind('.')
-        extension = data[puntoExtension:]
-        mime = 'text/html'
-        if (extension.startswith(".xml")):
-            mime = 'text/xml'
-        elif (extension.startswith(".txt")):
-            mime = 'text/plain'
-        elif (extension.startswith(".kml")):
-            mime = 'application/octet-stream'
-        elif (extension.startswith(".css") or extension.startswith(".scss")):
-            mime = 'text/css'
-        elif (extension.startswith(".js")):
-            mime = 'text/javascript'
-        
-        user = users.get_current_user()
-        
-        anterior = memcache.get(llaveParaMemcache)
-        if (anterior):
-            anterior = anterior.replace('__USER__', generarVariablesUsuario(var_full_path, leng), 1)
-            return HttpResponse(anterior, content_type=mime)
-        
-        #Se lee el template para saber cuales ids se deben buscar de la base de datos
-        llavesEntidades = []
-        identificadores = []
-        module = __import__('models')
-        
-        #Buscar un template valido para la url
-        ruta = data
-        varRutaExiste = 0
-        #0. Primero se mira si tal vez existe la ruta exacta
-        varRutaExiste = rutaExiste(ruta)
-        if (varRutaExiste == 0):
-            #1. Se le quita la extensión
-            if (puntoExtension >= 0):
-                ruta = ruta[:puntoExtension]
-            #2. Se itera por los diferentes slash y se mira si existe template
-            ultimoIndice = len(ruta)
-            
-            while True:
-                rutaParcial = ruta[:ultimoIndice]+'.html'
-                ultimoIndice = ruta.rfind('/', 0, ultimoIndice)
-                varRutaExiste = rutaExiste(rutaParcial)
-                if (not (varRutaExiste == 0) or ultimoIndice <= 0):
-                    break
-        else:
-            rutaParcial = ruta
-        
-        #Si no encontró se queda con el index
-        if (varRutaExiste == 0 and ultimoIndice <= 0):
-            data = 'index.html'
-        else:
-            data = rutaParcial
-            
-        todo = procesarTemplate(data, var_path)
-        
-        for parte in todo['nodos']:
-            class_ = getattr(module, parte['tipo'])
-            identificadores.append(ndb.Key(class_, parte['id']))
-            
-        llavesEntidades = todo['busquedas']
-        
-        #Se leen las entidades
-        list_of_entities = ndb.get_multi(identificadores)
-        dicci = {}
-        for entidad in list_of_entities:
-            if entidad is not None:
-                nombreClase = entidad.__class__.__name__
-                if not dicci.has_key(nombreClase):
-                    dicci[nombreClase] = {}
-                dicci[nombreClase][entidad.key.id()] = entidad.to_dict()
-        
-        entidades = {}
-        cursores = {}
-        
-        data_q = request.GET.get('data-q', None)
-        data_next = request.GET.get('data-next', None)
-        
-        for llaveEntidad in llavesEntidades:
-            objeto_busqueda = simplejson.loads(llaveEntidad)
-            if (data_q == llaveEntidad and not data_next == None):
-                objeto_busqueda['next'] = data_next
-            objeto = comun.buscarGQL(objeto_busqueda)
-            entidades[llaveEntidad] = comun.to_dict(objeto['datos'])
-            if (objeto.has_key('next')):
-                cursores[llaveEntidad] = objeto['next']
-        
-        valAnalytics = '';
-        
-        if (dicci.has_key('Configuracion')):
-            millave = 'analytics_'+leng
-            if (dicci['Configuracion'].has_key('/general') and dicci['Configuracion']['/general'].has_key(millave)):
-                valor = dicci['Configuracion']['/general'][millave]
-                if (not valor is None and len(valor) > 0):
-                    valAnalytics = ANALYTICS.replace('$1', valor)
-        
-        context = {
-            'ANALYTICS':valAnalytics,
-            'admin':users.is_current_user_admin(),
-            'path':var_path,
-            'dicci': dicci,
-            'leng': leng,
-            'leng_pred': LENGUAJE_PRED,
-            'user': user,
-            'entidades' : entidades,
-            'cursores' : cursores,
-            'DATETIME_NOW': comun.DATETIME_NOW,
-            'DATETIME_NOW_LAST': comun.DATETIME_NOW_LAST,
-            'DATETIME_NOW_FIRST': comun.DATETIME_NOW_FIRST,
-            'DATE_NOW': comun.DATE_NOW,
-            'LOCATION': request.build_absolute_uri()
-        }
-        
-        respuesta = direct_to_template(request, data, context, mime)
-        
-        if (extension.startswith(".scss")):
-            respuesta.content = Compiler().compile_string(respuesta.content)
-        
-        memcache.set(llaveParaMemcache, respuesta.content)
-        respuesta.content = respuesta.content.decode('utf-8').replace('__USER__', generarVariablesUsuario(var_full_path, leng), 1)
-        return respuesta
-    elif request.method == 'DELETE':
+    try:
+        #incluye los parametros del get no va a ignorar el lenguaje (solo se usa para memcache)
+        var_full_path = request.get_full_path()
+        llaveParaMemcache = var_full_path
         if users.is_current_user_admin():
-            response = HttpResponse("", content_type='application/json')
-            try:
-                memcache.delete(llaveParaMemcache)
-                response.write(simplejson.dumps({'error':0}))
-            except Exception, e:
-                exc_type, exc_value, exc_traceback = sys.exc_info()
+            llaveParaMemcache = PREFIJO_MEMCACHE_ADMIN+llaveParaMemcache
+        #incluye hasta la ? o # y va a ignorar el lenguaje
+        var_path = request.path
+        
+        if request.method == 'GET':
+            leng = re.findall('^(\/leng-)([a-zA-Z]{3})(\/)', var_path)
+            
+            if (len(leng) > 0):
+                leng = leng[0][1].lower()
+                var_path = var_path[9:]
+                data = data[9:]
+            else:
+                leng = LENGUAJE_PRED
+            
+            puntoExtension = data.rfind('.')
+            extension = data[puntoExtension:]
+            mime = 'text/html'
+            if (extension.startswith(".xml")):
+                mime = 'text/xml'
+            elif (extension.startswith(".txt")):
+                mime = 'text/plain'
+            elif (extension.startswith(".kml")):
+                mime = 'application/octet-stream'
+            elif (extension.startswith(".css") or extension.startswith(".scss")):
+                mime = 'text/css'
+            elif (extension.startswith(".js")):
+                mime = 'text/javascript'
+            
+            user = users.get_current_user()
+            
+            anterior = memcache.get(llaveParaMemcache)
+            if (anterior):
+                logging.info('HIT para '+llaveParaMemcache)
+                anterior = anterior.replace('__USER__', generarVariablesUsuario(var_full_path, leng), 1)
+                return HttpResponse(anterior, content_type=mime)
+            
+            #Se lee el template para saber cuales ids se deben buscar de la base de datos
+            llavesEntidades = []
+            identificadores = []
+            module = __import__('models')
+            
+            #Buscar un template valido para la url
+            ruta = data
+            varRutaExiste = 0
+            #0. Primero se mira si tal vez existe la ruta exacta
+            varRutaExiste = rutaExiste(ruta)
+            if (varRutaExiste == 0):
+                #1. Se le quita la extensión
+                if (puntoExtension >= 0):
+                    ruta = ruta[:puntoExtension]
+                #2. Se itera por los diferentes slash y se mira si existe template
+                ultimoIndice = len(ruta)
+                
+                while True:
+                    rutaParcial = ruta[:ultimoIndice]+'.html'
+                    ultimoIndice = ruta.rfind('/', 0, ultimoIndice)
+                    varRutaExiste = rutaExiste(rutaParcial)
+                    if (not (varRutaExiste == 0) or ultimoIndice <= 0):
+                        break
+            else:
+                rutaParcial = ruta
+            
+            #Si no encontró se queda con el index
+            if (varRutaExiste == 0 and ultimoIndice <= 0):
+                data = 'index.html'
+            else:
+                data = rutaParcial
+                
+            todo = procesarTemplate(data, var_path)
+            
+            for parte in todo['nodos']:
+                class_ = getattr(module, parte['tipo'])
+                identificadores.append(ndb.Key(class_, parte['id']))
+                
+            llavesEntidades = todo['busquedas']
+            
+            #Se leen las entidades
+            list_of_entities = ndb.get_multi(identificadores)
+            dicci = {}
+            for entidad in list_of_entities:
+                if entidad is not None:
+                    nombreClase = entidad.__class__.__name__
+                    if not dicci.has_key(nombreClase):
+                        dicci[nombreClase] = {}
+                    dicci[nombreClase][entidad.key.id()] = entidad.to_dict()
+            
+            entidades = {}
+            cursores = {}
+            
+            data_q = request.GET.get('data-q', None)
+            data_next = request.GET.get('data-next', None)
+            
+            for llaveEntidad in llavesEntidades:
+                objeto_busqueda = simplejson.loads(llaveEntidad)
+                if (data_q == llaveEntidad and not data_next == None):
+                    objeto_busqueda['next'] = data_next
+                objeto = comun.buscarGQL(objeto_busqueda)
+                entidades[llaveEntidad] = comun.to_dict(objeto['datos'])
+                if (objeto.has_key('next')):
+                    cursores[llaveEntidad] = objeto['next']
+            
+            valAnalytics = '';
+            
+            if (dicci.has_key('Configuracion')):
+                millave = 'analytics_'+leng
+                if (dicci['Configuracion'].has_key('/general') and dicci['Configuracion']['/general'].has_key(millave)):
+                    valor = dicci['Configuracion']['/general'][millave]
+                    if (not valor is None and len(valor) > 0):
+                        valAnalytics = ANALYTICS.replace('$1', valor)
+            
+            context = {
+                'ANALYTICS':valAnalytics,
+                'admin':users.is_current_user_admin(),
+                'path':var_path,
+                'dicci': dicci,
+                'leng': leng,
+                'leng_pred': LENGUAJE_PRED,
+                'user': user,
+                'entidades' : entidades,
+                'cursores' : cursores,
+                'DATETIME_NOW': comun.DATETIME_NOW,
+                'DATETIME_NOW_LAST': comun.DATETIME_NOW_LAST,
+                'DATETIME_NOW_FIRST': comun.DATETIME_NOW_FIRST,
+                'DATE_NOW': comun.DATE_NOW,
+                'LOCATION': request.build_absolute_uri()
+            }
+            
+            respuesta = direct_to_template(request, data, context, mime)
+            
+            if (extension.startswith(".scss")):
+                respuesta.content = Compiler().compile_string(respuesta.content)
+            
+            memcache.set(llaveParaMemcache, respuesta.content)
+            agregarRutaParaMemcache(request.path, llaveParaMemcache)
+            respuesta.content = respuesta.content.decode('utf-8').replace('__USER__', generarVariablesUsuario(var_full_path, leng), 1)
+            return respuesta
+        elif request.method == 'DELETE':
+            if users.is_current_user_admin():
                 response = HttpResponse("", content_type='application/json')
-                response.write(simplejson.dumps({'error':1, 'msg': 'Error de servidor: '+repr(traceback.format_tb(exc_traceback))+'->'+str(e)}))
-            return response
+                borrarRutasDeMemcache(request.path, llaveParaMemcache)
+                response.write(simplejson.dumps({'error':0}))
+    except Exception, e:
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        response = HttpResponse("", content_type='application/json', status=500)
+        response.write(simplejson.dumps({'error':1, 'msg': 'Error de servidor: '+repr(traceback.format_tb(exc_traceback))+'->'+str(e)}))
+    return response
 
 def RESTfulActions(request, ident):
     response = HttpResponse("", content_type='application/json')

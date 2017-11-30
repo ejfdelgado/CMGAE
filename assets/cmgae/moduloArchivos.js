@@ -242,6 +242,10 @@ var moduloArchivos = (function() {
 		});
 	};
 	
+	var borrarCacheRutaAtual = function() {
+		return moduloHttp.borrar(location.pathname);
+	};
+	
 	var borrarCacheConId = function(id) {
 		var url = normalizarId(id);
 		url = eliminarPrefijo(url, darRaizPublica());
@@ -271,6 +275,7 @@ var moduloArchivos = (function() {
 		'crearBasico': crearBasico,
 		'darRaizPublica': darRaizPublica,
 		'borrarCacheConId': borrarCacheConId,
+		'borrarCacheRutaAtual': borrarCacheRutaAtual,
 	};
 })();
 }

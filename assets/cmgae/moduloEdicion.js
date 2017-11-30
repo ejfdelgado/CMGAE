@@ -83,7 +83,9 @@ var moduloEdicion = (function() {
 							  contentType: "application/json; charset=utf-8",
 							})
 							.done(function( msg ) {
-								  options.success(model);
+								//Se borra la cache actual
+								moduloArchivos.borrarCacheRutaAtual();
+								options.success(model);
 							})
 							.fail(function( jqXHR, textStatus ) {
 								options.error('error');
