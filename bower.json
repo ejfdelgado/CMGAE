@@ -1,0 +1,15 @@
+{
+  "name": "CMGAE",
+  "version": "0.0.1",
+  "ignore": [
+    "node_modules",
+    "bower_components"
+  ],
+  "dependencies": {
+    "chart.js": "^2.7.1",
+    "jquery": "^3.2.1",
+    "jquery-ui": "^1.12.1",
+    "moment": "momentjs#^2.19.3"
+  },
+  "overrides": {}
+}

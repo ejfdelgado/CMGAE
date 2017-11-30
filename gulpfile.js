@@ -2,10 +2,17 @@
 var gulp = require('gulp')
 , uglify = require("gulp-uglify")
 , concat = require("gulp-concat")
+, gulpCopy = require("gulp-copy")
 , babel = require("gulp-babel");
 
 gulp.task('default', function() {
 
+  gulp.src(['./bower_components/chart.js/dist/Chart.min.js'])
+  .pipe(gulpCopy('./assets/js/chartjs/', { prefix: 3 }));
+  
+  gulp.src(['./bower_components/jquery/dist/jquery.min.js'])
+  .pipe(gulpCopy('./assets/js/comun/', { prefix: 3 }));
+	
   gulp.src([
 	'./assets/cmgae/utils.js',
 	'./assets/cmgae/moduloSonido.js',
