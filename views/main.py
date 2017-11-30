@@ -205,7 +205,6 @@ def principal(request, data):
             
             anterior = memcache.get(llaveParaMemcache)
             if (anterior):
-                logging.info('HIT para '+llaveParaMemcache)
                 anterior = anterior.replace('__USER__', generarVariablesUsuario(var_full_path, leng), 1)
                 return HttpResponse(anterior, content_type=mime)
             
