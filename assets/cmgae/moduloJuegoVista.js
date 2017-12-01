@@ -73,12 +73,34 @@ if (!hayValor(moduloJuegoVista)) {
 				};
 			},
 		},
+		'reloj': {
+			boton: {icono:'fa-clock-o', color: 'btn-danger'},
+			programa: function(metadata) {
+				return {
+					'url':'/assets/cmgae/juego/modos/reloj.html', 
+					'recargarHtml': false,
+					'funInicio':function(plantilla) {
+						plantilla = plantilla.replace('$1', darHtmlSeguro(metadata.preguntaActual.texto));
+						return $(plantilla);
+					},
+					'funFinalizar':function() {
+						var elTimer = moduloTimer($('div.timer')); 
+						var segundos = leerObj(metadata, 'preguntaActual.segundos', 10);
+						var promesa = elTimer.iniciar(segundos);
+						metadata.moduloJuego.publicarJuego();
+						$.when(promesa).then(function() {
+							metadata.moduloJuego.terminarJuego();
+						});
+					},
+				};
+			},
+		},
 		'pregunta': {
 			boton: {icono:'fa-question', color: 'btn-info'},
 			programa: function(metadata) {
 				return {
 					'url':'/assets/cmgae/juego/modos/pregunta.html', 
-					'recargarHtml': false,
+					'recargarHtml': true,
 					'funInicio':function(plantilla) {
 						plantilla = plantilla.replace('$1', darHtmlSeguro(metadata.preguntaActual.texto));
 						return $(plantilla);
@@ -344,7 +366,7 @@ if (!hayValor(moduloJuegoVista)) {
 			}
 			
 			var funcionDespues = function(plantilla, tieneContenido) {
-				console.log('funcionDespues', tieneContenido)
+				console.log('funcionDespues', tieneContenido);
 				datos.ultimaPlantilla = props.url;
 				datos.ultimaPregunta = datos.idPregunta;
 				if (tieneContenido) {

@@ -10,7 +10,8 @@
     "create": "*",
     "jquery.enhsplitter": "^1.2.3",
     "jstree": "^3.3.4",
-    "ace": "^1.2.9"
+    "ace": "^1.2.9",
+    "bootstrap": "^3.3.7"
   },
   "overrides": {}
 }

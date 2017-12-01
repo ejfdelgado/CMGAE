@@ -19,6 +19,9 @@ gulp.task('default', function() {
   //gulp.src(['./bower_components/ace/lib/ace/**/*'])
   //.pipe(gulpCopy('./assets/js/ace/', { prefix: 4 }));
   
+  gulp.src(['./bower_components/bootstrap/dist/js/bootstrap.min.js'])
+  .pipe(gulpCopy('./assets/js/bootstrap/', { prefix: 10 }));
+  
   gulp.src([
             './bower_components/jquery/jquery.min.js',
             './bower_components/jquery/dist/jquery.min.js'
@@ -39,6 +42,7 @@ gulp.task('default', function() {
 	'./assets/cmgae/moduloEdicion.js',
 	'./assets/cmgae/moduloMenus.js',
 	'./assets/cmgae/moduloJuegoVista.js',
+	'./assets/cmgae/moduloTimer.js',
   ]).pipe(concat('modulos.min.js'))
     .pipe(babel())
     //.pipe(uglify())

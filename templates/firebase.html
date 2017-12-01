@@ -28,7 +28,7 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="/assets/js/comun/bootstrap.min.js"></script>
+<script src="/assets/js/bootstrap/bootstrap.min.js"></script>
 <script src="/assets/js/chartjs/Chart.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/4.1.3/firebase.js"></script>
 <script>
@@ -135,6 +135,8 @@
 		
 		return {
 			'borrarJugador': borrarJugador,
+			'publicarJuego': publicarJuego,
+			'terminarJuego': terminarJuego,
 			'asignarModuloVista': asignarModuloVista,
 			'inicializar': inicializar,
 		};
