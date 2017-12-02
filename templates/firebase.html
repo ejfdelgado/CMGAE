@@ -4,20 +4,29 @@
 <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
 <link rel="stylesheet" href="/assets/css/font-awesome.min.css" />
 <link rel="stylesheet" href="/assets/css/juego/main.css" />
+<style>
+.btn-group.special {
+  display: flex;
+}
+
+.special .btn {
+  flex: 1
+}
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="panel panel-default abc-jugadores">
   <div class="panel-heading">
   <div class="container">
-	<div class="btn-group" role="group">
+	<div class="btn-group special col-sm-12 col-md-6" role="group">
 	  <button type="button" class="btn btn-default abc-anterior"><i class="fa fa-step-backward" aria-hidden="true"></i></button>
 	  <button type="button" class="btn btn-success abc-jugar"><i class="fa fa-play" aria-hidden="true"></i></button>
 	  <button type="button" class="btn btn-info abc-terminar"><i class="fa fa-pause" aria-hidden="true"></i></button>
 	  <button type="button" class="btn btn-danger abc-salir"><i class="fa fa-stop" aria-hidden="true"></i></button>
 	  <button type="button" class="btn btn-default abc-siguiente"><i class="fa fa-step-forward" aria-hidden="true"></i></button>
 	</div>
-	<div class="btn-group pull-right abc-botones-vista" role="group" aria-label="...">
+	<div class="btn-group pull-right abc-botones-vista special col-xs-12 col-sm-12 col-md-6" role="group" aria-label="...">
 	</div>
 	</div>
   </div>

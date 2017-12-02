@@ -121,16 +121,24 @@
 			promesa.then(function() {
 				
 			});
+			var avatar = datos.jPanelPregunta.find('.abc-avatar');
 			if (valorRespuesta.puntos == 0) {
 				sonidos.mal.play();
+				avatar.attr('src', '/assets/img/perro/m_'+darNumeroAleatorio(0,2)+'.png');
 			} else {
 				sonidos.bien.play();
+				avatar.attr('src', '/assets/img/perro/b_'+darNumeroAleatorio(0,1)+'.png');
 			}
 			//Solo se muestra la que la persona escogió
 			elem.removeClass('col-xs-6');
 			elem.removeClass('col-sm-6');
 			elem.removeClass('col-md-6');
 			elem.addClass('col-xs-12');
+			
+			console.log(datos.jPanelPregunta)
+			
+			datos.jPanelPregunta.find('.abc-respuesta-correcta').removeClass('invisible');
+			
 			elem.show();
 		};
 		
@@ -154,6 +162,8 @@
 			remotos.usuario = database.ref(datos.llaveCompleta);
 			remotos.ultimaPregunta = database.ref('ultimaPregunta');
 			
+			//Se asigna el modo inicial
+			datos.moduloVista.asignarModo('blanco');
 			remotos.ultimaPregunta.on('value', function(data) {
 				if (data.val() == 'fin') {
 					desconectar();

@@ -103,6 +103,7 @@ if (!hayValor(moduloJuegoVista)) {
 					'recargarHtml': true,
 					'funInicio':function(plantilla) {
 						plantilla = plantilla.replace('$1', darHtmlSeguro(metadata.preguntaActual.texto));
+						plantilla = plantilla.replace('$3', darHtmlSeguro(metadata.preguntaActual.respuesta));
 						return $(plantilla);
 					},
 					'lista':metadata.preguntaActual.respuestas,
@@ -110,11 +111,13 @@ if (!hayValor(moduloJuegoVista)) {
 						plantilla = plantilla.replace('$2', darHtmlSeguro(elemento.texto));
 						var nuevo = $(plantilla);
 						nuevo.find('.panel-body').css('background-color', elemento.color);
-						nuevo.on('click', function() {
+						var funcionFinal = function() {
 							if (esFuncion(metadata.moduloJuego.usuarioEligeRespuesta)) {
 								metadata.moduloJuego.usuarioEligeRespuesta(llave, elemento, nuevo, metadata.preguntaActual.id);
 							}
-						});
+						};
+						nuevo.on('doubletap', funcionFinal);
+						nuevo.dblclick(funcionFinal);
 						return nuevo;
 					}
 				};
@@ -123,7 +126,13 @@ if (!hayValor(moduloJuegoVista)) {
 		'blanco': {
 			boton: null,
 			programa: function(metadata) {
-				return null;
+				return {
+					'url':'/assets/cmgae/juego/modos/blanco.html', 
+					'recargarHtml': true,
+					'funInicio':function(plantilla) {
+						return $(plantilla);
+					}
+				};
 			},
 		},
 		'respuesta': {
@@ -371,7 +380,11 @@ if (!hayValor(moduloJuegoVista)) {
 				datos.ultimaPregunta = datos.idPregunta;
 				if (tieneContenido) {
 					datos.elem.empty();
-					datos.elem.append(props.funInicio(plantilla, datos.metadata));
+					if (esFuncion(props.funInicio)) {
+						datos.elem.append(props.funInicio(plantilla, datos.metadata));
+					} else {
+						datos.elem.append($(plantilla));
+					}
 				}
 				if (hayValor(props.lista)) {
 					var listaValores = [];
