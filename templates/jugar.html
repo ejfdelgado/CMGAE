@@ -3,6 +3,7 @@
 {% block encabezado %}
 <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
 <link rel="stylesheet" href="/assets/css/font-awesome.min.css" />
+<link rel="stylesheet" href="/assets/css/juego/main.css" />
 {% endblock %}
 
 {% block content %}
@@ -45,7 +46,7 @@
 </div>
 
 <div class="panel panel-default abc-pregunta">
-  <div class="panel-heading abc-titulo">ABC</div>
+  <div class="panel-heading abc-titulo"><strong class="abc-nombre"></strong><p class="invisible abc-puntos pull-right"></p></div>
   <div class="panel-body">
 	
   </div>
@@ -101,13 +102,21 @@
 			datos.moduloVista = modulo;
 		};		
 		
+		var actualizarPuntos = function(puntos) {
+			if (!esNumero(puntos)) {
+				puntos = 0;
+			}
+			$('.abc-titulo').find('.abc-puntos').text(puntos+' Puntos');
+		};
+		
 		var asignarApodo = function(valor) {
 			//Se guarda en el local storage
 			try {localStorage['apodo'] = valor;} catch (e){}
 			datos.apodo = valor;
 			datos.llave = valor.replace(/[^a-z]+/ig, '_');
 			datos.llaveCompleta = '/jugadores/'+datos.llave;
-			$('.abc-titulo').html('ABC + <strong>'+valor+'</srong>');
+			$('.abc-titulo').find('.abc-nombre').text(valor);
+			actualizarPuntos();
 			conectar();
 		};
 		
@@ -134,8 +143,6 @@
 			elem.removeClass('col-sm-6');
 			elem.removeClass('col-md-6');
 			elem.addClass('col-xs-12');
-			
-			console.log(datos.jPanelPregunta)
 			
 			datos.jPanelPregunta.find('.abc-respuesta-correcta').removeClass('invisible');
 			
@@ -179,7 +186,6 @@
 					datos.remotos = {
 						apodo: datos.apodo,
 					};
-					
 					var updates = {};
 					updates[datos.llaveCompleta] = datos.remotos;
 					var promesa = firebase.database().ref().update(updates);
@@ -189,6 +195,7 @@
 					});
 				} else {
 					datos.remotos = existente;
+					actualizarPuntos(datos.remotos.puntos)
 				}
 			}, funcionError);
 		};

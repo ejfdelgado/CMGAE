@@ -100,7 +100,7 @@ if (!hayValor(moduloJuegoVista)) {
 			programa: function(metadata) {
 				return {
 					'url':'/assets/cmgae/juego/modos/pregunta.html', 
-					'recargarHtml': true,
+					'recargarHtml': false,
 					'funInicio':function(plantilla) {
 						plantilla = plantilla.replace('$1', darHtmlSeguro(metadata.preguntaActual.texto));
 						plantilla = plantilla.replace('$3', darHtmlSeguro(metadata.preguntaActual.respuesta));
