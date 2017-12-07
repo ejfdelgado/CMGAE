@@ -97,7 +97,9 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
             			contenido = '';
             		}
             		instanciaEditorTexto.abrirEditor(ref.text, contenido, ref.id);
-            	}, moduloMenus.error);
+            	}, function(obj) {
+            		moduloMenus.error(obj.msg);
+            	});
             }
         };
 		var crearCarpeta = {
@@ -232,6 +234,18 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 				}
 		};
 		
+		var copiarRutaBruta = {
+		        "separator_before": false,
+		        "separator_after": false,
+		        "label": "URL Bruta",
+				"action": function(data) {
+					var inst = $.jstree.reference(data.reference);
+					var obj = inst.get_node(data.reference);
+					var url = moduloArchivos.normalizarId(obj.id);
+					copiarEnPortapapeles(url);
+				}
+		};
+		
 		var borrarCacheArchivo = {
 		        "separator_before": false,
 		        "separator_after": false,
@@ -261,6 +275,7 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 	            'Abrir': abrir,
 	            'copiarRuta': copiarRuta,
 	            'copiarRutaLocal': copiarRutaLocal,
+	            'copiarRutaBruta': copiarRutaBruta,
 	            //'borrarCacheArchivo': borrarCacheArchivo,
 	            'Renombrar': renombrar,
 	            "Borrar": borrar,

@@ -190,6 +190,7 @@ def principal(request, data):
             puntoExtension = data.rfind('.')
             extension = data[puntoExtension:]
             mime = 'text/html'
+            esBinario = False
             if (extension.startswith(".xml")):
                 mime = 'text/xml'
             elif (extension.startswith(".txt")):
@@ -200,113 +201,127 @@ def principal(request, data):
                 mime = 'text/css'
             elif (extension.startswith(".js")):
                 mime = 'text/javascript'
+            elif (extension.startswith(".woff2") or extension.startswith(".ttf")):
+                mime = 'application/octet-stream'
+                esBinario = True
             
             user = users.get_current_user()
             
-            anterior = memcache.get(llaveParaMemcache)
-            if (anterior):
-                anterior = anterior.replace('__USER__', generarVariablesUsuario(var_full_path, leng), 1)
-                return HttpResponse(anterior, content_type=mime)
+            
+            if True:#Usar cache
+                anterior = memcache.get(llaveParaMemcache)
+                if (anterior):
+                    if not esBinario:
+                        anterior = anterior.replace('__USER__', generarVariablesUsuario(var_full_path, leng), 1)
+                    return HttpResponse(anterior, content_type=mime)
             
             #Se lee el template para saber cuales ids se deben buscar de la base de datos
-            llavesEntidades = []
-            identificadores = []
-            module = __import__('models')
-            
-            #Buscar un template valido para la url
-            ruta = data
-            varRutaExiste = 0
-            #0. Primero se mira si tal vez existe la ruta exacta
-            varRutaExiste = rutaExiste(ruta)
-            if (varRutaExiste == 0):
-                #1. Se le quita la extensión
-                if (puntoExtension >= 0):
-                    ruta = ruta[:puntoExtension]
-                #2. Se itera por los diferentes slash y se mira si existe template
-                ultimoIndice = len(ruta)
+            if (not esBinario):
+                llavesEntidades = []
+                identificadores = []
+                module = __import__('models')
                 
-                while True:
-                    rutaParcial = ruta[:ultimoIndice]+'.html'
-                    ultimoIndice = ruta.rfind('/', 0, ultimoIndice)
-                    varRutaExiste = rutaExiste(rutaParcial)
-                    if (not (varRutaExiste == 0) or ultimoIndice <= 0):
-                        break
+                #Buscar un template valido para la url
+                ruta = data
+                varRutaExiste = 0
+                #0. Primero se mira si tal vez existe la ruta exacta
+                varRutaExiste = rutaExiste(ruta)
+                if (varRutaExiste == 0):
+                    #1. Se le quita la extensión
+                    if (puntoExtension >= 0):
+                        ruta = ruta[:puntoExtension]
+                    #2. Se itera por los diferentes slash y se mira si existe template
+                    ultimoIndice = len(ruta)
+                    
+                    while True:
+                        rutaParcial = ruta[:ultimoIndice]+'.html'
+                        ultimoIndice = ruta.rfind('/', 0, ultimoIndice)
+                        varRutaExiste = rutaExiste(rutaParcial)
+                        if (not (varRutaExiste == 0) or ultimoIndice <= 0):
+                            break
+                else:
+                    rutaParcial = ruta
+                
+                #Si no encontró se queda con el index
+                if (varRutaExiste == 0 and ultimoIndice <= 0):
+                    data = 'index.html'
+                else:
+                    data = rutaParcial
+                    
+                todo = procesarTemplate(data, var_path)
+                
+                for parte in todo['nodos']:
+                    class_ = getattr(module, parte['tipo'])
+                    identificadores.append(ndb.Key(class_, parte['id']))
+                    
+                llavesEntidades = todo['busquedas']
+                
+                #Se leen las entidades
+                list_of_entities = ndb.get_multi(identificadores)
+                dicci = {}
+                for entidad in list_of_entities:
+                    if entidad is not None:
+                        nombreClase = entidad.__class__.__name__
+                        if not dicci.has_key(nombreClase):
+                            dicci[nombreClase] = {}
+                        dicci[nombreClase][entidad.key.id()] = entidad.to_dict()
+                
+                entidades = {}
+                cursores = {}
+                
+                data_q = request.GET.get('data-q', None)
+                data_next = request.GET.get('data-next', None)
+                
+                for llaveEntidad in llavesEntidades:
+                    objeto_busqueda = simplejson.loads(llaveEntidad)
+                    if (data_q == llaveEntidad and not data_next == None):
+                        objeto_busqueda['next'] = data_next
+                    objeto = comun.buscarGQL(objeto_busqueda)
+                    entidades[llaveEntidad] = comun.to_dict(objeto['datos'])
+                    if (objeto.has_key('next')):
+                        cursores[llaveEntidad] = objeto['next']
+                
+                valAnalytics = '';
+                
+                if (dicci.has_key('Configuracion')):
+                    millave = 'analytics_'+leng
+                    if (dicci['Configuracion'].has_key('/general') and dicci['Configuracion']['/general'].has_key(millave)):
+                        valor = dicci['Configuracion']['/general'][millave]
+                        if (not valor is None and len(valor) > 0):
+                            valAnalytics = ANALYTICS.replace('$1', valor)
+                
+                context = {
+                    'ANALYTICS':valAnalytics,
+                    'admin':users.is_current_user_admin(),
+                    'path':var_path,
+                    'dicci': dicci,
+                    'leng': leng,
+                    'leng_pred': LENGUAJE_PRED,
+                    'user': user,
+                    'entidades' : entidades,
+                    'cursores' : cursores,
+                    'DATETIME_NOW': comun.DATETIME_NOW,
+                    'DATETIME_NOW_LAST': comun.DATETIME_NOW_LAST,
+                    'DATETIME_NOW_FIRST': comun.DATETIME_NOW_FIRST,
+                    'DATE_NOW': comun.DATE_NOW,
+                    'LOCATION': request.build_absolute_uri()
+                }
+                
+                respuesta = direct_to_template(request, data, context, mime)
+                
+                if (extension.startswith(".scss")):
+                    respuesta.content = Compiler().compile_string(respuesta.content)
             else:
-                rutaParcial = ruta
+                respuesta = storage.read_file(data)
             
-            #Si no encontró se queda con el index
-            if (varRutaExiste == 0 and ultimoIndice <= 0):
-                data = 'index.html'
-            else:
-                data = rutaParcial
-                
-            todo = procesarTemplate(data, var_path)
-            
-            for parte in todo['nodos']:
-                class_ = getattr(module, parte['tipo'])
-                identificadores.append(ndb.Key(class_, parte['id']))
-                
-            llavesEntidades = todo['busquedas']
-            
-            #Se leen las entidades
-            list_of_entities = ndb.get_multi(identificadores)
-            dicci = {}
-            for entidad in list_of_entities:
-                if entidad is not None:
-                    nombreClase = entidad.__class__.__name__
-                    if not dicci.has_key(nombreClase):
-                        dicci[nombreClase] = {}
-                    dicci[nombreClase][entidad.key.id()] = entidad.to_dict()
-            
-            entidades = {}
-            cursores = {}
-            
-            data_q = request.GET.get('data-q', None)
-            data_next = request.GET.get('data-next', None)
-            
-            for llaveEntidad in llavesEntidades:
-                objeto_busqueda = simplejson.loads(llaveEntidad)
-                if (data_q == llaveEntidad and not data_next == None):
-                    objeto_busqueda['next'] = data_next
-                objeto = comun.buscarGQL(objeto_busqueda)
-                entidades[llaveEntidad] = comun.to_dict(objeto['datos'])
-                if (objeto.has_key('next')):
-                    cursores[llaveEntidad] = objeto['next']
-            
-            valAnalytics = '';
-            
-            if (dicci.has_key('Configuracion')):
-                millave = 'analytics_'+leng
-                if (dicci['Configuracion'].has_key('/general') and dicci['Configuracion']['/general'].has_key(millave)):
-                    valor = dicci['Configuracion']['/general'][millave]
-                    if (not valor is None and len(valor) > 0):
-                        valAnalytics = ANALYTICS.replace('$1', valor)
-            
-            context = {
-                'ANALYTICS':valAnalytics,
-                'admin':users.is_current_user_admin(),
-                'path':var_path,
-                'dicci': dicci,
-                'leng': leng,
-                'leng_pred': LENGUAJE_PRED,
-                'user': user,
-                'entidades' : entidades,
-                'cursores' : cursores,
-                'DATETIME_NOW': comun.DATETIME_NOW,
-                'DATETIME_NOW_LAST': comun.DATETIME_NOW_LAST,
-                'DATETIME_NOW_FIRST': comun.DATETIME_NOW_FIRST,
-                'DATE_NOW': comun.DATE_NOW,
-                'LOCATION': request.build_absolute_uri()
-            }
-            
-            respuesta = direct_to_template(request, data, context, mime)
-            
-            if (extension.startswith(".scss")):
-                respuesta.content = Compiler().compile_string(respuesta.content)
-            
+            if (respuesta.status_code == 204):
+                return respuesta
             memcache.set(llaveParaMemcache, respuesta.content)
             agregarRutaParaMemcache(request.path, llaveParaMemcache)
-            respuesta.content = respuesta.content.decode('utf-8').replace('__USER__', generarVariablesUsuario(var_full_path, leng), 1)
+            
+            if (not esBinario):
+                respuesta.content = respuesta.content.decode('utf-8').replace('__USER__', generarVariablesUsuario(var_full_path, leng), 1)
+                
             return respuesta
         elif request.method == 'DELETE':
             if users.is_current_user_admin():

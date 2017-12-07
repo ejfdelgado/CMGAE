@@ -1,7 +1,7 @@
 
 if (!hayValor(moduloArchivos)) {
 var moduloArchivos = (function() {
-	var MAX_FILE_SIZE = 500*1024;//en KB
+	var MAX_FILE_SIZE = 550*1024;//en KB
 	var PREFIJO_LOCAL = '/app_default_bucket';
 	var PREFIJO_RAIZ_PUBLICA = '/public';
 	
@@ -140,10 +140,14 @@ var moduloArchivos = (function() {
             type: 'GET',
             cache: false,
             dataType: 'text',
-        }).done(function(data) {
-        	diferido.resolve(data);
+        }).done(function(data, a, b) {
+        	if (b.status == 204) {
+        		diferido.reject({'error': b.status, 'msg': b.statusText});
+        	} else {
+        		diferido.resolve(data);
+        	}
         }).fail(function(jqXHR, textStatus, errorThrown) {
-        	diferido.reject(textStatus+':'+errorThrown);
+        	diferido.reject({'error': textStatus, 'msg': textStatus+':'+errorThrown});
         }).always(function() {
         	moduloActividad.off();
         });
@@ -230,14 +234,21 @@ var moduloArchivos = (function() {
 		var idIndex = PREFIJO_RAIZ_PUBLICA+'/index.html';
 		var promesa = leerTextoPlano(idIndex);
 		$.when(promesa).then(function(datos) {
-			let temp = leerObj(datos, 'error', null);
-			if (esNumero(temp) && temp != 0) {
+			//Ya existe!
+		}, function(objeto) {
+			if (objeto.error == 204) {
 				//Se busca crear
-				let contenido = '{% extends "base.html" %}{% block content %}It works from cloud storage!{% endblock %}';
-				let promesaEscritura = escribirTextoPlano(idIndex, contenido);
-				$.when(promesaEscritura).then(function() {
-					location.reload();
-				});
+				$.ajax({
+		            url: '/assets/cmgae/ejemplos/index.html',
+		            type: 'GET',
+		            cache: false,
+		            dataType: 'text',
+		        }).done(function(contenido) {
+		        	let promesaEscritura = escribirTextoPlano(idIndex, contenido);
+					$.when(promesaEscritura).then(function() {
+						location.reload();
+					});
+		        });
 			}
 		});
 	};

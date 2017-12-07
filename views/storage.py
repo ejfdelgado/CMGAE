@@ -113,11 +113,16 @@ def read_file_interno(filename):
 
 def read_file(filename):
     completo = generarRuta(darRaizStorage(), filename)
-    metadata = gcs.stat(completo)
-    mime = (metadata.content_type if metadata.content_type is not None else (metadata.mime if metadata.mime is not None else 'text/plain'))
-    with gcs.open(completo) as cloudstorage_file:
-        temp = cloudstorage_file.read()
-        response = HttpResponse(temp, content_type=mime)
+    try:
+        metadata = gcs.stat(completo)
+        mime = (metadata.content_type if metadata.content_type is not None else (metadata.mime if metadata.mime is not None else 'text/plain'))
+        with gcs.open(completo) as cloudstorage_file:
+            temp = cloudstorage_file.read()
+            response = HttpResponse(temp, content_type=mime, status=202)
+            return response
+    except NotFoundError:
+        response = HttpResponse("", content_type='application/json', status=204)
+        response.write(simplejson.dumps({'error':204, 'msg': 'No existe'}))
         return response
 
 def generarUID():
