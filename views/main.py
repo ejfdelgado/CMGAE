@@ -315,6 +315,7 @@ def principal(request, data):
                 respuesta = storage.read_file(data)
             
             if (respuesta.status_code == 204):
+                #significa que no existe
                 return respuesta
             memcache.set(llaveParaMemcache, respuesta.content)
             agregarRutaParaMemcache(request.path, llaveParaMemcache)

@@ -9,7 +9,6 @@ import uuid
 
 import cloudstorage as gcs
 
-from google.appengine.api import users
 from google.appengine.api import app_identity
 
 from django.http import HttpResponse
@@ -17,6 +16,7 @@ from django.utils import simplejson
 
 from google.appengine.api.app_identity import get_application_id
 from cloudstorage.errors import NotFoundError
+from views.respuestas import *
 
 def general(response):
     bucket_name = os.environ.get('BUCKET_NAME', app_identity.get_default_gcs_bucket_name())
@@ -85,14 +85,14 @@ def renombrar_archivo(response, viejo, nuevo):
         gcs.delete(darRaizStorage()+viejo)
         response.write(simplejson.dumps({'error':0}))
     except:
-        response.write(simplejson.dumps({'error':1}))
+        raise NoExisteException()#Aca puede ser otro error
 
 def delete_files(response, filename):
     try:
         gcs.delete(darRaizStorage()+filename)
         response.write(simplejson.dumps({'error':0}))
     except gcs.NotFoundError:
-        response.write(simplejson.dumps({'error':1}))
+        raise NoExisteException()
 
 def existe(filename):
     metadata = None
@@ -118,12 +118,10 @@ def read_file(filename):
         mime = (metadata.content_type if metadata.content_type is not None else (metadata.mime if metadata.mime is not None else 'text/plain'))
         with gcs.open(completo) as cloudstorage_file:
             temp = cloudstorage_file.read()
-            response = HttpResponse(temp, content_type=mime, status=202)
+            response = HttpResponse(temp, content_type=mime, status=200)
             return response
     except NotFoundError:
-        response = HttpResponse("", content_type='application/json', status=204)
-        response.write(simplejson.dumps({'error':204, 'msg': 'No existe'}))
-        return response
+        raise NoExisteException()
 
 def generarUID():
     return str(uuid.uuid4())
@@ -159,6 +157,7 @@ def StorageHandler(request, ident):
     try:
         if request.method == 'GET':
             if (ident == 'jstreelist'):
+                soloAdmin()
                 ruta = request.GET.get('id', '/')
                 if (ruta == '#'):
                     ans = list_bucket('', 100, None)
@@ -177,9 +176,8 @@ def StorageHandler(request, ident):
                 nombre = request.GET.get('name', None)
                 metadatos = existe(nombre)
                 if (metadatos is None):
-                    response.write(simplejson.dumps({'error':1}))
-                else:
-                    response.write(simplejson.dumps({'error':0, 'metadata': metadatos}))
+                    raise ParametrosIncompletosException()
+                response.write(simplejson.dumps({'error':0, 'metadata': metadatos}))
             elif (ident == 'list'):
                 ruta = request.GET.get('ruta', '/')
                 ultimo = request.GET.get('ultimo', None)
@@ -192,27 +190,23 @@ def StorageHandler(request, ident):
                 nombre = request.GET.get('name', None)
                 response = read_file(nombre)
             elif (ident == 'renombrar'):
-                if (not users.is_current_user_admin()):
-                    response.write(simplejson.dumps({'error':2, 'msg':'No tiene permisos'}))
-                else:
-                    viejo = request.GET.get('viejo', None)
-                    nuevo = request.GET.get('nuevo', None)
-                    if (viejo is None or nuevo is None):
-                        response.write(simplejson.dumps({'error':2, 'msg':'Falta parametros'}))
-                    else:
-                        renombrar_archivo(response, viejo, nuevo)
+                soloAdmin()
+                viejo = request.GET.get('viejo', None)
+                nuevo = request.GET.get('nuevo', None)
+                if (viejo is None or nuevo is None):
+                    raise ParametrosIncompletosException()
+                renombrar_archivo(response, viejo, nuevo)
             elif (ident == 'guid'):
                 response.write(simplejson.dumps({'error':0, 'uid':generarUID()}))
             else:
                 response.write(simplejson.dumps({'error':0}))
         elif request.method == 'DELETE':
             if (ident == 'borrar'):
-                if (not users.is_current_user_admin()):
-                    response.write(simplejson.dumps({'error':2, 'msg':'No tiene permisos'}))
-                else:
-                    nombre = request.GET.get('name', None)
-                    delete_files(response, nombre)
+                soloAdmin()
+                nombre = request.GET.get('name', None)
+                delete_files(response, nombre)
         elif request.method == 'POST':
+            soloAdmin()
             archivo = request.FILES['file-0']
             uploaded_file_content = archivo.read()
             uploaded_file_filename = archivo.name
@@ -243,7 +237,12 @@ def StorageHandler(request, ident):
             gcs_file.write(uploaded_file_content)
             gcs_file.close()
             response.write(simplejson.dumps({'error':0, 'id':nombre}))
-            
+    except NoAutorizadoException:
+        return RespuestaNoAutorizado()
+    except ParametrosIncompletosException:
+        return RespuestaParametrosIncompletos()
+    except NoExisteException:
+        return RespuestaNoExiste()
     except Exception, e:
         exc_type, exc_value, exc_traceback = sys.exc_info()
         response = HttpResponse("", content_type='application/json', status=500)
