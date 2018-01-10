@@ -14,8 +14,28 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 		  }
 	});
 	
+	var actualizarAlturaTabsNav = function() {
+		var altura = $($('#tabs').find( ".ui-tabs-nav" )).outerHeight(true);
+		$('.pluginEditorInner>.ace_editor').css({top: altura});
+	};
+	
+	$(window).on( "resize", function() {
+		actualizarAlturaTabsNav();
+	});
+	
     tabs.on( "click", "span.ui-icon-close", function() {
-    	cerrarTab($( this ));
+    	var tabSeleccionado = $( this );
+    	
+    	//Se mira si ha cambiado o no
+    	if (editorActual.editor.haCambiado()) {
+    		//Se pide confirmar en caso que el hash haya cambiado
+        	var promesaConf = moduloMenus.confirmar('general.perderacambios');
+        	$.when(promesaConf).then(function() {
+        		cerrarTab(tabSeleccionado);
+        	});
+    	} else {
+    		cerrarTab(tabSeleccionado);
+    	}
     });
 	
 	jQuery(document).keydown(function(event) {
@@ -38,11 +58,12 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 		return hijos;
 	};
 	
-	var cerrarTab = function(elemTab) {
+	var cerrarTab = function(elemTab) {    	
 	    var panelId = elemTab.closest( "li" ).remove().attr( "aria-controls" );
 	    $( "#" + panelId ).remove();
 	    delete mapaTabs[panelId];
 	    tabs.tabs( "refresh" );
+	    actualizarAlturaTabsNav()
 	};
 	
     // Actual addTab function: adds new tab using the input from the form above
@@ -67,13 +88,11 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 		
 		li.find('a').click();
 		
-		
 		var instanciaEditorTexto = moduloEditorTexto($('#'+id+' .pluginEditorInner'));
 		instanciaEditorTexto.abrirEditor(nombreArchivo, contenido, rutaUnica);
 		
-
-		
 		mapaTabs[id]['editor'] = instanciaEditorTexto;
+		actualizarAlturaTabsNav()
     };
 	
 	elem.on("changed.jstree", function (event, data) {
@@ -385,6 +404,8 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
         }
     });
 	
-	return {}
+	return {
+		'actualizarAlturaTabsNav': actualizarAlturaTabsNav,
+	}
 });
 }

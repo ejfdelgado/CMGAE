@@ -5,7 +5,8 @@
 		"error_ajax": "Error al invocar servicio",
 		"confirme": "¿Está seguro de realizar la acción?",
 		"procesando": "Procesando petición... :)",
-		"verifique": "Verifique el campo "
+		"verifique": "Verifique el campo ",
+		"perderacambios": "¿Hay cambios sin guardar, desea cerrar de todas formas?"
 	},
 	"menus": {
 		"general": {
@@ -20,6 +21,8 @@
 		},
 		"mensajes": {
 			"hecho": "Hecho!",
+			"sincambios": "No hay cambios",
+			"guardado": "Guardado exitosamente",
 			"error": "Ups, ha ocurrido un error, por favor reintente."
 		},
 		"botones": {

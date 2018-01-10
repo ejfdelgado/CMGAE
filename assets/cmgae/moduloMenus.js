@@ -26,6 +26,10 @@ var moduloMenus = (function() {
 		});
 	};
 	
+	var info = function(texto) {
+		mostrarMenuSoloTexto(moduloLocal.traducir(texto));
+	};
+	
 	var error = function(mensaje) {
 		if (!hayValor(mensaje)){
 			mensaje = '';
@@ -89,10 +93,13 @@ var moduloMenus = (function() {
 		}
 	};
 	
-	var confirmar = function() {
+	var confirmar = function(mensaje) {
 		var promesa = cargarHtml('/confirmar.html');
 		var diferido = $.Deferred();
 		$.when(promesa).then(function(data) {
+			if (hayValor(mensaje)) {
+				data = data.replace('general.confirme', mensaje);
+			}
 			var otros = {
 				'botones': {
 					'aceptar': {
@@ -192,6 +199,7 @@ var moduloMenus = (function() {
 		'confirmar': confirmar,
 		'sacarUltimo': sacarUltimo,
 		'error': error,
+		'info': info,
 	};
 })();
 }

@@ -5,7 +5,8 @@
 		"error_ajax": "Service invocation error",
 		"confirme": "Are you sure?",
 		"procesando": "Loading...",
-		"verifique": "Verify field "
+		"verifique": "Verify field ",
+		"perderacambios": "File not saved, you will lost changes if close, are you sure?"
 	},
 	"menus": {
 		"general": {
@@ -20,6 +21,8 @@
 		},
 		"mensajes": {
 			"hecho": "Done!",
+			"sincambios": "No changes found",
+			"guardado": "Saved successfully",
 			"error": "Ups, some error has occured, please retry."
 		},
 		"botones": {

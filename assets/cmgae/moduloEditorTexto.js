@@ -3,10 +3,13 @@ if (!hayValor(moduloEditorTexto)) {
 var moduloEditorTexto = (function(ele) {
 	var idLocal = 'pluginEditor-'+(new Date().getTime());
 	var idActual = null;
+	var hashActual = null;
+	
 	var destruirEditor = function() {
 		ele.empty();
 		var nuevo = $('<div/>', {id: idLocal});
 		ele.append(nuevo);
+		hashActual = null;
 	};
 	  
 	var abrirEditor = function(nombre, contenido, id) {
@@ -23,6 +26,8 @@ var moduloEditorTexto = (function(ele) {
 	    var editor = ace.edit(idLocal);
 	    editor.setValue(contenido);
 	    editor.setTheme("ace/theme/monokai");
+	    
+	    hashActual = MD5(contenido);
 	    /*
 	    editor.commands.addCommand({
 	        name: 'comandoGuardar',
@@ -42,20 +47,32 @@ var moduloEditorTexto = (function(ele) {
 	};
 	
 	var guardarArchivo = function() {
+		if (!haCambiado()) {
+			moduloMenus.info('menus.mensajes.sincambios');
+			return;
+		}
 		var editor = ace.edit(idLocal);
 		var promesasTodas = moduloArchivos.borrarCacheConId(idActual);
-		promesasTodas['guardado'] = moduloArchivos.escribirTextoPlano(idActual, editor.getValue()); 
+		var contenido = editor.getValue();
+		promesasTodas['guardado'] = moduloArchivos.escribirTextoPlano(idActual, contenido); 
 		$.when(promesasTodas).then(function() {
-			alert('Archivo guardado!');
+			moduloMenus.info('menus.mensajes.guardado');
+			hashActual = MD5(contenido);
 		}, function() {
 			alert('Error subiendo el archivo');
 		});
+	};
+	
+	var haCambiado = function() {
+		var editor = ace.edit(idLocal);
+		return (hashActual != MD5(editor.getValue()));
 	};
 	
 	return {
 		abrirEditor: abrirEditor,
 		destruirEditor: destruirEditor,
 		guardarArchivo: guardarArchivo,
+		haCambiado: haCambiado,
 	};
 });
 }
