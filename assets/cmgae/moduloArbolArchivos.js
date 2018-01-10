@@ -15,9 +15,7 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 	});
 	
     tabs.on( "click", "span.ui-icon-close", function() {
-	    var panelId = $( this ).closest( "li" ).remove().attr( "aria-controls" );
-	    $( "#" + panelId ).remove();
-	    tabs.tabs( "refresh" );
+    	cerrarTab($( this ));
     });
 	
 	jQuery(document).keydown(function(event) {
@@ -38,6 +36,13 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 			hijos[i] = moduloArchivos.darNombreId(hijos[i]);
 		}
 		return hijos;
+	};
+	
+	var cerrarTab = function(elemTab) {
+	    var panelId = elemTab.closest( "li" ).remove().attr( "aria-controls" );
+	    $( "#" + panelId ).remove();
+	    delete mapaTabs[panelId];
+	    tabs.tabs( "refresh" );
 	};
 	
     // Actual addTab function: adds new tab using the input from the form above
@@ -139,6 +144,25 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
     	}
 	};
 	
+	elem.on('dblclick','.jstree-anchor', function (e) {
+	   var inst = $.jstree.reference(this),
+	   ref = inst.get_node(this);
+	   abrirNodo(ref);
+	});
+	
+	var abrirNodo = function(ref) {
+    	var promesaCargue = moduloArchivos.leerTextoPlano(ref.id);
+    	$.when(promesaCargue).then(function(contenido) {
+    		//TODO detectar que es error de que no existe, diferente a otro error
+    		if (typeof(contenido) != 'string') {
+    			contenido = '';
+    		}
+    		agregarTab(ref.text, contenido, ref.id);
+    	}, function(obj) {
+    		moduloMenus.error(obj.msg);
+    	});
+	}
+	
 	var menuALaMedida = function($node) {
 		var abrir = {
             "separator_before": false,
@@ -147,16 +171,7 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
             "action": function(data) {
             	var inst = $.jstree.reference(data.reference);
             	var ref = inst.get_node(data.reference);
-            	var promesaCargue = moduloArchivos.leerTextoPlano(ref.id);
-            	$.when(promesaCargue).then(function(contenido) {
-            		//TODO detectar que es error de que no existe, diferente a otro error
-            		if (typeof(contenido) != 'string') {
-            			contenido = '';
-            		}
-            		agregarTab(ref.text, contenido, ref.id);
-            	}, function(obj) {
-            		moduloMenus.error(obj.msg);
-            	});
+            	abrirNodo(ref);
             }
         };
 		var crearCarpeta = {
