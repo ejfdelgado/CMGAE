@@ -1,7 +1,8 @@
 //Leer https://ace.c9.io/build/kitchen-sink.html
 if (!hayValor(moduloEditorTexto)) {
 var moduloEditorTexto = (function(ele) {
-	var idLocal = 'pluginEditor';
+	var idLocal = 'pluginEditor-'+(new Date().getTime());
+	var idActual = null;
 	var destruirEditor = function() {
 		ele.empty();
 		var nuevo = $('<div/>', {id: idLocal});
@@ -9,6 +10,7 @@ var moduloEditorTexto = (function(ele) {
 	};
 	  
 	var abrirEditor = function(nombre, contenido, id) {
+		idActual = id;
 		var mapaTipos = [
 		    {'patron': /.*\.js/ig, 'editor': 'ace/mode/javascript'},
 		    {'patron': /.*\.html/ig, 'editor': 'ace/mode/html'},
@@ -21,14 +23,16 @@ var moduloEditorTexto = (function(ele) {
 	    var editor = ace.edit(idLocal);
 	    editor.setValue(contenido);
 	    editor.setTheme("ace/theme/monokai");
+	    /*
 	    editor.commands.addCommand({
 	        name: 'comandoGuardar',
 	        bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
 	        exec: function(editor) {
-            	guardarArchivo(id);
+            	guardarArchivo();
 	        },
 	        readOnly: true // false if this command should not apply in readOnly mode
 	    });
+	    */
 	    for (let i=0; i<mapaTipos.length; i++) {
 	    	let unTipo = mapaTipos[i];
 	    	if (unTipo.patron.test(nombre)) {
@@ -37,10 +41,10 @@ var moduloEditorTexto = (function(ele) {
 	    }
 	};
 	
-	var guardarArchivo = function(id) {
+	var guardarArchivo = function() {
 		var editor = ace.edit(idLocal);
-		var promesasTodas = moduloArchivos.borrarCacheConId(id);
-		promesasTodas['guardado'] = moduloArchivos.escribirTextoPlano(id, editor.getValue()); 
+		var promesasTodas = moduloArchivos.borrarCacheConId(idActual);
+		promesasTodas['guardado'] = moduloArchivos.escribirTextoPlano(idActual, editor.getValue()); 
 		$.when(promesasTodas).then(function() {
 			alert('Archivo guardado!');
 		}, function() {
@@ -51,6 +55,7 @@ var moduloEditorTexto = (function(ele) {
 	return {
 		abrirEditor: abrirEditor,
 		destruirEditor: destruirEditor,
+		guardarArchivo: guardarArchivo,
 	};
 });
 }

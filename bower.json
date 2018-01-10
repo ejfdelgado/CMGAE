@@ -8,6 +8,8 @@
   "dependencies": {
     "chart.js": "^2.7.1",
     "create": "*",
+    "jquery": "1.9.x",
+    "jquery-ui": "1.10.x",
     "jquery.enhsplitter": "^1.2.3",
     "jstree": "^3.3.4",
     "ace": "^1.2.9",

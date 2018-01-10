@@ -3,7 +3,34 @@
 if (!hayValor(moduloArbolArchivos)) {
 var moduloArbolArchivos = (function(elem, elemEditor) {
 	
-	var instanciaEditorTexto = moduloEditorTexto(elemEditor);
+	var tabTemplate = "<li><a href='#{href}'>#{label}</a> <span class='ui-icon ui-icon-close' role='presentation'>Remove Tab</span></li>";
+	var mapaTabs = {};
+	var editorActual = null;
+	
+	var tabs = $( "#tabs" ).tabs({
+		  activate: function( event, ui ) {
+			  var id = $(ui.newPanel).attr('id');
+			  editorActual = mapaTabs[id];
+		  }
+	});
+	
+    tabs.on( "click", "span.ui-icon-close", function() {
+	    var panelId = $( this ).closest( "li" ).remove().attr( "aria-controls" );
+	    $( "#" + panelId ).remove();
+	    tabs.tabs( "refresh" );
+    });
+	
+	jQuery(document).keydown(function(event) {
+	        // If Control or Command key is pressed and the S key is pressed
+	        // run save function. 83 is the key code for S.
+	        if((event.ctrlKey || event.metaKey) && event.which == 83) {
+	            // Save Function
+	        	editorActual.editor.guardarArchivo();
+	            event.preventDefault();
+	            return false;
+	        }
+	    }
+	);
 	
 	var darNombresHijos = function(nodo) {
 		var hijos = copiarJSON(leerObj(nodo, 'children', []));
@@ -12,6 +39,37 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
 		}
 		return hijos;
 	};
+	
+    // Actual addTab function: adds new tab using the input from the form above
+    function agregarTab(nombreArchivo, contenido, rutaUnica) {
+    	
+		var label = nombreArchivo,
+		id = MD5('tab-'+rutaUnica),
+		li = $( tabTemplate.replace( /#\{href\}/g, "#" + id ).replace( /#\{label\}/g, label ) );
+    	
+    	if (hayValor(mapaTabs[id])) {
+    		mapaTabs[id].li.find('a').click();
+    		return;
+    	}
+		 
+		tabs.find( ".ui-tabs-nav" ).append( li );
+		tabs.append( '<div id="' + id + '" class="pluginEditor"><div class="pluginEditorInner"></div></div>');
+		tabs.tabs( "refresh" );
+		
+		mapaTabs[id] = {
+			'li': li,
+		};
+		
+		li.find('a').click();
+		
+		
+		var instanciaEditorTexto = moduloEditorTexto($('#'+id+' .pluginEditorInner'));
+		instanciaEditorTexto.abrirEditor(nombreArchivo, contenido, rutaUnica);
+		
+
+		
+		mapaTabs[id]['editor'] = instanciaEditorTexto;
+    };
 	
 	elem.on("changed.jstree", function (event, data) {
 		if(data.selected.length) {
@@ -87,7 +145,6 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
             "separator_after": false,
             "label": "Abrir",
             "action": function(data) {
-            	instanciaEditorTexto.destruirEditor();
             	var inst = $.jstree.reference(data.reference);
             	var ref = inst.get_node(data.reference);
             	var promesaCargue = moduloArchivos.leerTextoPlano(ref.id);
@@ -96,7 +153,7 @@ var moduloArbolArchivos = (function(elem, elemEditor) {
             		if (typeof(contenido) != 'string') {
             			contenido = '';
             		}
-            		instanciaEditorTexto.abrirEditor(ref.text, contenido, ref.id);
+            		agregarTab(ref.text, contenido, ref.id);
             	}, function(obj) {
             		moduloMenus.error(obj.msg);
             	});
