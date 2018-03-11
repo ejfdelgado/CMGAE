@@ -41,6 +41,7 @@ gulp.task('default', function() {
 	'./assets/cmgae/moduloImagenes.js',
 	'./assets/cmgae/moduloEdicion.js',
 	'./assets/cmgae/moduloMenus.js',
+	'./assets/cmgae/moduloHistoria.js',
 	'./assets/cmgae/moduloJuegoVista.js',
 	'./assets/cmgae/moduloTimer.js',
   ]).pipe(concat('modulos.min.js'))

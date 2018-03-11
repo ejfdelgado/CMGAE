@@ -29,7 +29,15 @@ from settings import TEMPLATE_DIRS, ROOT_PATH, LENGUAJE_PRED
 CORREO_ENVIOS = 'edgar.jose.fernando.delgado@gmail.com'
 PREFIJO_MEMCACHE_ADMIN = '@'
 PREFIJO_MEMCACHE_RUTAS = '$'
-
+LISTA_PATRONES = [
+                 {'bin': True, 'mime': 'application/octet-stream', 'patron': re.compile("^\.(woff2?|ttf|png|jpg|bmp|wav|mp3|ogg|midi?|bin|dat|kml|gif)$", re.IGNORECASE)},
+                 {'bin': False, 'mime': 'text/xml', 'patron': re.compile("^\.(xml)$", re.IGNORECASE)},
+                 {'bin': False, 'mime': 'text/plain', 'patron': re.compile("^\.(txt|csv)$", re.IGNORECASE)},
+                 {'bin': False, 'mime': 'text/css', 'patron': re.compile("^\.(css|scss)$", re.IGNORECASE)},
+                 {'bin': False, 'mime': 'text/javascript', 'patron': re.compile("^\.(js)$", re.IGNORECASE)},
+                 {'bin': True, 'mime': 'image/svg+xml', 'patron': re.compile("^\.(svg)$", re.IGNORECASE)},
+                 ]
+            
 ANALYTICS = '<script>'\
             '    (function(i,s,o,g,r,a,m){i["GoogleAnalyticsObject"]=r;i[r]=i[r]||function(){'\
             '    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),'\
@@ -191,22 +199,13 @@ def principal(request, data):
             extension = data[puntoExtension:]
             mime = 'text/html'
             esBinario = False
-            if (extension.startswith(".xml")):
-                mime = 'text/xml'
-            elif (extension.startswith(".txt")):
-                mime = 'text/plain'
-            elif (extension.startswith(".kml")):
-                mime = 'application/octet-stream'
-            elif (extension.startswith(".css") or extension.startswith(".scss")):
-                mime = 'text/css'
-            elif (extension.startswith(".js")):
-                mime = 'text/javascript'
-            elif (extension.startswith(".woff2") or extension.startswith(".ttf")):
-                mime = 'application/octet-stream'
-                esBinario = True
-            
+            for tipo in LISTA_PATRONES:
+                if (tipo['patron'].match(extension)):
+                    mime = tipo['mime']
+                    if tipo['bin']:
+                        esBinario = True
+                    break
             user = users.get_current_user()
-            
             
             if True:#Usar cache
                 anterior = memcache.get(llaveParaMemcache)

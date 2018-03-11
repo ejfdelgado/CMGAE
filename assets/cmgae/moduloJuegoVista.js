@@ -95,6 +95,34 @@ if (!hayValor(moduloJuegoVista)) {
 				};
 			},
 		},
+		'historia': {
+			boton: {icono:'fa-question', color: 'btn-info'},
+			programa: function(metadata) {
+				return {
+					'url':'/assets/cmgae/juego/modos/historia.html', 
+					'recargarHtml': false,
+					'funInicio':function(plantilla) {
+						plantilla = plantilla.replace('$1', metadata.preguntaActual.href);
+						plantilla = plantilla.replace('$3', darHtmlSeguro(metadata.preguntaActual.respuesta));
+						return $(plantilla);
+					},
+					'lista':metadata.preguntaActual.respuestas,
+					'funIter':function(plantilla, i, llave, elemento) {
+						plantilla = plantilla.replace('$2', darHtmlSeguro(elemento.texto));
+						var nuevo = $(plantilla);
+						nuevo.find('.panel-body').css('background-color', elemento.color);
+						var funcionFinal = function() {
+							if (esFuncion(metadata.moduloJuego.usuarioEligeRespuesta)) {
+								metadata.moduloJuego.usuarioEligeRespuesta(llave, elemento, nuevo, metadata.preguntaActual.id);
+							}
+						};
+						nuevo.on('doubletap', funcionFinal);
+						nuevo.dblclick(funcionFinal);
+						return nuevo;
+					}
+				};
+			},
+		},
 		'pregunta': {
 			boton: {icono:'fa-question', color: 'btn-info'},
 			programa: function(metadata) {
@@ -408,6 +436,20 @@ if (!hayValor(moduloJuegoVista)) {
 						repetido.remove();
 					}
 				}
+				
+				//mira si se deben cargar htmls externos
+				$('[data-incluir]').each(function(i, elem) {
+					var jelem = $(elem);
+					var incluirHref = jelem.attr('data-incluir');
+					if (hayValor(incluirHref)) {
+						var promesaIncluir = moduloHttp.get(incluirHref, true);
+						promesaIncluir.then(function(contenidoIncluir) {
+							jelem.html(contenidoIncluir);
+							moduloHistoria.inicializar();
+						});
+					}
+				});
+				
 				if (esFuncion(props.funFinalizar)) {
 					props.funFinalizar(datos.metadata);
 				}
