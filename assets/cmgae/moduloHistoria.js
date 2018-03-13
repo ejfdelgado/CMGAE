@@ -58,6 +58,11 @@ var moduloHistoria = (function() {
 					var estiloPonderado = hijoPonderado.attr('style');
 					pHijo.attr('style', estiloPonderado);
 					
+					//Se aplican todas las clases del hijo excepto la de invisible
+					var clasesPonderadas = hijoPonderado.attr('class');
+					pHijo.attr('class', clasesPonderadas);
+					pHijo.removeClass('invisible');
+					
 					//Se pasa el texto ponderado
 					if (analisisTexto.usar) {
 						pHijo.text(analisisTexto.txt.substring(0, analisisTexto.tam*internos.p2));
