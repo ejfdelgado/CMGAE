@@ -1,6 +1,6 @@
 
 var moduloHistoria = (function() {
-	var OFFSET_VISIBLE = 0.1;//Porcentaje de la altura de la ventana
+	var OFFSET_VISIBLE = 0.01;//Porcentaje de la altura de la ventana
 	
 	var inicializar = function() {
 		//1. Se itera el dom buscando la clase principal

@@ -99,3 +99,25 @@ def to_dict(model, propio=None):
         else:
             output = getattr(model, propio)()
     return output
+
+def siempreUtf8(a):
+    return darUnicode(a).encode('utf-8')
+def darUnicode(a):
+    if isinstance(a, unicode):
+        return a
+    tipos = ['utf-8', 'ascii', 'utf-16', 'latin1', 'utf-32']
+    for tipo in tipos:
+        try:
+            return a.decode(tipo)
+        except:
+            pass
+    return None
+def remplazar(a, b, c, autf8=False):
+    #todo lo trabajamos en unicode
+    a = darUnicode(a)
+    b = darUnicode(b)
+    c = darUnicode(c)
+    if autf8:
+        return a.replace(b, c).encode('utf-8')
+    else:
+        return a.replace(b, c)

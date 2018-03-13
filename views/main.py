@@ -205,13 +205,16 @@ def principal(request, data):
                     if tipo['bin']:
                         esBinario = True
                     break
+            if not esBinario:
+                mime = mime+'; charset=utf-8'
+                
             user = users.get_current_user()
             
             if True:#Usar cache
                 anterior = memcache.get(llaveParaMemcache)
                 if (anterior):
                     if not esBinario:
-                        anterior = anterior.replace('__USER__', generarVariablesUsuario(var_full_path, leng), 1)
+                        anterior = comun.remplazar(anterior, '__USER__', generarVariablesUsuario(var_full_path, leng), True)
                     return HttpResponse(anterior, content_type=mime)
             
             #Se lee el template para saber cuales ids se deben buscar de la base de datos
@@ -287,7 +290,7 @@ def principal(request, data):
                     if (dicci['Configuracion'].has_key('/general') and dicci['Configuracion']['/general'].has_key(millave)):
                         valor = dicci['Configuracion']['/general'][millave]
                         if (not valor is None and len(valor) > 0):
-                            valAnalytics = ANALYTICS.replace('$1', valor)
+                            valAnalytics = comun.remplazar(ANALYTICS, '$1', valor)
                 
                 context = {
                     'ANALYTICS':valAnalytics,
@@ -309,18 +312,25 @@ def principal(request, data):
                 respuesta = direct_to_template(request, data, context, mime)
                 
                 if (extension.startswith(".scss")):
+                    for llave in request.GET.keys():
+                        valor = request.GET.get(llave)
+                        respuesta.content = comun.remplazar(respuesta.content, llave, valor)
                     respuesta.content = Compiler().compile_string(respuesta.content)
+                #Siempre se codifica utf-8
+                respuesta.content = comun.siempreUtf8(respuesta.content)
             else:
                 respuesta = storage.read_file(data)
             
             if (respuesta.status_code == 204):
                 #significa que no existe
                 return respuesta
+            
+            
             memcache.set(llaveParaMemcache, respuesta.content)
             agregarRutaParaMemcache(request.path, llaveParaMemcache)
             
             if (not esBinario):
-                respuesta.content = respuesta.content.decode('utf-8').replace('__USER__', generarVariablesUsuario(var_full_path, leng), 1)
+                respuesta.content = comun.remplazar(respuesta.content, '__USER__', generarVariablesUsuario(var_full_path, leng), True)
                 
             return respuesta
         elif request.method == 'DELETE':
