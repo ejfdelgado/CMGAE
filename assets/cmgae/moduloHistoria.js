@@ -28,7 +28,14 @@ var moduloHistoria = (function() {
 				pHijo.removeClass('invisible');
 				
 				jelem.data('darIndicePonderado', function(ponderacion) {
-					return parseInt(ponderacion*(hijos.length-1));//Por que no se desea contar el hijo agregado
+					var ans = parseInt(ponderacion*(hijos.length));
+					if (ans < 0) {
+						ans = 0;
+					}
+					if (ans >= hijos.length) {
+						ans = hijos.length-1;
+					}
+					return ans;
 				});
 				
 				//Se agrega la función de actualización
