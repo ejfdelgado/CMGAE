@@ -5,10 +5,11 @@ var moduloHistoria = (function() {
 	var ANCHO = $( window ).width();
 	
 	var EXPRESION = '(\\s*|\\d|(maxx)|(maxy)|\\*|-|\\+|\\.)+';
+	var EXPRESIONSE = '(\\d|(maxx)|(maxy)|\\*|-|\\+|\\.)+';//No acepta espacios
 	var DOSCAMPOS = '\\(\\s*('+EXPRESION+')\\s*(px)?\\s*,\\s*('+EXPRESION+')(px)?\\s*\\)';
-	var DOSCAMPOSNP = '('+EXPRESION+')\\s*(px)?\\s*('+EXPRESION+')(px)?';
+	var DOSCAMPOSNP = '('+EXPRESIONSE+')\\s*(px)?\\s*('+EXPRESIONSE+')(px)?';
 	var UNCAMPO = '\\(\\s*('+EXPRESION+')\\s*(deg|rad|px)?\\s*\\)';
-	var UNCAMPONP = '('+EXPRESION+')\\s*(deg|rad|px)?';
+	var UNCAMPONP = '('+EXPRESIONSE+')\\s*(deg|rad|px)?';
 	var TRANSFORM = '[^;]?\\s*transform\\s*:.*?';
 	
 	var PATRONES = {
@@ -101,8 +102,12 @@ var moduloHistoria = (function() {
 						let temp = todo[grupos[i]];
 						temp = temp.replace(/maxx/ig, ANCHO);
 						temp = temp.replace(/maxy/ig, ALTO);
-						temp = eval(temp);
-						ans.push(temp);
+						try {
+							temp = eval(temp);
+							ans.push(temp);
+						} catch (e) {
+							console.log('No se pudo evaluar:', temp);
+						}
 					}
 					return ans;
 				};
