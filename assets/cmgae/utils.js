@@ -29,6 +29,7 @@ var estaEnLista = function(valor, lista) {
 };
 
 var copiarJSON = function(dato) {
+	if (typeof dato == 'undefined') {return null;}
 	return JSON.parse(JSON.stringify(dato));
 };
 

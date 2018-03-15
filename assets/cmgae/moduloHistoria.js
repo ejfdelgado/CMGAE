@@ -1,6 +1,88 @@
 
 var moduloHistoria = (function() {
 	var OFFSET_VISIBLE = 0.01;//Porcentaje de la altura de la ventana
+	var ALTO = $( window ).height();
+	var ANCHO = $( window ).width();
+	
+	var EXPRESION = '(\\s*|\\d|(maxx)|(maxy)|\\*|-|\\+|\\.)+';
+	var DOSCAMPOS = '\\(\\s*('+EXPRESION+')\\s*(px)?\\s*,\\s*('+EXPRESION+')(px)?\\s*\\)';
+	var DOSCAMPOSNP = '('+EXPRESION+')\\s*(px)?\\s*('+EXPRESION+')(px)?';
+	var UNCAMPO = '\\(\\s*('+EXPRESION+')\\s*(deg|rad|px)?\\s*\\)';
+	var UNCAMPONP = '('+EXPRESION+')\\s*(deg|rad|px)?';
+	var TRANSFORM = '[^;]?\\s*transform\\s*:.*?';
+	
+	var PATRONES = {
+		'translate': {
+			'p': new RegExp('('+TRANSFORM+'translate\\s*'+DOSCAMPOS+')', 'ig'), 
+			'borrar': new RegExp('(translate\\s*'+DOSCAMPOS+')', 'ig'), 
+			'defs': ['transform', '-ms-transform', '-webkit-transform'], 
+			'grupos': [2,7],
+			'par': true,
+			'pre': 'translate',
+			'sep': ',',
+			'uni': 'px',//Siempre se interpretará en px
+		},
+		'btranslate': {
+			'p': new RegExp('(background-position\\s*:\\s*'+DOSCAMPOSNP+'\\s*[;$])', 'ig'), 
+			'borrar': new RegExp('(background-position\\s*:\\s*'+DOSCAMPOSNP+'\\s*[;$])', 'ig'), 
+			'defs': ['background-position'], 
+			'grupos': [2,7],
+			'par': false,
+			'pre': '',
+			'sep': ' ',
+			'uni': 'px',
+		},
+		'rotate': {
+			'p': new RegExp('('+TRANSFORM+'rotate\\s*'+UNCAMPO+')', 'ig'), 
+			'borrar': new RegExp('(rotate\\s*'+UNCAMPO+')', 'ig'), 
+			'defs': ['transform', '-ms-transform', '-webkit-transform'], 
+			'grupos': [2],
+			'par': true,
+			'pre': 'rotate',
+			'sep': ' ',
+			'uni': 'deg',
+		},
+		'scale1': {
+			'p': new RegExp('('+TRANSFORM+'scale\\s*'+UNCAMPO+')', 'ig'), 
+			'borrar': new RegExp('(scale\\s*'+UNCAMPO+')', 'ig'), 
+			'defs': ['transform', '-ms-transform', '-webkit-transform'], 
+			'grupos': [2],
+			'par': true,
+			'pre': 'scale',
+			'sep': ' ',
+			'uni': '',
+		},
+		'scale2': {
+			'p': new RegExp('('+TRANSFORM+'scale\\s*'+DOSCAMPOS+')', 'ig'), 
+			'borrar': new RegExp('(scale\\s*'+DOSCAMPOS+')', 'ig'), 
+			'defs': ['transform', '-ms-transform', '-webkit-transform'], 
+			'grupos': [2, 7],
+			'par': true,
+			'pre': 'scale',
+			'sep': ',',
+			'uni': '',
+		},
+		'bscale1': {
+			'p': new RegExp('(background-size\\s*:\\s*'+UNCAMPONP+'\\s*[;$])', 'ig'), 
+			'borrar': new RegExp('(background-size\\s*:\\s*'+UNCAMPONP+'\\s*[;$])', 'ig'), 
+			'defs': ['background-size', '-webkit-background-size', '-moz-background-size', '-o-background-size'], 
+			'grupos': [2],
+			'par': false,
+			'pre': '',
+			'sep': ' ',
+			'uni': 'px',
+		},
+		'bscale2': {
+			'p': new RegExp('(background-size\\s*:\\s*'+DOSCAMPOSNP+'\\s*[;$])', 'ig'), 
+			'borrar': new RegExp('(background-size\\s*:\\s*'+DOSCAMPOSNP+'\\s*[;$])', 'ig'), 
+			'defs': ['background-size'], 
+			'grupos': [2,7],
+			'par': false,
+			'pre': '',
+			'sep': ' ',
+			'uni': 'px',
+		},
+	};
 	
 	var inicializar = function() {
 		//1. Se itera el dom buscando la clase principal
@@ -12,6 +94,59 @@ var moduloHistoria = (function() {
 				//Se esconden los demás hijos
 				var hijos = jelem.children();
 				jelem.children().addClass('invisible');
+				
+				var leerGrupos = function(todo, grupos) {
+					var ans = []
+					for (let i=0; i<grupos.length; i++) {
+						let temp = todo[grupos[i]];
+						temp = temp.replace(/maxx/ig, ANCHO);
+						temp = temp.replace(/maxy/ig, ALTO);
+						temp = eval(temp);
+						ans.push(temp);
+					}
+					return ans;
+				};
+				
+				var procesarExpresion = function(patron, estilo) {
+					patron.p.lastIndex = 0;
+					var m;
+					var ans = null;
+					do {
+					    m = patron.p.exec(estilo);
+					    if (m) {
+					    	ans = leerGrupos(m, patron.grupos);
+					    }
+					} while (m);
+					return ans;
+				};
+				
+				var procesarEstilo = function(jelem) {
+					
+					var estilo = jelem.attr('style');
+					if (hayValor(estilo)) {
+						var metadata = {};
+						for (let llavePatron in PATRONES) {
+							let unPatron = PATRONES[llavePatron];
+							let calculado = procesarExpresion(unPatron, estilo);
+							if (hayValor(calculado)) {
+								unPatron.borrar.lastIndex = 0;
+								estilo = estilo.replace(unPatron.borrar, '');
+								metadata[llavePatron] = calculado;
+							}
+						}
+						estilo = estilo.replace(new RegExp('transform\\s*:.*?[;$]', 'ig'), '');
+						jelem.attr('style', estilo);
+						//console.log('estilo final:', estilo);
+						//console.log(JSON.stringify(metadata));
+						jelem.data('pinterpol', metadata);
+					}
+				};
+				
+				//Se pre-procesan los estilos
+				jelem.children().each(function(i, elem) {
+					var jelem = $(elem);
+					procesarEstilo(jelem);
+				});
 				
 				//Se clona el primer hijo
 				var pHijo = jelem.children(":first").clone();
@@ -38,6 +173,11 @@ var moduloHistoria = (function() {
 					return ans;
 				});
 				
+				jelem.data('darSubPonderado', function(indice, ponderacion) {
+					let ans = (ponderacion-(indice/hijos.length))*hijos.length;
+					return ans;
+				});
+				
 				//Se agrega la función de actualización
 				jelem.data('act', function(datos) {
 					var internos = {
@@ -55,14 +195,75 @@ var moduloHistoria = (function() {
 					var ext2 = (internos.ymax - datos.offset);
 					internos.p1 = ponderar(datos.scroll, ext1, ext2);
 					internos.p2 = ponderar(datos.scroll, ext1+internos.altura, ext2-internos.altura);
+					internos.p2Inv = (1-internos.p2);//Solo cuando está todo visible
+					internos.p1Inv = (1-internos.p1);//Desde que aparece
 					internos.i1 = jelem.data('darIndicePonderado')(internos.p1);
 					internos.i2 = jelem.data('darIndicePonderado')(internos.p2);
 					
 					//Se calcula el hijo ponderado
 					var hijoPonderado = $(hijos[internos.i2]);
-					
+					internos.i2sp = jelem.data('darSubPonderado')(internos.i1, internos.p1);
+					internos.i2spInv = (1-internos.i2sp); 
 					//Se aplican los estilos del hijo ponderado
 					var estiloPonderado = hijoPonderado.attr('style');
+					var estadoActual = {};
+					var datos1 = hijoPonderado.data('pinterpol');
+					if (internos.i2 < (hijos.length - 1)) {
+						var hijoPonderadoAnterior = $(hijos[internos.i2+1]);
+						var datos2 = hijoPonderadoAnterior.data('pinterpol');
+						//Se generan los estilos interpolados
+						for (let llavePatron in datos2) {
+							let datoActual = datos2[llavePatron];
+							let datoAnterior = datos1[llavePatron];
+							if (hayValor(datoActual)) {
+								if (hayValor(datoAnterior)) {
+									//Se interpola
+									estadoActual[llavePatron] = [];
+									for (let k=0; k<datoActual.length; k++) {
+										estadoActual[llavePatron][k] = parseInt(datoActual[k]*internos.i2sp + datoAnterior[k]*internos.i2spInv);
+									}
+								} else {
+									//No se interpola
+									estadoActual[llavePatron] = copiarJSON(datoActual);
+								}
+							}
+						}
+					} else {
+						//Se debe aplicar los estilos del único actual
+						estadoActual = copiarJSON(datos1);
+					}
+					let mapaFinal = {};
+					//1. Se agrupan
+					for (let llavePatron in estadoActual) {
+						let unPatron = PATRONES[llavePatron];
+						let lista = estadoActual[llavePatron];
+						for (let j=0; j<lista.length; j++) {
+							lista[j]=lista[j]+unPatron.uni;
+						}
+						for (let m=0; m<1; m++){//unPatron.defs.length
+							let estiloNom = unPatron.defs[m];
+							if (!(estiloNom in mapaFinal)) {
+								mapaFinal[estiloNom] = [];
+							}
+							let temp = lista.join(unPatron.sep);
+							if (unPatron.par) {
+								temp = '('+temp+')';
+							}
+							mapaFinal[estiloNom].push(unPatron.pre+temp);
+						}
+					}
+					
+					//2. Se generan los estilos
+					for (let llaveEstilo in mapaFinal) {
+						let nuevoEstilo = ' ';
+						let subMapa = mapaFinal[llaveEstilo]
+						nuevoEstilo+=llaveEstilo+': ';
+						for (let m=0; m<subMapa.length; m++) {
+							nuevoEstilo+=subMapa[m]+' ';
+						}
+						estiloPonderado+=nuevoEstilo+';';
+					}
+					
 					pHijo.attr('style', estiloPonderado);
 					
 					//Se aplican todas las clases del hijo excepto la de invisible
