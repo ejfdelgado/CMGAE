@@ -41,4 +41,10 @@ canvas {
 
 .mostrar-historia {
 	overflow: hidden;
+	/*position: absolute;*/
+	text-align: center;
+}
+
+.mostrar-historia.absoluta {
+	position: absolute;
 }

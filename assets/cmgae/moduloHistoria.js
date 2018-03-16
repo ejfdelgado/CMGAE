@@ -94,7 +94,12 @@ var moduloHistoria = (function() {
 				
 				//Se esconden los demás hijos
 				var hijos = jelem.children();
-				jelem.children().addClass('invisible');
+				hijos.addClass('invisible');
+				
+				var OFFSET = jelem.attr('data-historia-offset');
+				if (!esNumero(OFFSET)) {
+					OFFSET = 0;
+				}
 				
 				var leerGrupos = function(todo, grupos) {
 					var ans = []
@@ -148,7 +153,7 @@ var moduloHistoria = (function() {
 				};
 				
 				//Se pre-procesan los estilos
-				jelem.children().each(function(i, elem) {
+				hijos.each(function(i, elem) {
 					var jelem = $(elem);
 					procesarEstilo(jelem);
 				});
@@ -168,7 +173,7 @@ var moduloHistoria = (function() {
 				pHijo.removeClass('invisible');
 				
 				jelem.data('darIndicePonderado', function(ponderacion) {
-					var ans = parseInt(ponderacion*(hijos.length));
+					var ans = parseInt(ponderacion*(hijos.length-OFFSET));
 					if (ans < 0) {
 						ans = 0;
 					}
@@ -179,7 +184,11 @@ var moduloHistoria = (function() {
 				});
 				
 				jelem.data('darSubPonderado', function(indice, ponderacion) {
-					let ans = (ponderacion-(indice/hijos.length))*hijos.length;
+					let tam = (hijos.length-OFFSET);
+					let ans = (ponderacion-(indice/tam))*tam;
+					if (ans > 1) {
+						ans = 1;
+					}
 					return ans;
 				});
 				
@@ -198,17 +207,24 @@ var moduloHistoria = (function() {
 					
 					var ext1 = (internos.ymin - datos.alturaVentana - datos.offset);
 					var ext2 = (internos.ymax - datos.offset);
-					internos.p1 = ponderar(datos.scroll, ext1, ext2);
-					internos.p2 = ponderar(datos.scroll, ext1+internos.altura, ext2-internos.altura);
-					internos.p2Inv = (1-internos.p2);//Solo cuando está todo visible
-					internos.p1Inv = (1-internos.p1);//Desde que aparece
-					internos.i1 = jelem.data('darIndicePonderado')(internos.p1);
+					var modo = 0;
+					if (modo == 0) {
+						//Desde que aparece
+						internos.p2 = ponderar(datos.scroll, ext1, ext2);
+					} else if (modo == 1) {
+						//Solo cuando está todo visible
+						internos.p2 = ponderar(datos.scroll, ext1+internos.altura, ext2-internos.altura);
+					}
+					internos.p2Inv = (1-internos.p2);
 					internos.i2 = jelem.data('darIndicePonderado')(internos.p2);
 					
 					//Se calcula el hijo ponderado
 					var hijoPonderado = $(hijos[internos.i2]);
-					internos.i2sp = jelem.data('darSubPonderado')(internos.i1, internos.p1);
-					internos.i2spInv = (1-internos.i2sp); 
+					internos.i2sp = jelem.data('darSubPonderado')(internos.i2, internos.p2);
+					internos.i2spInv = (1-internos.i2sp);
+					
+					
+					//console.log(internos.p2, internos.i2, internos.i2sp);
 					//Se aplican los estilos del hijo ponderado
 					var estiloPonderado = hijoPonderado.attr('style');
 					var estadoActual = {};
@@ -279,6 +295,8 @@ var moduloHistoria = (function() {
 					//Se pasa el texto ponderado
 					if (analisisTexto.usar) {
 						pHijo.text(analisisTexto.txt.substring(0, analisisTexto.tam*internos.p2));
+					} else {
+						pHijo.html(hijoPonderado.html());
 					}
 					
 					//Se pasa la fuente de la imagen
