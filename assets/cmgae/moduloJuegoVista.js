@@ -107,17 +107,36 @@ if (!hayValor(moduloJuegoVista)) {
 						return $(plantilla);
 					},
 					'lista':metadata.preguntaActual.respuestas,
+					'funFinalizar': function() {
+						$('.mi-boton-final').on('click', function() {
+							if (esFuncion(metadata.moduloJuego.usuarioEligeRespuesta)) {
+								metadata.moduloJuego.usuarioEligeRespuesta();
+							}
+						});
+					},
 					'funIter':function(plantilla, i, llave, elemento) {
 						plantilla = plantilla.replace('$2', darHtmlSeguro(elemento.texto));
+						plantilla = plantilla.replace('$4', i);
 						var nuevo = $(plantilla);
-						nuevo.find('.panel-body').css('background-color', elemento.color);
+						var miInput = nuevo.find('input')[0]; 
 						var funcionFinal = function() {
-							if (esFuncion(metadata.moduloJuego.usuarioEligeRespuesta)) {
-								metadata.moduloJuego.usuarioEligeRespuesta(llave, elemento, nuevo, metadata.preguntaActual.id);
+							//Hacer exluyentes las demás
+							nuevo.parent().find('input').each(function(i, elem) {
+								if (elem != miInput) {
+									elem.checked = false;
+								}
+							});
+							//Mostrar el botón del final si hay al menos una opción
+							var tam = nuevo.parent().find('input:checked').length;
+							if (tam == 0) {
+								$('.mi-boton-final').addClass('invisible');
+							} else {
+								metadata.moduloJuego.usuarioTomaRespuesta(llave, elemento, nuevo, metadata.preguntaActual.id);
+								$('.mi-boton-final').removeClass('invisible');
 							}
 						};
-						nuevo.on('doubletap', funcionFinal);
-						nuevo.dblclick(funcionFinal);
+						nuevo.on('click', funcionFinal);
+						nuevo.click(funcionFinal);
 						return nuevo;
 					}
 				};
@@ -437,6 +456,14 @@ if (!hayValor(moduloJuegoVista)) {
 					}
 				}
 				
+				var funcionEsperar = function(i, elem2) {
+					moduloActividad.on();
+					let jelem = $(elem2);
+					jelem.ready(function() {
+						moduloActividad.off();
+					});
+				};
+				
 				//mira si se deben cargar htmls externos
 				$('[data-incluir]').each(function(i, elem) {
 					var jelem = $(elem);
@@ -445,6 +472,8 @@ if (!hayValor(moduloJuegoVista)) {
 						var promesaIncluir = moduloHttp.get(incluirHref, true);
 						promesaIncluir.then(function(contenidoIncluir) {
 							jelem.html(contenidoIncluir);
+							jelem.find('img,style,script,link').each(funcionEsperar);
+							$('head').find('link').each(funcionEsperar);
 							moduloHistoria.inicializar();
 						});
 					}

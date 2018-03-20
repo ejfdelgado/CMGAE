@@ -1,6 +1,6 @@
 
 var moduloHistoria = (function() {
-	var OFFSET_VISIBLE = 0.01;//Porcentaje de la altura de la ventana
+	var OFFSET_VISIBLE = 0;//Porcentaje de la altura de la ventana
 	var ALTO = $( window ).height();
 	var ANCHO = $( window ).width();
 	
@@ -162,11 +162,6 @@ var moduloHistoria = (function() {
 				var pHijo = jelem.children(":first").clone();
 				var tipoHijo = pHijo[0].tagName;
 				
-				var analisisTexto = {
-					'usar': pHijo.hasClass('historia-texto'),
-					'txt': pHijo.text(),
-					'tam': pHijo.text().length,
-				};
 				//Se agrega
 				jelem.append(pHijo);
 				//Solo se muestra el primer hijo
@@ -293,11 +288,7 @@ var moduloHistoria = (function() {
 					pHijo.removeClass('invisible');
 					
 					//Se pasa el texto ponderado
-					if (analisisTexto.usar) {
-						pHijo.text(analisisTexto.txt.substring(0, analisisTexto.tam*internos.p2));
-					} else {
-						pHijo.html(hijoPonderado.html());
-					}
+					pHijo.html(hijoPonderado.html());
 					
 					//Se pasa la fuente de la imagen
 					if (tipoHijo == 'IMG') {

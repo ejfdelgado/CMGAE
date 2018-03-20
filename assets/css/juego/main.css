@@ -1,7 +1,3 @@
-canvas {
-	
-}
-
 .chart-container {
   position: relative;
   margin: auto;
@@ -32,19 +28,46 @@ canvas {
   flex: 1
 }
 
-.historia-animada {
-    -webkit-transition: 0.5s ease-in-out;
-    -moz-transition: 0.5s ease-in-out;
-    -o-transition: 0.5s ease-in-out;
-    transition: 0.5s ease-in-out;
-}
-
 .mostrar-historia {
 	overflow: hidden;
-	/*position: absolute;*/
 	text-align: center;
 }
 
 .mostrar-historia.absoluta {
 	position: absolute;
+}
+
+ul li.abc-una-respuesta {
+    list-style: none;
+}
+
+input[type=checkbox] {
+     position: relative;
+     margin: 4px 10px 0px 0px;
+}
+
+.abc-nombre {
+	font-size: 150%;
+}
+
+.abc-150 {
+	font-size: 150%;
+}
+
+ label>input[type=checkbox]:before {
+     position: absolute;
+    background-color: #FFFFFF;
+    height: 100%;
+	width: 100%;
+    font-family: FontAwesome;
+    display: inline-block;
+    content:"\f096";
+    letter-spacing: 10px;
+}
+
+ label>input[type=checkbox]:checked:before {
+     font-family: FontAwesome;
+    display: inline-block;
+    content:"\f046";
+    letter-spacing: 5px;
 }

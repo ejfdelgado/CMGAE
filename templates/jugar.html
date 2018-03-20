@@ -87,6 +87,7 @@
 			ultimaPregunta: null,
 			jPanelPregunta: $('.abc-pregunta'),
 			moduloVista: null,
+			respuestaTomada: null,
 		};
 		
 		var remotos = {
@@ -121,7 +122,21 @@
 			conectar();
 		};
 		
-		var usuarioEligeRespuesta = function(llaveRes, valorRespuesta, elem, idPregunta) {
+		//Es la intención de elegir una respuesta
+		var usuarioTomaRespuesta = function(llaveRes, valorRespuesta, elem, idPregunta) {
+			datos.respuestaTomada = {
+					'llaveRes': llaveRes,
+					'valorRespuesta': valorRespuesta,
+					'elem': elem,
+					'idPregunta': idPregunta,
+			};
+		};
+		
+		var usuarioEligeRespuesta = function() {
+			var llaveRes = datos.respuestaTomada.llaveRes;
+			var valorRespuesta = datos.respuestaTomada.valorRespuesta;
+			var elem = datos.respuestaTomada.elem;
+			var idPregunta = datos.respuestaTomada.idPregunta;
 			var cuerpoPanel = datos.jPanelPregunta.find('.panel-body');
 			//Esconde todas las respuestas
 			cuerpoPanel.find('.abc-una-respuesta').hide();
@@ -133,10 +148,10 @@
 			});
 			var avatar = datos.jPanelPregunta.find('.abc-avatar');
 			if (valorRespuesta.puntos == 0) {
-				sonidos.mal.play();
+				//sonidos.mal.play();
 				avatar.attr('src', '/assets/img/perro/m_'+darNumeroAleatorio(0,2)+'.png');
 			} else {
-				sonidos.bien.play();
+				//sonidos.bien.play();
 				avatar.attr('src', '/assets/img/perro/b_'+darNumeroAleatorio(0,1)+'.png');
 			}
 			//Solo se muestra la que la persona escogió
@@ -210,6 +225,7 @@
 			'leerUltimoApodo': leerUltimoApodo,
 			'asignarModuloVista': asignarModuloVista,
 			'usuarioEligeRespuesta': usuarioEligeRespuesta,
+			'usuarioTomaRespuesta': usuarioTomaRespuesta,
 		};
 	};
 	
