@@ -5,6 +5,10 @@
   width: 80vw;
 }
 
+.letra-blanca {
+    color: #ffffff;
+}
+
 .noselect {
   -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
@@ -18,6 +22,10 @@
 .abc-una-respuesta .panel-body:active {
 	background-color: white !important;
 	font-weight: bold !important;
+}
+
+.abc-una-respuesta label {
+	font-weight: 100;	
 }
 
 .btn-group.special {
@@ -48,6 +56,7 @@ input[type=checkbox] {
 
 .abc-nombre {
 	font-size: 200%;
+	margin: 10px;
 }
 
 .abc-150 {
@@ -70,4 +79,12 @@ input[type=checkbox] {
     display: inline-block;
     content:"\f046";
     letter-spacing: 5px;
+}
+
+.abc-flecha {
+	content: url(/assets/img/arrow.svg);
+    position: fixed;
+    bottom: 3%;
+    right: 0;
+    z-index: 1000;
 }

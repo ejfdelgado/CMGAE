@@ -319,12 +319,18 @@ var moduloHistoria = (function() {
 		return (val - ext1)/(ext2 - ext1);
 	};
 	
+	var valorFlecha = true;
+	
 	var refrescar = function(){
 		var datos = {
 			'scroll': $(window).scrollTop(),
 			'alturaVentana': $( window ).height(),
 			//'alturaDocumento': $( document ).height(),
 		};
+		if (valorFlecha === true && datos.scroll > (datos.alturaVentana/2)) {
+			valorFlecha = false;
+			$('.abc-flecha').addClass('invisible');
+		}
 		datos.offset = parseInt(datos.alturaVentana*OFFSET_VISIBLE);
 		datos.ymin = (datos.scroll + datos.offset);
 		datos.ymax = (datos.scroll + datos.alturaVentana - datos.offset);

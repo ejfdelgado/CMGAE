@@ -1,4 +1,20 @@
 
+var agregarLinkDinamico = function(src, callback) {	
+    var s = document.createElement('link');
+   	s.rel = 'stylesheet';
+    s.href = src;
+    s.type="text/css";
+    s.async = false;
+    s.onload = function() {
+    	moduloActividad.off();
+    	if (esFuncion(callback)) {
+    		callback();
+    	}
+    };
+    moduloActividad.on();
+    document.head.appendChild(s);
+};
+
 var hayValor = function(valor) {
 	return (valor != undefined && valor != null && (!(typeof valor == 'string') || valor.trim().length > 0));
 };
@@ -474,3 +490,7 @@ var MD5 = function (string) {
     var temp = WordToHex(a)+WordToHex(b)+WordToHex(c)+WordToHex(d);
     return temp.toLowerCase();
 };
+
+var irAlFinal = function() {
+	$('html, body').scrollTop( $(document).height() );
+}
