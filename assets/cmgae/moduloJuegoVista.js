@@ -455,15 +455,28 @@ if (!hayValor(moduloJuegoVista)) {
 						repetido.remove();
 					}
 				}
-				
-				var funcionEsperarImagenes = function(i, elem2) {
-					$('img').each(function(){
-					    var imgSrc = $(this).attr("src"); //get the image src so it can be put back in to convince IE to run the .load() function correctly
+				var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+				var funcionEsperarImagenes = function(elem) {
+					elem.find('img').each(function(){
+						var imagen = $(this);
+					    var imgSrc = imagen.attr("src"); //get the image src so it can be put back in to convince IE to run the .load() function correctly
 					    moduloActividad.on();
-					    $(this).load(function(){
-					        //do something as the images are loaded (eg, count them to make sure they're all loaded then run a callback)
-					    	moduloActividad.off();
-					    }).attr("src", imgSrc); //makes .load() work in IE when images are cached
+					    if (iOS) {
+						    var checkearfin = function() {
+						    	var tam = imagen.height();
+						    	if (tam > 0) {
+						    		moduloActividad.off();
+						    	} else {
+						    		setTimeout(checkearfin, 500);
+						    	}
+						    };
+						    checkearfin();
+					    } else {
+						    $(this).load(function(){
+						        //do something as the images are loaded (eg, count them to make sure they're all loaded then run a callback)
+						    	moduloActividad.off();
+						    }).attr("src", imgSrc); //makes .load() work in IE when images are cached
+					    }
 					});
 				};
 				
@@ -475,7 +488,7 @@ if (!hayValor(moduloJuegoVista)) {
 						var promesaIncluir = moduloHttp.get(incluirHref, true);
 						promesaIncluir.then(function(contenidoIncluir) {
 							jelem.html(contenidoIncluir);
-							funcionEsperarImagenes();
+							funcionEsperarImagenes(jelem);
 							moduloHistoria.inicializar();
 						});
 					}
