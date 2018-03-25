@@ -102,6 +102,7 @@ if (!hayValor(moduloJuegoVista)) {
 					'url':'/assets/cmgae/juego/modos/historia.html', 
 					'recargarHtml': false,
 					'funInicio':function(plantilla) {
+						asignarTituloPagina(metadata.preguntaActual.titulo);//TODO el título no llega, ¿por qué?
 						plantilla = plantilla.replace('$1', metadata.preguntaActual.href);
 						plantilla = plantilla.replace('$3', darHtmlSeguro(metadata.preguntaActual.respuesta));
 						return $(plantilla);
@@ -455,13 +456,13 @@ if (!hayValor(moduloJuegoVista)) {
 						repetido.remove();
 					}
 				}
-				var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+				
 				var funcionEsperarImagenes = function(elem) {
 					elem.find('img').each(function(){
 						var imagen = $(this);
 					    var imgSrc = imagen.attr("src"); //get the image src so it can be put back in to convince IE to run the .load() function correctly
 					    moduloActividad.on();
-					    if (iOS) {
+					    if (moduloCrossBrowser.esiOS()) {
 						    var checkearfin = function() {
 						    	var tam = imagen.height();
 						    	if (tam > 0) {

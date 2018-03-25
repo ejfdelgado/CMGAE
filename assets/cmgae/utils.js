@@ -1,4 +1,23 @@
 
+var moduloCrossBrowser = (function() {
+	var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+	
+	var esiOS = function() {
+		return iOS;
+	};
+	
+	return {
+		esiOS: esiOS,
+	};
+})();
+
+var asignarTituloPagina = function(titulo) {
+	if (!hayValor(titulo)) {return;}
+    $(document).ready(function() {
+        document.title = titulo;
+    });
+};
+
 var agregarLinkDinamico = function(src, callback) {	
     var s = document.createElement('link');
    	s.rel = 'stylesheet';
