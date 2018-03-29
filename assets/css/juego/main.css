@@ -89,10 +89,12 @@ input[type=checkbox] {
     letter-spacing: 5px;
 }
 
-.abc-flecha {
-	content: url(/assets/img/arrow.svg);
+.abc-flecha:before {
+	font-family: FontAwesome;
+	content: "\f0ab";
     position: fixed;
     bottom: 3%;
-    right: 0;
+    right: 1%;
     z-index: 1000;
+    font-size: xx-large;
 }

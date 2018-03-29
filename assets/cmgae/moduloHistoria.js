@@ -327,7 +327,7 @@ var moduloHistoria = (function() {
 			'alturaVentana': $( window ).height(),
 			//'alturaDocumento': $( document ).height(),
 		};
-		if (valorFlecha === true && datos.scroll > (datos.alturaVentana/2)) {
+		if (valorFlecha === true && datos.scroll > (datos.alturaVentana/5)) {
 			valorFlecha = false;
 			$('.abc-flecha').addClass('invisible');
 		}
