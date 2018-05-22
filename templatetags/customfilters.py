@@ -4,8 +4,11 @@ Created on 20/01/2016
 @author: Edgar
 '''
 import urllib
+
 from django import template
+
 from settings import LENGUAJE_PRED, TRADUCTOR
+
 
 register = template.Library()
 

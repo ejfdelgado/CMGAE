@@ -2,7 +2,7 @@
 <?eclipse-pydev version="1.0"?><pydev_project>
 <pydev_variables_property name="org.python.pydev.PROJECT_VARIABLE_SUBSTITUTION">
 <key>GOOGLE_APP_ENGINE</key>
-<value>C:\Program Files (x86)\Google\google_appengine</value>
+<value>E:\Google\Cloud SDK\google-cloud-sdk\platform\google_appengine</value>
 </pydev_variables_property>
 <pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
 <path>/${PROJECT_DIR_NAME}</path>
@@ -43,7 +43,6 @@
 <path>${GOOGLE_APP_ENGINE}/lib/rsa</path>
 <path>${GOOGLE_APP_ENGINE}/lib/setuptools-0.6c11</path>
 <path>${GOOGLE_APP_ENGINE}/lib/simplejson</path>
-<path>${GOOGLE_APP_ENGINE}/lib/six</path>
 <path>${GOOGLE_APP_ENGINE}/lib/sqlcmd</path>
 <path>${GOOGLE_APP_ENGINE}/lib/uritemplate</path>
 <path>${GOOGLE_APP_ENGINE}/lib/webapp2-2.3</path>
@@ -54,7 +53,7 @@
 <path>${GOOGLE_APP_ENGINE}/lib/webob_0_9</path>
 <path>${GOOGLE_APP_ENGINE}/lib/websocket</path>
 <path>${GOOGLE_APP_ENGINE}/lib/yaml-3.10</path>
-<path>${GOOGLE_APP_ENGINE}/lib/yaml/lib</path>
+<path>${GOOGLE_APP_ENGINE}/lib/six-1.9.0</path>
 </pydev_pathproperty>
 <pydev_property name="org.python.pydev.PYTHON_PROJECT_VERSION">python 2.7</pydev_property>
 <pydev_property name="org.python.pydev.PYTHON_PROJECT_INTERPRETER">Default</pydev_property>

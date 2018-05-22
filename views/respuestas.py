@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from django.utils import simplejson
 from google.appengine.api import users
 
+
 class NoAutorizadoException(Exception):
     pass
 

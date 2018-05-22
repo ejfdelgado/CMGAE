@@ -4,27 +4,27 @@ Created on 17/01/2016
 
 @author: Edgar
 '''
-import os
+import HTMLParser
 import logging
+import os
 import re
 import sys, traceback
 from time import gmtime, strftime
-import HTMLParser
 import traceback
 
-from scss import Compiler
-from django.views.generic.simple import direct_to_template
 from django.http import HttpResponse
 from django.utils import simplejson
-
+from django.views.generic.simple import direct_to_template
+from google.appengine.api import mail
 from google.appengine.api import memcache
 from google.appengine.api import users
-from google.appengine.api import mail
 from google.appengine.ext import ndb
 
 from models import *
-from views import comun, storage
+from scss import Compiler
 from settings import TEMPLATE_DIRS, ROOT_PATH, LENGUAJE_PRED
+from views import comun, storage, seguridad
+
 
 CORREO_ENVIOS = 'edgar.jose.fernando.delgado@gmail.com'
 PREFIJO_MEMCACHE_ADMIN = '@'
@@ -356,6 +356,8 @@ def RESTfulActions(request, ident):
                 else:
                     response.write(simplejson.dumps({'error':0}))
                 return response
+            if ident == 'identidad':
+                return seguridad.buscarIdentidad(request)
         if request.method == 'PUT':
             if ident == 'correo':
                 tmp = simplejson.loads(request.raw_post_data)

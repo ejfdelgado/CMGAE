@@ -3,16 +3,22 @@ Created on 5/03/2016
 
 @author: Edgar
 '''
-import re
 import datetime
+import os
+import re
+
 from django.utils import simplejson
 from google.appengine.ext import ndb
+
 
 fechaAhora = datetime.datetime.now() - datetime.timedelta(hours=5)
 DATETIME_NOW = fechaAhora.strftime("%Y, %m, %d, %H, %M, %S")
 DATETIME_NOW_LAST = fechaAhora.strftime("%Y, %m, %d, 23, 59, 59")
 DATETIME_NOW_FIRST = fechaAhora.strftime("%Y, %m, %d, 0, 0, 0")
 DATE_NOW = fechaAhora.strftime("%Y, %m, %d")
+
+def esProduccion():
+    return os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine/')
 
 def diferenciarIdDeQueryParam(ident):
     encontrado = re.search('^([^\?]*)(\?)?(.*)?$', ident)

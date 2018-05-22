@@ -5,7 +5,9 @@ Created on 20/01/2016
 '''
 import datetime
 import time
+
 from google.appengine.ext import ndb
+
 
 def to_dict_(entidad):
     ans = {}

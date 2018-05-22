@@ -1,11 +1,11 @@
 
 import os
 
-from django.core.handlers import wsgi
-from django.conf import settings
-
 from django import template
+from django.conf import settings
+from django.core.handlers import wsgi
 from google.appengine.ext.webapp import util
+
 
 settings._target = None
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'

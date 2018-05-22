@@ -2,10 +2,12 @@
 """Defines the url patterns for the application."""
 
 from django.conf.urls import defaults
+
+from views.main import RESTfulActions
 from views.main import RESTfulHandler
 from views.main import RESTpaginar
-from views.main import RESTfulActions
 from views.storage import StorageHandler
+
 
 urlpatterns = defaults.patterns(
     'views',

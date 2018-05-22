@@ -3,6 +3,7 @@
 
 import os
 
+
 APPEND_SLASH = False
 LENGUAJE_PRED = 'esp'
 DEBUG = os.environ['SERVER_SOFTWARE'].startswith('Dev')

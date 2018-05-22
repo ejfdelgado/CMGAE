@@ -1,9 +1,12 @@
 
-import os
 import logging
-from views import storage
-from django.template.loaders import app_directories
+import os
+
 from django.template.base import TemplateDoesNotExist
+from django.template.loaders import app_directories
+
+from views import storage
+
 
 class CloudStorageLoader(app_directories.Loader):
     is_usable = True

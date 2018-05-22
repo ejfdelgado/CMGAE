@@ -26,10 +26,13 @@ import collections
 import os
 import urlparse
 
+from google.appengine.api import app_identity
+
 from . import api_utils
 from . import common
 from . import errors
 from . import rest_api
+
 
 try:
   from google.appengine.api import urlfetch
@@ -38,7 +41,6 @@ except ImportError:
   from google.appengine.api import urlfetch
   from google.appengine.ext import ndb
 
-from google.appengine.api import app_identity
 
 
 def _get_storage_api(retry_params, account_id=None):

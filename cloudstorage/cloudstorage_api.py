@@ -18,6 +18,19 @@
 
 from __future__ import with_statement
 
+import StringIO
+import itertools
+import logging
+import os
+import types
+import urllib
+
+import xml.etree.cElementTree as ET
+
+from . import api_utils
+from . import common
+from . import errors
+from . import storage_api
 
 
 __all__ = ['copy2',
@@ -30,17 +43,6 @@ __all__ = ['copy2',
            'get_storage_class',
           ]
 
-import logging
-import StringIO
-import urllib
-import os
-import itertools
-import types
-import xml.etree.cElementTree as ET
-from . import api_utils
-from . import common
-from . import errors
-from . import storage_api
 
 
 
