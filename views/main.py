@@ -348,6 +348,8 @@ def RESTfulActions(request, ident):
     response = HttpResponse("", content_type='application/json')
     try:
         if request.method == 'GET':
+            if ident == 'identidad':
+                return seguridad.buscarIdentidad(request)
             if not users.is_current_user_admin():
                 return HttpResponse(status=401)
             if ident == 'clearmemcache':
@@ -356,8 +358,6 @@ def RESTfulActions(request, ident):
                 else:
                     response.write(simplejson.dumps({'error':0}))
                 return response
-            if ident == 'identidad':
-                return seguridad.buscarIdentidad(request)
         if request.method == 'PUT':
             if ident == 'correo':
                 tmp = simplejson.loads(request.raw_post_data)
