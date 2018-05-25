@@ -3,17 +3,17 @@
 
 from django.conf.urls import defaults
 
-from views.main import RESTfulActions
-from views.main import RESTfulHandler
-from views.main import RESTpaginar
+from views.admin import AdminGeneral
+from views.crud import CrudAdmin
+from views.crud import Paginar
 from views.storage import StorageHandler
 
 
 urlpatterns = defaults.patterns(
     'views',
-    (r'^rest/?(.*)', RESTfulHandler),
-    (r'^paginar/?(.*)', RESTpaginar),
-    (r'^act/?(.*)', RESTfulActions),
+    (r'^rest/?(.*)', CrudAdmin),
+    (r'^paginar/?(.*)', Paginar),
+    (r'^act/?(.*)', AdminGeneral),
     (r'^storage/?(.*)', StorageHandler),
     (r'^(.*)$', 'main.principal'),
     

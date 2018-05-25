@@ -7,7 +7,6 @@ import datetime
 import os
 import re
 
-from django.utils import simplejson
 from google.appengine.ext import ndb
 
 

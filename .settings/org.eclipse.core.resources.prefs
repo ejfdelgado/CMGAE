@@ -8,5 +8,7 @@ encoding//assets/css/date/default.css=UTF-8
 encoding//templates/firebase.html=UTF-8
 encoding//templates/index.html=UTF-8
 encoding//templates/jugar.html=UTF-8
+encoding//views/admin.py=utf-8
+encoding//views/crud.py=utf-8
 encoding//views/main.py=utf-8
 encoding/<project>=UTF-8

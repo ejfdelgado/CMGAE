@@ -7,6 +7,7 @@ import logging
 from django.http import HttpResponse
 from django.utils import simplejson
 import os
+from google.appengine.api.app_identity import get_application_id
 
 def base64url_decode(s):
     """ Decode base64 encoded strings with stripped trailing '=' """
@@ -117,7 +118,7 @@ def verify_firebase_token(token, firebase_project_id):
         raise TokenException("Token signature did not match payload.")
     
     # If all of the above checks pass, then the token is valid.
-    return True
+    return {'header': header, 'payload': payload}
 
 def _get_token(request):
     """Get the auth token for this request.
@@ -145,11 +146,11 @@ def _get_token(request):
             if token:
                 return token
 
-#https://github.com/GoogleCloudPlatform/python-docs-samples/blob/master/appengine/standard/firebase/firenotes/backend/main.py
+
 def buscarIdentidad(request):
+    logging.info(os.environ)
     id_token = _get_token(request)
-    #claims = google.oauth2.id_token.verify_firebase_token(id_token, HTTP_REQUEST)
-    verify_firebase_token(id_token, 'proyeccion-colombia1')
+    datos = verify_firebase_token(id_token, get_application_id())
     response = HttpResponse("", content_type='application/json', status=200)
-    response.write(simplejson.dumps({'id_token': id_token}))
+    response.write(simplejson.dumps({'token': datos}))
     return response
