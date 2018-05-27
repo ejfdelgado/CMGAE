@@ -5,26 +5,31 @@ Created on 25/05/2018
 @author: Edgar
 '''
 
+import logging
 from django.http import HttpResponse
-from views import comun, storage, seguridad
 from google.appengine.api import users
 from google.appengine.api import memcache
 from django.utils import simplejson
 from google.appengine.ext import ndb
 from models import Configuracion
 from google.appengine.api import mail
-from settings import TEMPLATE_DIRS, ROOT_PATH, LENGUAJE_PRED
+from settings import LENGUAJE_PRED
 import sys, traceback
+from views.seguridad import inyectarUsuario, rolesPermitidos
 
 CORREO_ENVIOS = 'edgar.jose.fernando.delgado@gmail.com'
 
 #Acciones administrativas
-def AdminGeneral(request, ident):
+@inyectarUsuario
+@rolesPermitidos(["editor", "escritor"])
+def AdminGeneral(request, ident, usuario=None):
     response = HttpResponse("", content_type='application/json')
     try:
         if request.method == 'GET':
             if ident == 'identidad':
-                return seguridad.buscarIdentidad(request)
+                response = HttpResponse("", content_type='application/json', status=200)
+                response.write(simplejson.dumps({'token': usuario.metadatos, 'username': usuario.darUsername()}))
+                return response
             if not users.is_current_user_admin():
                 return HttpResponse(status=401)
             if ident == 'clearmemcache':

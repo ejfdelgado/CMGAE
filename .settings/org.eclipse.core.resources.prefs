@@ -11,4 +11,5 @@ encoding//templates/jugar.html=UTF-8
 encoding//views/admin.py=utf-8
 encoding//views/crud.py=utf-8
 encoding//views/main.py=utf-8
+encoding//views/seguridad.py=utf-8
 encoding/<project>=UTF-8

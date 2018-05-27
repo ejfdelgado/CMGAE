@@ -1,3 +1,4 @@
+# coding: utf-8
 '''
 Created on 22/04/2018
 
@@ -5,9 +6,50 @@ Created on 22/04/2018
 '''
 import logging
 from django.http import HttpResponse
-from django.utils import simplejson
 import os
 from google.appengine.api.app_identity import get_application_id
+
+class Usuario:
+    
+    def __init__(self, request):
+        self.id_token = _get_token(request)
+        self.metadatos = verify_firebase_token(self.id_token, get_application_id())
+        #TODO mirar cómo cargar los permisos de un usuario
+        self.roles = ['editor']
+        
+    def darUsername(self):
+        respuesta = None
+        if (self.metadatos is not None):
+            contenedor = self.metadatos['payload']['firebase']
+            identidades = contenedor['identities']
+            respuesta = {'dominio': contenedor['sign_in_provider']}
+            if (identidades.has_key('email')):
+                respuesta['usuario'] = identidades['email'][0]
+            elif (identidades.has_key('phone')):
+                respuesta['usuario'] = identidades['phone'][0]
+        return respuesta
+    
+    def usuarioTieneAlgunRol(self, roles):
+        return not set(roles).isdisjoint(self.roles) 
+
+#Anotación que inyecta el usuario
+def inyectarUsuario(funcion):
+    def decorador(*args, **kwargs):
+        kwargs['usuario'] = Usuario(args[0]) 
+        return funcion(*args, **kwargs)
+    return decorador
+
+def rolesPermitidos(roles):
+    def rolesPermitidosImpl(funcion):
+        def decorador(*args, **kwargs):
+            usuario = kwargs['usuario']
+            if (usuario is None or not usuario.usuarioTieneAlgunRol(roles)):
+                return HttpResponse(status=401)
+            else:
+                return funcion(*args, **kwargs)
+                
+        return decorador
+    return rolesPermitidosImpl
 
 def base64url_decode(s):
     """ Decode base64 encoded strings with stripped trailing '=' """
@@ -145,12 +187,3 @@ def _get_token(request):
             token, _ = request.get_unrecognized_field_info(key)
             if token:
                 return token
-
-
-def buscarIdentidad(request):
-    logging.info(os.environ)
-    id_token = _get_token(request)
-    datos = verify_firebase_token(id_token, get_application_id())
-    response = HttpResponse("", content_type='application/json', status=200)
-    response.write(simplejson.dumps({'token': datos}))
-    return response
