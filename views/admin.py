@@ -21,7 +21,7 @@ CORREO_ENVIOS = 'edgar.jose.fernando.delgado@gmail.com'
 
 #Acciones administrativas
 @inyectarUsuario
-@rolesPermitidos(["editor", "escritor"])
+@rolesPermitidos(["editor"])
 def AdminGeneral(request, ident, usuario=None):
     response = HttpResponse("", content_type='application/json')
     try:

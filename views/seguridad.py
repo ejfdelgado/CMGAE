@@ -6,16 +6,25 @@ Created on 22/04/2018
 '''
 import logging
 from django.http import HttpResponse
+from google.appengine.api import users
 import os
 from google.appengine.api.app_identity import get_application_id
+from views.respuestas import NoAutorizadoException
 
 class Usuario:
     
     def __init__(self, request):
         self.id_token = _get_token(request)
-        self.metadatos = verify_firebase_token(self.id_token, get_application_id())
-        #TODO mirar cómo cargar los permisos de un usuario
-        self.roles = ['editor']
+        if (self.id_token is not None):
+            self.metadatos = verify_firebase_token(self.id_token, get_application_id())
+            #TODO mirar cómo cargar los permisos de un usuario
+            self.roles = ['editor']
+            
+            if (users.is_current_user_admin()):
+                self.roles.append('admin')
+        else:
+            self.roles = []
+            self.metadatos = None
         
     def darUsername(self):
         respuesta = None
@@ -35,6 +44,7 @@ class Usuario:
 #Anotación que inyecta el usuario
 def inyectarUsuario(funcion):
     def decorador(*args, **kwargs):
+        logging.info(args)
         kwargs['usuario'] = Usuario(args[0]) 
         return funcion(*args, **kwargs)
     return decorador
@@ -43,13 +53,22 @@ def rolesPermitidos(roles):
     def rolesPermitidosImpl(funcion):
         def decorador(*args, **kwargs):
             usuario = kwargs['usuario']
-            if (usuario is None or not usuario.usuarioTieneAlgunRol(roles)):
-                return HttpResponse(status=401)
-            else:
+            try:
+                soloRolesPermitidos(usuario, roles)
                 return funcion(*args, **kwargs)
+            except:
+                return HttpResponse(status=401)
+                    
                 
         return decorador
     return rolesPermitidosImpl
+
+def soloRolesPermitidos(usuario, roles):
+    if (users.is_current_user_admin()):
+        #Lo deja pasar
+        return
+    elif (usuario is None or not usuario.usuarioTieneAlgunRol(roles)):
+        raise NoAutorizadoException()
 
 def base64url_decode(s):
     """ Decode base64 encoded strings with stripped trailing '=' """
@@ -182,8 +201,9 @@ def _get_token(request):
             if auth_header.startswith(auth_scheme):
                 return auth_header[len(auth_scheme) + 1:]
         return None
-    if request:
+    if request and hasattr(request, 'get_unrecognized_field_info'):
         for key in ('bearer_token', 'access_token'):
             token, _ = request.get_unrecognized_field_info(key)
             if token:
                 return token
+    return None

@@ -14,6 +14,7 @@ from google.appengine.api import app_identity
 import cloudstorage as gcs
 from cloudstorage.errors import NotFoundError
 from views.respuestas import *
+from views.seguridad import inyectarUsuario, soloRolesPermitidos
 
 
 def general(response):
@@ -148,13 +149,14 @@ def nodosJsTree(lista, excepto=None):
             
     return nueva
 
-def StorageHandler(request, ident):
+@inyectarUsuario
+def StorageHandler(request, ident, usuario=None):
     if not ident == 'read':
         response = HttpResponse("", content_type='application/json')
     try:
         if request.method == 'GET':
             if (ident == 'jstreelist'):
-                soloAdmin()
+                soloRolesPermitidos(usuario, ['admin'])
                 ruta = request.GET.get('id', '/')
                 if (ruta == '#'):
                     ans = list_bucket('', 100, None)
@@ -187,7 +189,7 @@ def StorageHandler(request, ident):
                 nombre = request.GET.get('name', None)
                 response = read_file(nombre)
             elif (ident == 'renombrar'):
-                soloAdmin()
+                soloRolesPermitidos(usuario, ['admin'])
                 viejo = request.GET.get('viejo', None)
                 nuevo = request.GET.get('nuevo', None)
                 if (viejo is None or nuevo is None):
@@ -199,11 +201,11 @@ def StorageHandler(request, ident):
                 response.write(simplejson.dumps({'error':0}))
         elif request.method == 'DELETE':
             if (ident == 'borrar'):
-                soloAdmin()
+                soloRolesPermitidos(usuario, ['admin'])
                 nombre = request.GET.get('name', None)
                 delete_files(response, nombre)
         elif request.method == 'POST':
-            soloAdmin()
+            soloRolesPermitidos(usuario, ['admin'])
             archivo = request.FILES['file-0']
             uploaded_file_content = archivo.read()
             uploaded_file_filename = archivo.name

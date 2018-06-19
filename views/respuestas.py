@@ -6,7 +6,6 @@ Created on 12/12/2017
 
 from django.http import HttpResponse
 from django.utils import simplejson
-from google.appengine.api import users
 
 
 class NoAutorizadoException(Exception):
@@ -32,7 +31,3 @@ class RespuestaNoExiste(HttpResponse):
     def __init__(self):
         super(RespuestaNoExiste, self).__init__(simplejson.dumps({'error':204, 'msg':'No existe'}),'application/json')
         self.status_code = 204
-
-def soloAdmin():
-    if (not users.is_current_user_admin()):
-        raise NoAutorizadoException()
