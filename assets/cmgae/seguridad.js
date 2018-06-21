@@ -1,7 +1,6 @@
 var  miseguridad = (function() {
-        
-    var diferidoToken = $.Deferred();
-    var diferidoUsuario = $.Deferred();
+    
+	var usuarioActual = null;
 
     function getRecaptchaMode() {
       // Quick way of checking query params in the fragment. If we add more config
@@ -20,19 +19,16 @@ var  miseguridad = (function() {
         messagingSenderId: "569221347334"
     };
     var CLIENT_ID = '569221347334-37jpt735fngvk5iob9dpb36491ahfq8v.apps.googleusercontent.com';
-    
-    var handleSignedInUser = function() {
-        console.log('Listo, acá hago algo');
-    };
 
     var getUiConfig = function() {
       return {
         'callbacks': {
           // Called when the user has been successfully signed in.
           'signInSuccess': function(user, credential, redirectUrl) {
-            handleSignedInUser(user);
-            // Do not redirect.
-            return false;
+        	  usuarioActual = user;
+        	  $.publish('miseguridad.login', user);
+        	  // Do not redirect.
+        	  return false;
           }
         },
         // Opens IDP Providers sign-in flow in a popup.
@@ -82,8 +78,8 @@ var  miseguridad = (function() {
         promesa.then(function() {
             // Sign-out successful.
             console.log('Salida exitosa');
-            diferidoToken = $.Deferred();
-            diferidoUsuario = $.Deferred();
+            usuarioActual = null;
+            $.publish('miseguridad.logout');
         }, function(error) {
             // An error happened.
             console.log('No se logró salir');
@@ -91,49 +87,60 @@ var  miseguridad = (function() {
         return promesa;
     };
     
-    diferidoToken.promise().then(function() {}, function(error) {
-        diferidoUsuario.reject(error);
-    });
+    var insertarToken = function(peticion) {
+    	var temp = $.Deferred();
+    	darToken().then(function(accessToken) {
+        	if (accessToken != null) {
+        		if (!('headers' in peticion)) {
+        			peticion.headers = {};
+        		}
+        		peticion.headers['Authorization'] = 'Bearer ' + accessToken;
+        	}
+        	temp.resolve(peticion);
+    	});
+    	return temp.promise();
+    };
     
     var darToken = function() {
-        return diferidoToken.promise();
+    	var temp = $.Deferred();
+    	if (hayValor(usuarioActual)) {
+    		usuarioActual.getIdToken().then(function(accessToken) {
+    			temp.resolve(accessToken);
+			}, function() {
+				temp.resolve(null);
+			});
+    	} else {
+    		temp.resolve(null);
+    	}
+        return temp.promise();
     };
     
-    var darUsuario = function() {
-        return diferidoUsuario.promise();
-    };
-  
-    initApp = function() {
-        firebase.auth().onAuthStateChanged(function(user) {
-          if (user) {
-              diferidoUsuario.resolve(user);
-              user.getIdToken().then(function(accessToken) {
-                diferidoToken.resolve(accessToken);
-            });
-          } else {
-              diferidoToken.reject();
-          }
-        }, function(error) {
-          diferidoToken.reject(error);
-        });
+    var initApp = function() {
+    	firebase.auth().onAuthStateChanged(function(user) {
+    		usuarioActual = user;
+    	}, function(error) {
+    		usuarioActual = null;
+    	});
     };
     
     $(document).ready(function() {
-        firebase.initializeApp(config);
-    
-        // Initialize the FirebaseUI Widget using Firebase.
-        var ui = new firebaseui.auth.AuthUI(firebase.auth());
-        // The start method will wait until the DOM is loaded.
-        ui.start('#firebaseui-auth-container', getUiConfig());
-        
-      window.addEventListener('load', function() {
-        initApp();
-      });
+    	firebase.initializeApp(config);
+
+    	// Initialize the FirebaseUI Widget using Firebase.
+    	var ui = new firebaseui.auth.AuthUI(firebase.auth());
+    	// The start method will wait until the DOM is loaded.
+    	var refTag = '#firebaseui-auth-container'; 
+    	if ($(refTag).length > 0) {
+    		ui.start(refTag, getUiConfig());
+    	}
+    	window.addEventListener('load', function() {
+    		initApp();
+    	});
     });
       
       return {
           'logout': salir,
           'darToken': darToken,
-          'darUsuario': darUsuario,
+          'insertarToken': insertarToken,
       };
     })();

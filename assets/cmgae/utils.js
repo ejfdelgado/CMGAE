@@ -513,3 +513,20 @@ var MD5 = function (string) {
 var irAlFinal = function() {
 	$('html, body').scrollTop( $(document).height() );
 }
+
+//Patron observer
+//$.publish('miseguridad.login', user);
+//$.subscribe('miseguridad.login', function(event, data) {});
+var patronObservable = function() {
+    var o = $({});
+    $.each({
+        trigger: 'publish',
+        on: 'subscribe',
+        off: 'unsubscribe'
+    }, function(key, val) {
+        $[val] = function() {
+            o[key].apply(o, arguments);
+        };
+    });
+};
+patronObservable();

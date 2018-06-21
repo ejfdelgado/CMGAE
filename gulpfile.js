@@ -30,6 +30,7 @@ gulp.task('default', function() {
 	
   gulp.src([
 	'./assets/cmgae/utils.js',
+	'./assets/cmgae/seguridad.js',
 	'./assets/cmgae/moduloSonido.js',
     './assets/cmgae/moduloActividad.js',
     './assets/cmgae/moduloHttp.js',

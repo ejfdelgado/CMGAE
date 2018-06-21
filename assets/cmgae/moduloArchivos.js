@@ -55,24 +55,27 @@ var moduloArchivos = (function() {
 		        //Sobra porque el servidor ya lo está capturando
 		        //form.append('mime', file.type);
 		        moduloActividad.on();
-		        $.ajax({
-		            url: '/storage/',
-		            type: 'POST',
-		            data: form,
-		            headers:moduloHttp.darHeader(),
-		            cache: false,
-		            contentType: false,
-		            processData: false,
-		        }).done(function(data) {
-		        	if (data.error != 0) {
-		        		diferido.reject();
-		        	} else {
-		        		diferido.resolve(data);
-		        	}
-		        }).fail(function() {
-		        	diferido.reject();
-		        }).always(function() {
-		        	moduloActividad.off();
+		        var peticion = {
+			            url: '/storage/',
+			            type: 'POST',
+			            data: form,
+			            headers:moduloHttp.darHeader(),
+			            cache: false,
+			            contentType: false,
+			            processData: false,
+			        };
+		        miseguridad.insertarToken(peticion).then(function(peticion) {
+			        $.ajax(peticion).done(function(data) {
+			        	if (data.error != 0) {
+			        		diferido.reject();
+			        	} else {
+			        		diferido.resolve(data);
+			        	}
+			        }).fail(function() {
+			        	diferido.reject();
+			        }).always(function() {
+			        	moduloActividad.off();
+			        });
 		        });
 	        };
 	        
@@ -110,24 +113,27 @@ var moduloArchivos = (function() {
         form.append('auto', 'false');
         form.append('name', id);
         moduloActividad.on();
-        $.ajax({
-            url: '/storage/',
-            type: 'POST',
-            data: form,
-            headers:moduloHttp.darHeader(),
-            cache: false,
-            contentType: false,
-            processData: false,
-        }).done(function(data) {
-        	if (data.error != 0) {
-        		diferido.reject();
-        	} else {
-        		diferido.resolve();
-        	}
-        }).fail(function() {
-        	diferido.reject();
-        }).always(function() {
-        	moduloActividad.off();
+        var peticion = {
+                url: '/storage/',
+                type: 'POST',
+                data: form,
+                headers:moduloHttp.darHeader(),
+                cache: false,
+                contentType: false,
+                processData: false,
+            };
+        miseguridad.insertarToken(peticion).then(function(peticion) {
+            $.ajax(peticion).done(function(data) {
+            	if (data.error != 0) {
+            		diferido.reject();
+            	} else {
+            		diferido.resolve();
+            	}
+            }).fail(function() {
+            	diferido.reject();
+            }).always(function() {
+            	moduloActividad.off();
+            });
         });
 		return diferido.promise();
 	};
@@ -135,22 +141,25 @@ var moduloArchivos = (function() {
 	var leerTextoPlano = function(id) {
 		var diferido = $.Deferred();
 		moduloActividad.on();
-        $.ajax({
-            url: generarUrlDadoId(id, true),
-            type: 'GET',
-            cache: false,
-            dataType: 'text',
-        }).done(function(data, a, b) {
-        	if (b.status == 204) {
-        		diferido.reject({'error': b.status, 'msg': b.statusText});
-        	} else {
-        		diferido.resolve(data);
-        	}
-        }).fail(function(jqXHR, textStatus, errorThrown) {
-        	diferido.reject({'error': textStatus, 'msg': textStatus+':'+errorThrown});
-        }).always(function() {
-        	moduloActividad.off();
-        });
+		var peticion = {
+	            url: generarUrlDadoId(id, true),
+	            type: 'GET',
+	            cache: false,
+	            dataType: 'text',
+	        };
+		miseguridad.insertarToken(peticion).then(function(peticion) {
+	        $.ajax(peticion).done(function(data, a, b) {
+	        	if (b.status == 204) {
+	        		diferido.reject({'error': b.status, 'msg': b.statusText});
+	        	} else {
+	        		diferido.resolve(data);
+	        	}
+	        }).fail(function(jqXHR, textStatus, errorThrown) {
+	        	diferido.reject({'error': textStatus, 'msg': textStatus+':'+errorThrown});
+	        }).always(function() {
+	        	moduloActividad.off();
+	        });
+		});
         return diferido.promise();
 	};
 	
@@ -238,17 +247,20 @@ var moduloArchivos = (function() {
 		}, function(objeto) {
 			if (objeto.error == 204) {
 				//Se busca crear
-				$.ajax({
-		            url: '/assets/cmgae/ejemplos/index.html',
-		            type: 'GET',
-		            cache: false,
-		            dataType: 'text',
-		        }).done(function(contenido) {
-		        	let promesaEscritura = escribirTextoPlano(idIndex, contenido);
-					$.when(promesaEscritura).then(function() {
-						location.reload();
-					});
-		        });
+				var peticion = {
+			            url: '/assets/cmgae/ejemplos/index.html',
+			            type: 'GET',
+			            cache: false,
+			            dataType: 'text',
+			        };
+				miseguridad.insertarToken(peticion).then(function(peticion) {
+					$.ajax(peticion).done(function(contenido) {
+			        	let promesaEscritura = escribirTextoPlano(idIndex, contenido);
+						$.when(promesaEscritura).then(function() {
+							location.reload();
+						});
+			        });
+				});
 			}
 		});
 	};

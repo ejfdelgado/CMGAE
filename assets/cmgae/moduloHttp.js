@@ -23,13 +23,16 @@ if (!hayValor(moduloHttp)) {
 		    	peticion.data = JSON.stringify(payload),
 		    	peticion.headers.contentType = "application/json; charset=utf-8";
 		    }
-		    $.ajax(peticion).done(function(datos) {        	
-		    	diferido.resolve(datos);
-		    }).fail(function() {
-		    	diferido.reject();
-		    }).always(function() {
-		    	moduloActividad.off();
+		    miseguridad.insertarToken(peticion).then(function(peticion) {
+			    $.ajax(peticion).done(function(datos) {        	
+			    	diferido.resolve(datos);
+			    }).fail(function() {
+			    	diferido.reject();
+			    }).always(function() {
+			    	moduloActividad.off();
+			    });
 		    });
+
 			return diferido.promise();
 		};
 		

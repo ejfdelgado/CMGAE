@@ -15,16 +15,19 @@ class Usuario:
     
     def __init__(self, request):
         self.id_token = _get_token(request)
+        self.roles = []
+        self.metadatos = None
         if (self.id_token is not None):
-            self.metadatos = verify_firebase_token(self.id_token, get_application_id())
-            #TODO mirar cómo cargar los permisos de un usuario
-            self.roles = ['editor']
-            
-            if (users.is_current_user_admin()):
-                self.roles.append('admin')
-        else:
-            self.roles = []
-            self.metadatos = None
+            try:
+                self.metadatos = verify_firebase_token(self.id_token, get_application_id())
+                #TODO mirar cómo cargar los permisos de un usuario
+                self.roles = ['editor']
+                
+                if (users.is_current_user_admin()):
+                    self.roles.append('admin')
+            except:
+                pass
+
         
     def darUsername(self):
         respuesta = None
