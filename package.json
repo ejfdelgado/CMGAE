@@ -19,5 +19,8 @@
   },
   "scripts": {
     "gulp": "gulp"
+  },
+  "dependencies": {
+  
   }
 }

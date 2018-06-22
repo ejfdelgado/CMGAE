@@ -10,15 +10,8 @@ var  miseguridad = (function() {
     }
 
     // Initialize Firebase
-    var config = {
-        apiKey: "AIzaSyCmZ2333zq8CGiAL93DGkZIOs7sgKoMr5I",
-        authDomain: "proyeccion-colombia1.firebaseapp.com",
-        databaseURL: "https://proyeccion-colombia1.firebaseio.com",
-        projectId: "proyeccion-colombia1",
-        storageBucket: "proyeccion-colombia1.appspot.com",
-        messagingSenderId: "569221347334"
-    };
-    var CLIENT_ID = '569221347334-37jpt735fngvk5iob9dpb36491ahfq8v.apps.googleusercontent.com';
+    var config = {};
+    var CLIENT_ID = null;
 
     var getUiConfig = function() {
       return {
@@ -124,18 +117,29 @@ var  miseguridad = (function() {
     };
     
     $(document).ready(function() {
-    	firebase.initializeApp(config);
+    	//Se lee la configuración dinámicamente desde un archivo JSON
+    	$.ajax({
+    		  dataType: "json",
+    		  url: "/firebase.json",
+    		  success: function(datos) {
+    			  //La configuración
+    			  $.extend(true, config, datos.config);
+    			  //El cliente
+    			  CLIENT_ID = datos.CLIENT_ID;
+    			  firebase.initializeApp(config);
+    			  // Initialize the FirebaseUI Widget using Firebase.
+    			  var ui = new firebaseui.auth.AuthUI(firebase.auth());
+    			  // The start method will wait until the DOM is loaded.
+    			  var refTag = '#firebaseui-auth-container'; 
+    			  if ($(refTag).length > 0) {
+    				  ui.start(refTag, getUiConfig());
+    			  }
 
-    	// Initialize the FirebaseUI Widget using Firebase.
-    	var ui = new firebaseui.auth.AuthUI(firebase.auth());
-    	// The start method will wait until the DOM is loaded.
-    	var refTag = '#firebaseui-auth-container'; 
-    	if ($(refTag).length > 0) {
-    		ui.start(refTag, getUiConfig());
-    	}
-    	window.addEventListener('load', function() {
-    		initApp();
-    	});
+    			  window.addEventListener('load', function() {
+    				  initApp();
+    			  });
+    		  }
+    		});
     });
       
       return {

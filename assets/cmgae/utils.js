@@ -515,8 +515,8 @@ var irAlFinal = function() {
 }
 
 //Patron observer
-//$.publish('miseguridad.login', user);
-//$.subscribe('miseguridad.login', function(event, data) {});
+//$.publish('millave', 'hello');
+//$.subscribe('millave', function(event, data) {console.log(data);});
 var patronObservable = function() {
     var o = $({});
     $.each({
